@@ -1,0 +1,48 @@
+package com.doitintl.blaster
+
+import com.doitintl.blaster.shared.AssetType
+import com.doitintl.blaster.shared.AssetTypeMap
+import com.doitintl.blaster.shared.Constants
+import picocli.CommandLine
+import java.io.BufferedReader
+import java.io.FileReader
+import java.util.concurrent.Callable
+import kotlin.system.exitProcess
+
+@CommandLine.Command(
+    name = "checksum",
+    mixinStandardHelpOptions = true,
+    version = ["0.1"],
+    description = ["Cleans up a GCP project."]
+)
+class Deleter : Callable<Int> {
+
+    override fun call(): Int {
+        val br = BufferedReader(FileReader(Constants.LISTED_ASSETS_FILENAME))
+        var line: String?
+        while (br.readLine().also { line = it } != null) {
+            if (line!!.trim { it <= ' ' }.length == 0) {
+                continue
+            }
+            val at: AssetType = AssetTypeMap.instance.pathToAssetType(line)
+                ?: throw NullPointerException("$line does not match any path regex")
+            val cls = at.deleterClass
+            val deleter = cls!!.getConstructor().newInstance()
+            deleter.setPathPatterns(at.getPathPatterns())
+            try {
+                deleter.delete(line)
+            } catch (e: Exception) {
+                System.err.println("Error in deleting $line:$e")
+            }
+        }
+        return 0
+    }
+
+    companion object {
+        @JvmStatic
+        fun main(args: Array<String>) {
+            val exitCode = CommandLine(Deleter()).execute(*args)
+            exitProcess(exitCode)
+        }
+    }
+}

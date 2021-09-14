@@ -1,0 +1,166 @@
+# These are the known  asset types. Only the non-comented ones  are supported by Cloud Blaster,
+# though if you only want to generate a listing of all assets, you can do tht, using switch `--print-all-assets`.
+#
+# In the YAML, deleterClass is the Java class (default package com.doitintl.blaster)
+# that implements AssetDeleter (usually subclassing AbstractDeleter).
+# If omitted, XDeleter is used, where X is the local part of the asset type.
+#
+# pathPattern (string- or list-valued) is one or more patterns of the path used to identify such assets.
+#
+
+#aiplatform.googleapis.com/BatchPredictionJob: {}
+#aiplatform.googleapis.com/CustomJob: {}
+#aiplatform.googleapis.com/DataLabelingJob: {}
+#aiplatform.googleapis.com/Dataset: {}
+#aiplatform.googleapis.com/Endpoint: {}
+#aiplatform.googleapis.com/HyperparameterTuningJob: {}
+#aiplatform.googleapis.com/Model: {}
+#aiplatform.googleapis.com/SpecialistPool: {}
+#aiplatform.googleapis.com/TrainingPipeline: {}
+#apigateway.googleapis.com/Api: {}
+#apigateway.googleapis.com/ApiConfig: {}
+#apigateway.googleapis.com/Gateway: {}
+# Impossible to  delete this: appengine.googleapis.com/Application: {}
+appengine.googleapis.com/Service:
+  pathPattern: //appengine.googleapis.com/apps/PROJECT/services/ID
+  deleterClass: GAEServiceDeleter
+appengine.googleapis.com/Version:
+  pathPattern: //appengine.googleapis.com/apps/PROJECT/services/SERVICE/versions/ID
+  deleterClass: GAEVersionDeleter
+#artifactregistry.googleapis.com/DockerImage: {}
+#artifactregistry.googleapis.com/Repository: {}
+#assuredworkloads.googleapis.com/Workload: {}
+#bigquery.googleapis.com/Dataset: {}
+#bigquery.googleapis.com/Table: {}
+#bigtableadmin.googleapis.com/AppProfile: {}
+#bigtableadmin.googleapis.com/Backup: {}
+#bigtableadmin.googleapis.com/Cluster:
+#bigtableadmin.googleapis.com/Instance: {}
+#bigtableadmin.googleapis.com/Table: {}
+#cloudbilling.googleapis.com/BillingAccount: {}
+#cloudfunctions.googleapis.com/CloudFunction: {}
+#cloudkms.googleapis.com/CryptoKey: {}
+#cloudkms.googleapis.com/CryptoKeyVersion: {}
+#cloudkms.googleapis.com/ImportJob: {}
+#cloudkms.googleapis.com/KeyRing: {}
+#cloudresourcemanager.googleapis.com/Folder: {}
+#cloudresourcemanager.googleapis.com/Organization: {}
+#cloudresourcemanager.googleapis.com/Project: {}
+#composer.googleapis.com/Environment: {}
+#compute.googleapis.com/Address: {}
+#compute.googleapis.com/Autoscaler: {}
+#compute.googleapis.com/BackendBucket: {}
+#compute.googleapis.com/BackendService: {}
+#compute.googleapis.com/Commitment: {}
+compute.googleapis.com/Disk:
+  pathPattern: //compute.googleapis.com/projects/PROJECT/zones/ZONE/disks/ID
+#compute.googleapis.com/ExternalVpnGateway: {}
+#compute.googleapis.com/Firewall: {}
+#compute.googleapis.com/ForwardingRule: {}
+#compute.googleapis.com/GlobalAddress: {}
+#compute.googleapis.com/GlobalForwardingRule: {}
+#compute.googleapis.com/HealthCheck: {}
+#compute.googleapis.com/HttpHealthCheck: {}
+#compute.googleapis.com/HttpsHealthCheck: {}
+#compute.googleapis.com/Image: {}
+compute.googleapis.com/Instance:
+  pathPattern: //compute.googleapis.com/projects/PROJECT/zones/ZONE/instances/ID
+  deleterClass: GCEInstanceDeleter
+#compute.googleapis.com/InstanceGroup: {}
+#compute.googleapis.com/InstanceGroupManager: {}
+#compute.googleapis.com/InstanceTemplate: {}
+#compute.googleapis.com/Interconnect: {}
+#compute.googleapis.com/InterconnectAttachment: {}
+#compute.googleapis.com/License: {}
+#compute.googleapis.com/Network: {}
+#compute.googleapis.com/NetworkEndpointGroup: {}
+#compute.googleapis.com/NodeGroup: {}
+#compute.googleapis.com/NodeTemplate: {}
+#compute.googleapis.com/PacketMirroring: {}
+#compute.googleapis.com/Project: {}
+#compute.googleapis.com/RegionBackendService: {}
+#compute.googleapis.com/RegionDisk: {}
+#compute.googleapis.com/Reservation: {}
+#compute.googleapis.com/ResourcePolicy: {}
+#compute.googleapis.com/Route: {}
+#compute.googleapis.com/Router: {}
+#compute.googleapis.com/SecurityPolicy: {}
+#compute.googleapis.com/Snapshot: {}
+#compute.googleapis.com/SslCertificate: {}
+#compute.googleapis.com/SslPolicy: {}
+#compute.googleapis.com/Subnetwork: {}
+#compute.googleapis.com/TargetHttpProxy: {}
+#compute.googleapis.com/TargetHttpsProxy: {}
+#compute.googleapis.com/TargetInstance: {}
+#compute.googleapis.com/TargetPool: {}
+#compute.googleapis.com/TargetSslProxy: {}
+#compute.googleapis.com/TargetTcpProxy: {}
+#compute.googleapis.com/TargetVpnGateway: {}
+#compute.googleapis.com/UrlMap: {}
+#compute.googleapis.com/VpnGateway: {}
+#compute.googleapis.com/VpnTunnel: {}
+container.googleapis.com/Cluster:
+  pathPattern:
+  - //container.googleapis.com/projects/PROJECT/zones/LOCATION/clusters/ID
+  - //container.googleapis.com/projects/PROJECT/locations/LOCATION/clusters/ID
+  deleterClass: GKEClusterDeleter
+#container.googleapis.com/NodePool: {}
+#containerregistry.googleapis.com/Image: {}
+#dataflow.googleapis.com/Job: {}
+#datafusion.googleapis.com/Instance: {}
+#dataproc.googleapis.com/Cluster: {}
+#dataproc.googleapis.com/Job: {}
+#dns.googleapis.com/ManagedZone: {}
+#dns.googleapis.com/Policy: {}
+#documentai.googleapis.com/HumanReviewConfig: {}
+#documentai.googleapis.com/LabelerPool: {}
+#documentai.googleapis.com/Processor: {}
+#eventarc.googleapis.com/Trigger: {}
+#file.googleapis.com/Backup: {}
+#file.googleapis.com/Instance: {}
+#gameservices.googleapis.com/GameServerCluster: {}
+#gameservices.googleapis.com/GameServerConfig: {}
+#gameservices.googleapis.com/GameServerDeployment: {}
+#gameservices.googleapis.com/Realm: {}
+#gkehub.googleapis.com/Membership: {}
+#iam.googleapis.com/Role: {}
+#iam.googleapis.com/ServiceAccount: {}
+#iam.googleapis.com/ServiceAccountKey: {}
+#logging.googleapis.com/LogBucket: {}
+#logging.googleapis.com/LogMetric: {}
+#logging.googleapis.com/LogSink: {}
+#managedidentities.googleapis.com/Domain: {}
+#memcache.googleapis.com/Instance: {}
+#monitoring.googleapis.com/AlertPolicy: {}
+#networkmanagement.googleapis.com/ConnectivityTest: {}
+#osconfig.googleapis.com/PatchDeployment: {}
+#privateca.googleapis.com/CaPool: {}
+#privateca.googleapis.com/CertificateAuthority: {}
+#privateca.googleapis.com/CertificateRevocationList: {}
+#privateca.googleapis.com/CertificateTemplate: {}
+#pubsub.googleapis.com/Snapshot: {}
+pubsub.googleapis.com/Subscription:
+  pathPattern: //pubsub.googleapis.com/projects/PROJECT/subscriptions/ID
+  otherLegalCharsInId: ".~%+"
+pubsub.googleapis.com/Topic:
+  pathPattern: //pubsub.googleapis.com/projects/PROJECT/topics/ID
+  otherLegalCharsInId: ".~%+"
+#redis.googleapis.com/Instance: {}
+#run.googleapis.com/DomainMapping: {}
+#run.googleapis.com/Revision: {}
+#run.googleapis.com/Service: {}
+#secretmanager.googleapis.com/Secret: {}
+#secretmanager.googleapis.com/SecretVersion: {}
+#servicedirectory.googleapis.com/Namespace: {}
+#servicemanagement.googleapis.com/ManagedService: {}
+#serviceusage.googleapis.com/Service: {}
+#spanner.googleapis.com/Backup: {}
+#spanner.googleapis.com/Database: {}
+#spanner.googleapis.com/Instance: {}
+#sqladmin.googleapis.com/Instance: {}
+#gpu.googleapis.com/Node: {}
+storage.googleapis.com/Bucket:
+  pathPattern: //storage.googleapis.com/ID
+  otherLegalCharsInId: "."
+
+#vpcaccess.googleapis.com/Connector: {}

@@ -1,0 +1,19 @@
+# These are the asset types that will be listed.
+
+# The lister will  list  the assets that are matched by the regex.
+# (Full-string match on the local name, for example the Topic or Instance name) .
+#
+# Put the regex in quotes to keep yaml happy.
+#
+# If the regex is missing, all assets of that type will be listed.
+#
+# To avoid listing an asset type, use the regex "$a"  which rejects all strings.
+
+appengine.googleapis.com/Version: "$a"
+appengine.googleapis.com/Service:
+compute.googleapis.com/Disk:
+compute.googleapis.com/Instance:
+container.googleapis.com/Cluster:
+pubsub.googleapis.com/Subscription:
+pubsub.googleapis.com/Topic:
+storage.googleapis.com/Bucket:
