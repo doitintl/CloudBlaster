@@ -10,29 +10,32 @@ See [the blog post](https://blog.doit-intl.com/safe-scrub-clean-up-your-google-c
 for an explanation of Safe Scrub
 
 The advantages of Safe Scrub over Cloud Blaster:
-* Safe Scrub  is in pure Bash. You may have more confidence as you see the code that it running, without a compilation step. 
 * Safe Scrub  does not delete anything. It just outputs a Bash script with a simple list of `delete` statements. 
 You then review it and run it.
+* Safe Scrub  is in pure Bash. You may have more confidence as you see the code that it running, without a compilation step. 
+* Safe Scrub supports more asset types (for now).
 
 The advantages of Cloud Blaster:
 * It supports more complexity, since it is in Kotlin rather than bash. 
 
-Cloud Blaster has its own safety features, listed below.
+Cloud Blaster has its own safety features, listed below. It also supports some of the most common asset types (see below),
+with the possibility of easily adding more (see below).
  
-Other than that, the use case is the same.
 
 ## Use case
-- It is intended for development and QA projects, where you want to start fresh at the end of the day or before a new test run.
-- It is less likely to be useful for production projects, where you should determine the potential dependencies between components before deleting
-anything.
+* The use case for Cloud Blaster is the same as for Safe Scrub.
+* It is intended for development and QA projects, where you want to start fresh at the end of the day or 
+before a new test run.
+* It is less likely to be useful for production projects, where you should determine the potential dependencies 
+between components before deleting anything.
 
 ## Safety First 
 To keep it safe, Cloud Blaster has these features.
-1. The first step, the Lister, does *not* delete assets; rather, it just lists assets in a file that you can review.
-1. The Lister requires you to explicitly state a project, to avoid accidentally listing assets that come from
- a default project.
-1. The Lister can be filtered (see `list-filter.yaml` file) so that certain assets are skipped when 
-building the `to-be-deleted.txt` file.
+1. The first step, the Lister, does *not* delete assets; rather, it just lists assets in a file, `assets-to-delete.txt`,
+that you review.
+1. The Lister requires you to explicitly state a project. It does not implicitly use your `gcloud`  default project.
+1. The Lister can be filtered (see `list-filter.yaml` file) so that specified assets are skipped when 
+building the `assets-to-delete.txt` file.
 1. After running the Lister, you review and manually edit the list of assets for deletion, before running the Deleter.
  
 ## Instructions
