@@ -71,6 +71,11 @@ See the top of that yaml for detailed instructions.)
         * Add the asset type to `list-filter.yamls`.
         * Implement a subclass of `Abstract Deleter`.  
 
+# Future features
+    * Parallelize some fo the deletion for speed
+    * More asset types
+    * Track dependencies, so that if you want to delete asset A, but it is undeletable until 
+    asset B is gone, you delete B first, then A. 
 # Other projects and approaches
 - [Safe Scrub](https://github.come/doitintl/SafeScrub) was an earlier bash-only project that does the same thing. 
 - [Travis CI GCloud Cleanup](https://github.com/travis-ci/gcloud-cleanup) and [Bazooka](https://github.com/enxebre/bazooka) also delete GCE assets.
