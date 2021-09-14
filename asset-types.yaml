@@ -1,11 +1,15 @@
 # These are the known  asset types. Only the non-comented ones  are supported by Cloud Blaster,
 # though if you only want to generate a listing of all assets, you can do tht, using switch `--print-all-assets`.
 #
-# In the YAML, deleterClass is the Java class (default package com.doitintl.blaster)
-# that implements AssetDeleter (usually subclassing AbstractDeleter).
-# If omitted, XDeleter is used, where X is the local part of the asset type.
+# Mandatory key pathPattern (string- or list-valued) is one or more patterns of the path
+# used to identify such assets, where upper-case words like PROJECT and ID will be substituted for a regex.
 #
-# pathPattern (string- or list-valued) is one or more patterns of the path used to identify such assets.
+# Optional key deleterClass is the Java class (default package com.doitintl.blaster)
+# that implements AssetDeleter (usually subclassing AbstractDeleter).
+# If omitted, XDeleter is used, where X is the local part of the asset type, e.g. BucketDeleter.
+#
+# Optional key   otherLegalCharsInId holds characters, other than alphanumerical, dash and underscore,
+# that are legal for the asset type. In most cases it is omitted.
 #
 
 #aiplatform.googleapis.com/BatchPredictionJob: {}

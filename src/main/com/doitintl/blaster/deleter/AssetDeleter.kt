@@ -8,7 +8,5 @@ interface AssetDeleter {
     fun setPathPatterns(pathPatterns: List<Pattern>)
     fun paramsFromPath(path: String): Map<String, String>
     val pathKeys: Array<String>
-
-
     fun delete(line: String)
 }
