@@ -13,16 +13,13 @@ class GAEVersionDeleter : AbstractDeleter() {
 
 
     override fun doDelete(p: Map<String?, String?>) {
-        val project = p["project"]
-        val service = p["service"]
-        val id = p["id"]
         val credentials = GoogleCredentials.getApplicationDefault()
         val requestInitializer: HttpRequestInitializer = HttpCredentialsAdapter(credentials)
         val engine = Appengine.Builder(
-            GoogleNetHttpTransport.newTrustedTransport(), JacksonFactory(), requestInitializer
+                GoogleNetHttpTransport.newTrustedTransport(), JacksonFactory(), requestInitializer
         ).setApplicationName("application").build()
         val versions = engine.apps().services().versions()
-        val del = versions.delete(project, service, id)
+        val del = versions.delete(p["project"], p["service"], p["id"])
         val result = del.execute()
         println(result)
     }

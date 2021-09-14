@@ -34,7 +34,7 @@ class AssetType(
     }
 
     private fun setPathPatterns(pathPatterns: List<String>?, otherLegalCharsInId_: String?) {
-        val otherLegalCharsInId =  otherLegalCharsInId_ ?: ""
+        val otherLegalCharsInId = otherLegalCharsInId_ ?: ""
         for (pathPattern in pathPatterns!!) {
             val regex = createIdentifierRegexes(pathPattern, otherLegalCharsInId)
             val p = Pattern.compile(regex)

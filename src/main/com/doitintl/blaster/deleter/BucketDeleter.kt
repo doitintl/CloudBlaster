@@ -2,7 +2,6 @@ package com.doitintl.blaster.deleter
 
 import com.google.auth.oauth2.GoogleCredentials
 import com.google.cloud.storage.StorageOptions
-import java.io.IOException
 
 class BucketDeleter : AbstractDeleter() {
     override val pathKeys: Array<String>

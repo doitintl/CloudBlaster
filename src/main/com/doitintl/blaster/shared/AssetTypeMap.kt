@@ -81,7 +81,7 @@ class AssetTypeMap private constructor() {
                     for (assetTypeId in assetTypesFromYaml.keys) {
                         val assetType =
                             assetTypesFromYaml[assetTypeId]
-                            ?: throw IllegalArgumentException("For key $assetTypeId, no value in yaml")
+                                ?: throw IllegalArgumentException("For key $assetTypeId, no value in yaml")
                         val deleterClass = deleterClassName(assetTypeId, assetType)
                         val pathPatterns = pathPatterns(assetType)
                         val otherLegalCharsInId = assetType["otherLegalCharsInId"] as String?
@@ -141,7 +141,7 @@ class AssetTypeMap private constructor() {
 
             when (val pathPatternObj = aType["pathPattern"]) { //can be null
                 null -> {
-                   //will be empty and asserted as broken, later
+                    //will be empty and asserted as broken, later
 
                 }
                 is String -> {

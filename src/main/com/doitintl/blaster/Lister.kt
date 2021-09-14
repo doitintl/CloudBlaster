@@ -10,17 +10,17 @@ import java.util.concurrent.Callable
 import kotlin.system.exitProcess
 
 @CommandLine.Command(
-    name = "checksum",
-    mixinStandardHelpOptions = true,
-    version = ["0.1"],
-    description = ["Cleans up a GCP project."]
+        name = "checksum",
+        mixinStandardHelpOptions = true,
+        version = ["0.1"],
+        description = ["Cleans up a GCP project."]
 )
 class Lister : Callable<Any?> {
     @CommandLine.Option(names = ["-p", "--project"], required = true)
     private var project: String? = null
 
     @CommandLine.Option(names = ["-a", "--print-all-assets"])
-    private var allAssetTypes   = false
+    private var allAssetTypes = false
 
 
     override fun call(): Int {
@@ -45,7 +45,7 @@ internal class FileWritingCallback(filename: String?) : Callback<String> {
     override fun call(s: String) {
         try {
             fw!!.write(
-                """
+                    """
     $s
     
     """.trimIndent()

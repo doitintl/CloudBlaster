@@ -2,7 +2,6 @@ package com.doitintl.blaster.deleter
 
 import com.google.cloud.pubsub.v1.TopicAdminClient
 import com.google.pubsub.v1.TopicName
-import java.io.IOException
 
 class TopicDeleter : AbstractDeleter() {
     override val pathKeys: Array<String>
@@ -10,14 +9,12 @@ class TopicDeleter : AbstractDeleter() {
 
 
     override fun doDelete(p: Map<String?, String?>) {
-        val proj = p["project"]
-        val id = p["id"]
         //todo use use clause here
-        val topicAdminClient: TopicAdminClient= TopicAdminClient.create()
+        val topicAdminClient: TopicAdminClient = TopicAdminClient.create()
 
-        val topicName = TopicName.of(proj, id)
+        val topicName = TopicName.of(p["project"], p["id"])
         topicAdminClient.deleteTopic(topicName)
-        println("Deleted topic $id")
+        println("Deleted topic ${p["id"]}")
 
     }
 }
