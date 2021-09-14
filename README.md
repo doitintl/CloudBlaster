@@ -59,9 +59,15 @@ the `--print-all-assets` flag.)
    There is no harm in having them in `assets-to-delete.txt` -- you will just get an exception.
 
 ## Features
-- I focused on the common important resource types that are set up and torn down in typical development and QA.
-- If you want more services or resource types, please submit a pull request or issue at GitHub.
-
+* I focused on the common important resource types that are set up and torn down in typical development and QA.
+    * This includes Google Compute Engine Instances and Disks, PubSub Topics and Subscriptions, 
+    Google Kubernetes Engine  regional and zonal clusters,
+    Google App Engine Services and Versions, and Google Cloud Storage Buckets.
+    * For the most up-to-date list of supported asset types, see `lister-filter.yaml`
+* If you want more services or resource types, please either
+    * Submit a pull request. Use the `com.doitintl.blaster.deleter.XDeleter` classes as exampes. 
+    Copy one, and implement `doDelete` to call the relevant Google API. 
+    * Or submit an issue at GitHub.
 
 # Other projects and approaches
 - [Safe Scrub](https://github.come/doitintl/SafeScrub) was an earlier bash-only project that does the same thing. 
