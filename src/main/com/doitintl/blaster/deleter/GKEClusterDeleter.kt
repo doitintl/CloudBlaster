@@ -1,6 +1,7 @@
 package com.doitintl.blaster.deleter
 
 import com.doitintl.blaster.shared.Constants
+import com.doitintl.blaster.shared.Constants.CLOUD_BLASTER
 import com.google.api.client.googleapis.javanet.GoogleNetHttpTransport
 import com.google.api.client.json.jackson2.JacksonFactory
 import com.google.api.services.container.Container
@@ -16,7 +17,7 @@ class GKEClusterDeleter : AbstractDeleter() {
         val requestInitializer = HttpCredentialsAdapter(GoogleCredentials.getApplicationDefault())
         val containerApi = Container.Builder(
             GoogleNetHttpTransport.newTrustedTransport(), JacksonFactory(), requestInitializer
-        ).setApplicationName(Constants.CLOUD_BLASTER)
+        ).setApplicationName(CLOUD_BLASTER)
             .build()
         val clusters = containerApi.projects().locations().clusters()
         val idTriplet = "projects/${p["project"]}/locations/${p["location"]}/clusters/${p["id"]}"

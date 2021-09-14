@@ -4,6 +4,8 @@ import com.doitintl.blaster.shared.AssetIterator
 import com.doitintl.blaster.shared.Callback
 import com.doitintl.blaster.shared.Constants
 import com.doitintl.blaster.shared.Constants.CLOUD_BLASTER
+import com.doitintl.blaster.shared.Constants.LISTED_ASSETS_FILENAME
+
 import picocli.CommandLine
 import java.io.FileWriter
 import java.util.concurrent.Callable
@@ -23,7 +25,7 @@ class Lister : Callable<Any> {
 
 
     override fun call(): Int {
-        FileWritingCallback(Constants.LISTED_ASSETS_FILENAME).use { callback ->
+        FileWritingCallback(LISTED_ASSETS_FILENAME).use { callback ->
             AssetIterator().listAssets(project, callback, allAssetTypes)
             return 0
         }
