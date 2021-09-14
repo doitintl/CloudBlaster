@@ -8,7 +8,7 @@ class TopicDeleter : AbstractDeleter() {
         get() = arrayOf("project", "id")
 
 
-    override fun doDelete(p: Map<String?, String?>) {
+    override fun doDelete(p: Map<String, String>) {
         TopicAdminClient.create().use {
             val topicName = TopicName.of(p["project"], p["id"])
             it.deleteTopic(topicName)

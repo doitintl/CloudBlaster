@@ -4,22 +4,24 @@ import java.util.*
 import java.util.regex.Pattern
 
 abstract class AbstractDeleter : AssetDeleter {
-    private var pathPatterns: List<Pattern?>? = null
-    override fun setPathPatterns(pathPatterns: List<Pattern?>?) {
+    /*pathPatterns is nullable because the constructor does not take pathPatterns; and that
+     is because we want a no-arg constructor (otherwise every subclass will need a one-arg constructor).
+    */
+    private var pathPatterns: List<Pattern>? = null
+    override fun setPathPatterns(pathPatterns: List<Pattern>) {
         this.pathPatterns = pathPatterns
     }
 
-
-    override fun delete(line: String?) {
+    override fun delete(line: String) {
         doDelete(paramsFromPath(line))
     }
 
-    override fun paramsFromPath(path: String?): Map<String?, String?> {
-        val params: MutableMap<String?, String?> = HashMap()
+    override fun paramsFromPath(path: String): Map<String, String> {
+        val params: MutableMap<String, String> = HashMap()
         val keys = pathKeys
         //There's probably a better way to match the multiple regexes than this weird loop
         for (pathPattern in pathPatterns!!) {
-            val matcher = pathPattern!!.matcher(path!!)
+            val matcher = pathPattern.matcher(path)
             if (matcher.matches()) {
                 for (k in keys) {
                     params[k] = matcher.group(k) //group() throws exc  on nomatch

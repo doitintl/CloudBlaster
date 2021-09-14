@@ -1,6 +1,5 @@
 package com.doitintl.blaster
 
-import com.doitintl.blaster.shared.AssetType
 import com.doitintl.blaster.shared.AssetTypeMap
 import com.doitintl.blaster.shared.Constants
 import picocli.CommandLine
@@ -24,11 +23,11 @@ class Deleter : Callable<Int> {
             if (line!!.isBlank()) {
                 continue
             }
-            val at: AssetType = AssetTypeMap.instance.pathToAssetType(line)!!
-            val deleter = at.deleterClass!!.getConstructor().newInstance()
-            deleter.setPathPatterns(at.getPathPatterns())
+            val assetType = AssetTypeMap.instance.pathToAssetType(line!!)!!
+            val deleter = assetType.deleterClass.getConstructor().newInstance()
+            deleter.setPathPatterns(assetType.getPathPatterns())
             try {
-                deleter.delete(line)
+                deleter.delete(line!!)
                 println("Deleted $line")
             } catch (e: Exception) {
                 System.err.println("Error in deleting $line:$e")// Just continue

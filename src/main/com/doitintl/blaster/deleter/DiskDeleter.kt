@@ -5,7 +5,7 @@ class DiskDeleter : GCEAbstractDeleter() {
         get() = arrayOf("project", "zone", "id")
 
 
-    override fun doDelete(p: Map<String?, String?>) {
+    override fun doDelete(p: Map<String, String>) {
         val computeService = createComputeService()
         val request = computeService.disks().delete(p["project"], p["zone"], p["id"])
         val response = request.execute()

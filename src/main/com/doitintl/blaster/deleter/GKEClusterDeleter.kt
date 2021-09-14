@@ -12,14 +12,13 @@ class GKEClusterDeleter : AbstractDeleter() {
         get() = arrayOf("project", "location", "id")
 
 
-    override fun doDelete(p: Map<String?, String?>) {
+    override fun doDelete(p: Map<String, String>) {
         val requestInitializer = HttpCredentialsAdapter(GoogleCredentials.getApplicationDefault())
         val containerApi = Container.Builder(
             GoogleNetHttpTransport.newTrustedTransport(), JacksonFactory(), requestInitializer
         ).setApplicationName(Constants.CLOUD_BLASTER)
             .build()
-        val projects = containerApi.projects()
-        val clusters = projects.locations().clusters()
+        val clusters = containerApi.projects().locations().clusters()
         val idTriplet = "projects/${p["project"]}/locations/${p["location"]}/clusters/${p["id"]}"
         val delete = clusters.delete(idTriplet)
         val result = delete.execute()

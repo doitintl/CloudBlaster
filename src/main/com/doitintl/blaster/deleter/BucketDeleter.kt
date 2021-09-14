@@ -8,11 +8,11 @@ class BucketDeleter : AbstractDeleter() {
         get() = arrayOf("id")
 
 
-    override fun doDelete(p: Map<String?, String?>) {
+    override fun doDelete(p: Map<String, String>) {
         val id = p["id"]
         val credentials = GoogleCredentials.getApplicationDefault()
         val storage = StorageOptions.newBuilder().setCredentials(credentials).build().service
-        val bucket = storage[id] ?: throw IllegalArgumentException("No bucket with id $id")
+        val bucket = storage[id]!!
         var page = bucket.list()
         var counter = 0
         while (true) {
@@ -27,6 +27,9 @@ class BucketDeleter : AbstractDeleter() {
             if (page == null) {
                 break
             }
+        }
+        if (counter > 0) {
+            println("Deleted total $counter blobs from bucket $id")
         }
         bucket.delete()
 

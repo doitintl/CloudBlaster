@@ -5,22 +5,20 @@ import java.util.*
 import java.util.regex.Pattern
 
 class AssetType(
-    apiIdentifier: String?,
-    pathPatterns: List<String>?,
-    deleterClass: String?,
+    val apiIdentifier: String,
+    pathPatterns: List<String>,
+    deleterClass: String,
     otherLegalCharsInId: String?
 ) {
     private val pathPatterns: MutableList<Pattern> = ArrayList()
-    val apiIdentifier: String?
-    var filterRegex: Pattern? = null
-        private set
-    var deleterClass: Class<AssetDeleter>? = null
+    lateinit var filterRegex: Pattern
         private set
 
-    fun supportedForDeletion(): Boolean {
-        return deleterClass != null && getPathPatterns().isNotEmpty()
-    }
+    lateinit var deleterClass: Class<AssetDeleter>
+        private set
 
+
+    //Nullable becase the regex can be omitted in the YAML
     fun setFilterRegex(regex_: String?) {
         var regex = regex_
         if (regex == null || regex.isEmpty()) {
@@ -33,12 +31,11 @@ class AssetType(
         return pathPatterns
     }
 
-    private fun setPathPatterns(pathPatterns: List<String>?, otherLegalCharsInId_: String?) {
+    private fun setPathPatterns(pathPatterns: List<String>, otherLegalCharsInId_: String?) {
         val otherLegalCharsInId = otherLegalCharsInId_ ?: ""
-        for (pathPattern in pathPatterns!!) {
+        for (pathPattern in pathPatterns) {
             val regex = createIdentifierRegexes(pathPattern, otherLegalCharsInId)
-            val p = Pattern.compile(regex)
-            this.pathPatterns.add(p)
+            this.pathPatterns.add(Pattern.compile(regex))
         }
     }
 
@@ -81,9 +78,7 @@ class AssetType(
     }
 
     init {
-        assert(apiIdentifier != null)
-        assert(pathPatterns != null)
-        this.apiIdentifier = apiIdentifier
+
         setPathPatterns(pathPatterns, otherLegalCharsInId)
         setDeleterClass(deleterClass)
     }

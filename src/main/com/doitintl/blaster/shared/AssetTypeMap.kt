@@ -7,31 +7,29 @@ import java.util.stream.Collectors
 
 class AssetTypeMap private constructor() {
     private val assetTypeMap: Map<String, AssetType>
-    fun pathToAssetType(line: String?): AssetType? {
+    fun pathToAssetType(line: String): AssetType? {
         var ret: AssetType? = null
         for (assetType in assetTypeMap.values) {
-            val regexes = assetType.getPathPatterns()
-            for (regex in regexes) {
-                val matcher = regex.matcher(line!!)
-                val matches = matcher.matches()
-                if (matches) {
+            for (regex in assetType.getPathPatterns()) {
+                val matcher = regex.matcher(line.trim())
+                if (matcher.matches()) {
                     if (ret != null) {
-                        throw RuntimeException("$ret and $assetType both found for pattern $regex")
+                        throw RuntimeException("We do not expect multiple patterns to match one path: $ret and $assetType both found for pattern $regex")
                     }
                     ret = assetType
                 }
             }
         }
-        assert(ret != null){"Did not match any path-pattern "+line}
+        assert(ret != null) { "Did not match any path-pattern $line" }
         return ret
     }
 
-    fun identifiers(): List<String?> {
+    fun identifiers(): List<String> {
         return assetTypeMap.values.stream().map { obj: AssetType -> obj.apiIdentifier }.collect(Collectors.toList())
     }
 
-    operator fun get(assetTypeIdentifier: String?): AssetType? {
-        return assetTypeMap[assetTypeIdentifier]
+    operator fun get(assetTypeIdentifier: String): AssetType {
+        return assetTypeMap[assetTypeIdentifier] ?: error(assetTypeIdentifier + "not found")
     }
 
     companion object {
@@ -43,10 +41,6 @@ class AssetTypeMap private constructor() {
             compareYamls()
             val map = loadAssetTypesYaml()
             loadListFilterYaml(map) //inout
-            for (at in map.values) {
-                //assert that EVERY item in asset-types.yaml has a filter
-                assert(null != at.filterRegex)
-            }
             return map
 
         }
@@ -84,7 +78,7 @@ class AssetTypeMap private constructor() {
 
         private fun deleterClassName(k: String, aType: Map<String, Any>): String {
             var deleterClass = aType["deleterClass"] as String?
-            if (deleterClass == null) {
+            if (deleterClass == null) {//use defaults because unspecified
                 val parts = k.split("/").toTypedArray()
                 val assetTypeShortName = parts[parts.size - 1]
                 deleterClass = assetTypeShortName + "Deleter"

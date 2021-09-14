@@ -14,9 +14,9 @@ import kotlin.system.exitProcess
     version = ["0.1"],
     description = ["Cleans up a GCP project."]
 )
-class Lister : Callable<Any?> {
+class Lister : Callable<Any> {
     @CommandLine.Option(names = ["-p", "--project"], required = true)
-    private var project: String? = null
+    private lateinit var project: String
 
     @CommandLine.Option(names = ["-a", "--print-all-assets"])
     private var allAssetTypes = false
@@ -24,8 +24,7 @@ class Lister : Callable<Any?> {
 
     override fun call(): Int {
         FileWritingCallback(Constants.LISTED_ASSETS_FILENAME).use { callback ->
-            val iterator = AssetIterator()
-            iterator.listAssets(project, callback, allAssetTypes)
+            AssetIterator().listAssets(project, callback, allAssetTypes)
             return 0
         }
     }
@@ -40,17 +39,15 @@ class Lister : Callable<Any?> {
 }
 
 internal class FileWritingCallback(filename: String) : Callback<String> {
-    private var fw: FileWriter? = null
-    override fun call(s: String) {
-        fw!!.write(" $s\n")
-    }
+    private val fw: FileWriter = FileWriter(filename)
 
+    override fun call(s: String) {
+        fw.write("$s\n")
+    }
 
     override fun close() {
-        fw!!.close()
+        fw.close()
     }
 
-    init {
-        fw = FileWriter(filename)
-    }
+
 }

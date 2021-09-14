@@ -8,7 +8,7 @@ class SubscriptionDeleter : AbstractDeleter() {
         get() = arrayOf("project", "id")
 
 
-    override fun doDelete(p: Map<String?, String?>) {
+    override fun doDelete(p: Map<String, String>) {
         SubscriptionAdminClient.create()
 
             .use { subscriptionAdminClient ->

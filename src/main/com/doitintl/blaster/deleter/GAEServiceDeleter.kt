@@ -13,7 +13,7 @@ class GAEServiceDeleter : AbstractDeleter() {
         get() = arrayOf("project", "id")
 
 
-    override fun doDelete(p: Map<String?, String?>) {
+    override fun doDelete(p: Map<String, String>) {
         val credentials = GoogleCredentials.getApplicationDefault()
         val requestInitializer: HttpRequestInitializer = HttpCredentialsAdapter(credentials)
         val engine = Appengine.Builder(
