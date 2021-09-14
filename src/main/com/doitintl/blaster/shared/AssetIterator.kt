@@ -10,18 +10,17 @@ class AssetIterator {
     fun listAssets(projectId: String?, callback: Callback<String>, allAssetTypes_: Boolean) {
         var allAssetTypes = allAssetTypes_
         val client = AssetServiceClient.create()
-        val parent = ProjectName.of(projectId)
         val contentType = ContentType.CONTENT_TYPE_UNSPECIFIED
         var apiIdentifiers: List<String?> = AssetTypeMap.instance.identifiers()
         if (allAssetTypes) {
             apiIdentifiers = emptyList<String>()
         }
         var request = ListAssetsRequest.newBuilder()
-                .setParent(parent.toString())
+                .setParent(ProjectName.of(projectId).toString())
                 .addAllAssetTypes(apiIdentifiers)
                 .setContentType(contentType)
                 .build()
-        if (apiIdentifiers.isEmpty()) {//because of empty asset-types.yaml
+        if (apiIdentifiers.isEmpty()) {//Will also be empty if   asset-types.yaml is empty
             allAssetTypes = true
         }
         if (allAssetTypes) {
@@ -53,7 +52,7 @@ class AssetIterator {
             val assetType: AssetType? = AssetTypeMap.instance[assetTypeIdentifier]
             val filterRegex = assetType!!.filterRegex
             if (filterRegex!!.matcher(id).matches()) {
-                println("Found " + asset.name)
+                println("Found ${asset.name}")
                 if (assetType.supportedForDeletion()) {
                     //TODO Avoid listing  that we can't possibly delete, like Disks attached to Instances or default GAE services
                     callback.call(asset.name)

@@ -29,6 +29,6 @@ class BucketDeleter : AbstractDeleter() {
             }
         }
         bucket.delete()
-        println("Deleted bucket $id")
+
     }
 }

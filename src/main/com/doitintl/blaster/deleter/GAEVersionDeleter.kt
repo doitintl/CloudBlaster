@@ -17,10 +17,12 @@ class GAEVersionDeleter : AbstractDeleter() {
         val requestInitializer: HttpRequestInitializer = HttpCredentialsAdapter(credentials)
         val engine = Appengine.Builder(
                 GoogleNetHttpTransport.newTrustedTransport(), JacksonFactory(), requestInitializer
-        ).setApplicationName("application").build()
+        )
+            //.setApplicationName("application")
+            .build()
         val versions = engine.apps().services().versions()
         val del = versions.delete(p["project"], p["service"], p["id"])
         val result = del.execute()
-        println(result)
+
     }
 }

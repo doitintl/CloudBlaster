@@ -17,10 +17,12 @@ class GAEServiceDeleter : AbstractDeleter() {
         val requestInitializer: HttpRequestInitializer = HttpCredentialsAdapter(credentials)
         val engine = Appengine.Builder(
                 GoogleNetHttpTransport.newTrustedTransport(), JacksonFactory(), requestInitializer
-        ).setApplicationName("application").build()
+        )
+            //. setApplicationName("application")
+            .build()
         val services = engine.apps().services()
         val del = services.delete(p["project"], p["id"])
         val result = del.execute()
-        println("Deleted GAE Service ${p["id"]}:$result")
+
     }
 }

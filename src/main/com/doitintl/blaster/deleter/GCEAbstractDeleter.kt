@@ -10,14 +10,14 @@ import com.google.api.services.compute.Compute
 abstract class GCEAbstractDeleter : AbstractDeleter() {
 
     protected fun createComputeService(): Compute {
-        val httpTransport: HttpTransport = GoogleNetHttpTransport.newTrustedTransport()
-        val jsonFactory: JsonFactory = JacksonFactory.getDefaultInstance()
+        val httpTransport = GoogleNetHttpTransport.newTrustedTransport()
+        val jsonFactory = JacksonFactory.getDefaultInstance()
         var credential = GoogleCredential.getApplicationDefault()
         if (credential.createScopedRequired()) {
             credential = credential.createScoped(listOf("https://www.googleapis.com/auth/cloud-platform"))
         }
         return Compute.Builder(httpTransport, jsonFactory, credential)
-            .setApplicationName("Google-ComputeSample/0.1")
+           // .setApplicationName("Blaster")
             .build()
     }
 }

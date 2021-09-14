@@ -21,18 +21,18 @@ class Deleter : Callable<Int> {
         val br = BufferedReader(FileReader(Constants.LISTED_ASSETS_FILENAME))
         var line: String?
         while (br.readLine().also { line = it } != null) {
-            if (line!!.trim { it <= ' ' }.length == 0) {
+            if (line!!.isBlank()) {
                 continue
             }
             val at: AssetType = AssetTypeMap.instance.pathToAssetType(line)
                 ?: throw NullPointerException("$line does not match any path regex")
-            val cls = at.deleterClass
-            val deleter = cls!!.getConstructor().newInstance()
+            val deleter = at.deleterClass!!.getConstructor().newInstance()
             deleter.setPathPatterns(at.getPathPatterns())
             try {
                 deleter.delete(line)
+                println("Deleted "+line)
             } catch (e: Exception) {
-                System.err.println("Error in deleting $line:$e")
+                System.err.println("Error in deleting $line:$e")// Just continue
             }
         }
         return 0

@@ -10,11 +10,10 @@ class TopicDeleter : AbstractDeleter() {
 
     override fun doDelete(p: Map<String?, String?>) {
         //todo use use clause here
-        val topicAdminClient: TopicAdminClient = TopicAdminClient.create()
+        TopicAdminClient.create().use {
+            val topicName = TopicName.of(p["project"], p["id"])
+            it.deleteTopic(topicName)
 
-        val topicName = TopicName.of(p["project"], p["id"])
-        topicAdminClient.deleteTopic(topicName)
-        println("Deleted topic ${p["id"]}")
-
+        }
     }
 }

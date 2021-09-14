@@ -11,8 +11,7 @@ abstract class AbstractDeleter : AssetDeleter {
 
 
     override fun delete(line: String?) {
-        val p = paramsFromPath(line)
-        doDelete(p)
+        doDelete(paramsFromPath(line))
     }
 
     override fun paramsFromPath(path: String?): Map<String?, String?> {
