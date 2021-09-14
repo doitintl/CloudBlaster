@@ -22,7 +22,7 @@ class AssetType(
     fun setFilterRegex(regex_: String?) {
         var regex = regex_
         if (regex == null || regex.isEmpty()) {
-            regex = "$-never-matches-so-we-list-ALL-resources"
+            regex = "$-never-matches-so-we-list-ALL-assets"
         }
         filterRegex = Pattern.compile(regex)
     }

@@ -3,16 +3,16 @@ package com.doitintl.blaster
 import com.doitintl.blaster.shared.AssetIterator
 import com.doitintl.blaster.shared.Callback
 import com.doitintl.blaster.shared.Constants
+import com.doitintl.blaster.shared.Constants.CLOUD_BLASTER
 import picocli.CommandLine
 import java.io.FileWriter
 import java.util.concurrent.Callable
 import kotlin.system.exitProcess
 
 @CommandLine.Command(
-    name = "checksum",
+    name = CLOUD_BLASTER,
     mixinStandardHelpOptions = true,
-    version = ["0.1"],
-    description = ["Cleans up a GCP project."]
+    description = ["Lists assets in a GCP project."]
 )
 class Lister : Callable<Any> {
     @CommandLine.Option(names = ["-p", "--project"], required = true)

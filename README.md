@@ -3,10 +3,6 @@
 Cloud Blaster helps you delete the unwanted resources in your Google Cloud Platform project, 
 leaving it clean of confusing clutter and saving you money.
 
-# TODO
-1. Bundle app in container, wqith scripts and instructions for running.
-
-
 # Compared to Safe Scrub
 
 [Safe Scrub](https://github.come/doitintl/SafeScrub) was an earlier project that does the same thing. 
@@ -45,25 +41,27 @@ the  `list-filter.yaml` file,
 * Edit `list-filter.yaml`. Write  regex for the asset types you don't want to list for deletion
 (Full-string match on the  local asset name, like Disk name  or Topic Name.)
 See the top of that yaml for detailed instructions. 
-* Run `java com.doitintl.blaster.Lister -p <GCP_PROJECT>`. This outputs `assets-to-delete.txt`
-* (If you just want to print, to standard output, a list of *all* GCP assets, whether  of a type
-supported for deletion by Cloud Blaster or not, use
+* Run `./lister.sh -p  <GCP_PROJECT>` 
+   * (With this script, Maven just builds if needed, then executes `java com.doitintl.blaster.Lister -p <GCP_PROJECT>` ). 
+   * The Lister outputs `assets-to-delete.txt`
+   * (If you just want to print, to standard output, a list of *all* GCP assets, whether  of a type
+supported for deletion by Cloud Blaster or not, add 
 the `--print-all-assets` flag.)
 
 ### Deletion step
 * Review `assets-to-delete.txt` and remove lines for any resources that you do not want to delete.
-* Run `java com.doitintl.blaster.Deleter` to delete all resources listed in `assets-to-delete.txt`.
-* Note that some resources cannot be deleted. There is no harm in having them in `assets-to-delete.txt` -- you will
-just get an exception.
+* (With this script, Maven just builds if needed, then executes `com.doitintl.blaster.Lister -p <GCP_PROJECT>` ). 
+* Run `./deleter.sh -p  <GCP_PROJECT>` 
+  * (With this script, Maven just builds if needed, then executes `com.doitintl.blaster.Deleter` ). 
+  * The Deleter  deletes  resources listed in `assets-to-delete.txt`. 
+  * You do not need to specify the project, as this is included in every asset path in  `assets-to-delete.txt`.
+  * Note that some resources cannot be deleted, such as attached disks or the default GAE service.
+   There is no harm in having them in `assets-to-delete.txt` -- you will just get an exception.
 
 ## Features
 - I focused on the common important resource types that are set up and torn down in typical development and QA.
 - If you want more services or resource types, please submit a pull request or issue at GitHub.
 
-## Usage
- For usage text,  
-- run `java com.doitintl.Cloud Blaster.Lister`.
-- or  `java com.doitintl.Cloud Blaster.Deleter`.
 
 # Other projects and approaches
 - [Safe Scrub](https://github.come/doitintl/SafeScrub) was an earlier bash-only project that does the same thing. 

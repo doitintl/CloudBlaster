@@ -2,6 +2,7 @@ package com.doitintl.blaster
 
 import com.doitintl.blaster.shared.AssetTypeMap
 import com.doitintl.blaster.shared.Constants
+import com.doitintl.blaster.shared.Constants.CLOUD_BLASTER
 import picocli.CommandLine
 import java.io.BufferedReader
 import java.io.FileReader
@@ -9,10 +10,9 @@ import java.util.concurrent.Callable
 import kotlin.system.exitProcess
 
 @CommandLine.Command(
-    name = "checksum",
+    name = CLOUD_BLASTER,
     mixinStandardHelpOptions = true,
-    version = ["0.1"],
-    description = ["Cleans up a GCP project."]
+    description = ["Deletes assets listed in assets-to-delete.txt"]
 )
 class Deleter : Callable<Int> {
 
