@@ -1,7 +1,8 @@
 package com.doitintl.blaster.deleter
 
-import com.doitintl.blaster.shared.Constants
 import com.doitintl.blaster.shared.Constants.CLOUD_BLASTER
+import com.doitintl.blaster.shared.Constants.ID
+import com.doitintl.blaster.shared.Constants.PROJECT
 import com.google.api.client.googleapis.javanet.GoogleNetHttpTransport
 import com.google.api.client.http.HttpRequestInitializer
 import com.google.api.client.json.jackson2.JacksonFactory
@@ -11,7 +12,7 @@ import com.google.auth.oauth2.GoogleCredentials
 
 class GAEServiceDeleter : AbstractDeleter() {
     override val pathKeys: Array<String>
-        get() = arrayOf("project", "id")
+        get() = arrayOf(PROJECT, ID)
 
 
     override fun doDelete(p: Map<String, String>) {
@@ -21,7 +22,7 @@ class GAEServiceDeleter : AbstractDeleter() {
             GoogleNetHttpTransport.newTrustedTransport(), JacksonFactory(), requestInitializer
         ).setApplicationName(CLOUD_BLASTER).build()
         val services = engine.apps().services()
-        val del = services.delete(p["project"], p["id"])
+        val del = services.delete(p[PROJECT], p[ID])
         val result = del.execute()
 
     }

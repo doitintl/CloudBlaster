@@ -1,7 +1,9 @@
 package com.doitintl.blaster.deleter
 
-import com.doitintl.blaster.shared.Constants
 import com.doitintl.blaster.shared.Constants.CLOUD_BLASTER
+import com.doitintl.blaster.shared.Constants.ID
+import com.doitintl.blaster.shared.Constants.LOCATION
+import com.doitintl.blaster.shared.Constants.PROJECT
 import com.google.api.client.googleapis.javanet.GoogleNetHttpTransport
 import com.google.api.client.json.jackson2.JacksonFactory
 import com.google.api.services.container.Container
@@ -10,7 +12,7 @@ import com.google.auth.oauth2.GoogleCredentials
 
 class GKEClusterDeleter : AbstractDeleter() {
     override val pathKeys: Array<String>
-        get() = arrayOf("project", "location", "id")
+        get() = arrayOf(PROJECT, LOCATION, ID)
 
 
     override fun doDelete(p: Map<String, String>) {
@@ -20,7 +22,7 @@ class GKEClusterDeleter : AbstractDeleter() {
         ).setApplicationName(CLOUD_BLASTER)
             .build()
         val clusters = containerApi.projects().locations().clusters()
-        val idTriplet = "projects/${p["project"]}/locations/${p["location"]}/clusters/${p["id"]}"
+        val idTriplet = "projects/${p[PROJECT]}/locations/${p[LOCATION]}/clusters/${p[ID]}"
         val delete = clusters.delete(idTriplet)
         val result = delete.execute()
 

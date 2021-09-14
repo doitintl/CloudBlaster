@@ -2,10 +2,8 @@ package com.doitintl.blaster
 
 import com.doitintl.blaster.shared.AssetIterator
 import com.doitintl.blaster.shared.Callback
-import com.doitintl.blaster.shared.Constants
 import com.doitintl.blaster.shared.Constants.CLOUD_BLASTER
 import com.doitintl.blaster.shared.Constants.LISTED_ASSETS_FILENAME
-
 import picocli.CommandLine
 import java.io.FileWriter
 import java.util.concurrent.Callable

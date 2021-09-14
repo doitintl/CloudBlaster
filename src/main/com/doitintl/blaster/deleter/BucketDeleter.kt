@@ -1,15 +1,16 @@
 package com.doitintl.blaster.deleter
 
+import com.doitintl.blaster.shared.Constants.ID
 import com.google.auth.oauth2.GoogleCredentials
 import com.google.cloud.storage.StorageOptions
 
 class BucketDeleter : AbstractDeleter() {
     override val pathKeys: Array<String>
-        get() = arrayOf("id")
+        get() = arrayOf(ID)
 
 
     override fun doDelete(p: Map<String, String>) {
-        val id = p["id"]
+        val id = p[ID]
         val credentials = GoogleCredentials.getApplicationDefault()
         val storage = StorageOptions.newBuilder().setCredentials(credentials).build().service
         val bucket = storage[id]!!

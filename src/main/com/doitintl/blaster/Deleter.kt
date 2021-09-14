@@ -1,10 +1,8 @@
 package com.doitintl.blaster
 
 import com.doitintl.blaster.shared.AssetTypeMap
-import com.doitintl.blaster.shared.Constants
 import com.doitintl.blaster.shared.Constants.CLOUD_BLASTER
 import com.doitintl.blaster.shared.Constants.LISTED_ASSETS_FILENAME
-
 import picocli.CommandLine
 import java.io.BufferedReader
 import java.io.FileReader

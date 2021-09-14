@@ -1,6 +1,5 @@
 package com.doitintl.blaster.deleter
 
-import com.doitintl.blaster.shared.Constants
 import com.doitintl.blaster.shared.Constants.CLOUD_BLASTER
 import com.google.api.client.googleapis.auth.oauth2.GoogleCredential
 import com.google.api.client.googleapis.javanet.GoogleNetHttpTransport
