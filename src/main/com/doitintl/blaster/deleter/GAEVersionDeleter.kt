@@ -14,7 +14,6 @@ import com.google.auth.oauth2.GoogleCredentials
 class GAEVersionDeleter : AbstractDeleter() {
     override val pathKeys: Array<String>
         get() {
-
             return arrayOf(PROJECT, SERVICE, ID)
         }
 
