@@ -13,7 +13,6 @@ class TopicDeleter : AbstractDeleter() {
         TopicAdminClient.create().use {
             val topicName = TopicName.of(p["project"], p["id"])
             it.deleteTopic(topicName)
-
         }
     }
 }
