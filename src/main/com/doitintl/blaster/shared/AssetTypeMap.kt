@@ -13,7 +13,8 @@ class AssetTypeMap private constructor() {
             val regexes = assetType.getPathPatterns()
             for (regex in regexes) {
                 val matcher = regex.matcher(line!!)
-                if (matcher.matches()) {
+                val matches = matcher.matches()
+                if (matches) {
                     if (ret != null) {
                         throw RuntimeException("$ret and $assetType both found for pattern $regex")
                     }
@@ -21,7 +22,7 @@ class AssetTypeMap private constructor() {
                 }
             }
         }
-        assert(ret != null) { line!! }
+        assert(ret != null){"Did not match any path-pattern "+line}
         return ret
     }
 
@@ -65,7 +66,7 @@ class AssetTypeMap private constructor() {
 
 
         private fun loadAssetTypesYaml(): Map<String, AssetType> {
-            val ret: MutableMap<String, AssetType> = HashMap()
+            val ret: MutableMap<String, AssetType> = TreeMap()
             FileInputStream(ASSET_TYPES_YAML).use { `in` ->
                 for (o in Yaml().loadAll(`in`)) {
                     val assetTypesFromYaml = o as Map<String, Map<String, Any>>
