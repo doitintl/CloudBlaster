@@ -1,8 +1,5 @@
-*.class
 .idea/
 target/
 *.iml
-/sample_input
-/sample_output
 /assets-to-delete.txt
 .DS_Store
