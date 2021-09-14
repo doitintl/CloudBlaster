@@ -1,15 +1,20 @@
-# These are the asset types that will be listed.
-
-# The lister will  list  the assets that are matched by the regex.
-# (Full-string match on the local name, for example the Topic or Instance name) .
+# These are the asset types that will be skipped by the Listerd:
+#
+# The lister will  list only the assets that are NOT matched by the regex.
+# (it is a fsull-string match on the local name, for example the Topic or Instance name) .
+#
+# For example,
+# appengine.googleapis.com/Version: "foo.*"
+# means that GAE Versions with names foo and foobar will be skipped in listing,
+# (but quuxfoo will not be skipped (as there is no full-string match, for which you might use ".*foo.*").
 #
 # Put the regex in quotes to keep yaml happy.
 #
 # If the regex is missing, all assets of that type will be listed.
 #
-# To avoid listing an asset type, use the regex "$a"  which rejects all strings.
+# To completely skip listing an asset type, use the regex ".*" .
 
-appengine.googleapis.com/Version: "$a"
+appengine.googleapis.com/Version:
 appengine.googleapis.com/Service:
 compute.googleapis.com/Disk:
 compute.googleapis.com/Instance:

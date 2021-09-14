@@ -7,12 +7,12 @@ import com.google.cloud.asset.v1.ProjectName
 
 class AssetIterator {
 
-    fun listAssets(projectId: String?, callback: Callback<String>, allAssetTypes_: Boolean) {
-        var allAssetTypes = allAssetTypes_
+    fun listAssets(projectId: String?, callback: Callback<String>, justPrintAllAssets: Boolean) {
+        var justPrintAll = justPrintAllAssets
         val client = AssetServiceClient.create()
         val contentType = ContentType.CONTENT_TYPE_UNSPECIFIED
         var apiIdentifiers: List<String?> = AssetTypeMap.instance.identifiers()
-        if (allAssetTypes) {
+        if (justPrintAll) {
             apiIdentifiers = emptyList<String>()
         }
         var request = ListAssetsRequest.newBuilder()
@@ -21,18 +21,18 @@ class AssetIterator {
                 .setContentType(contentType)
                 .build()
         if (apiIdentifiers.isEmpty()) {//Will also be empty if   asset-types.yaml is empty
-            allAssetTypes = true
+            justPrintAll = true
         }
-        if (allAssetTypes) {
+        if (justPrintAll) {
             println("Just printing all assets of all types to stout")
         }
         // Repeatedly call ListAssets until page token is empty.
         var response = client.listAssets(request)
-        iterateListingResponse(response, callback, allAssetTypes)
+        iterateListingResponse(response, callback, justPrintAll)
         while (response.nextPageToken.isNotEmpty()) {
             request = request.toBuilder().setPageToken(response.nextPageToken).build()
             response = client.listAssets(request)
-            iterateListingResponse(response, callback, allAssetTypes)
+            iterateListingResponse(response, callback, justPrintAll)
         }
     }
 
@@ -51,10 +51,10 @@ class AssetIterator {
             val assetTypeIdentifier = asset.assetType
             val assetType: AssetType? = AssetTypeMap.instance[assetTypeIdentifier]
             val filterRegex = assetType!!.filterRegex
-            if (filterRegex!!.matcher(id).matches()) {
+            if (!filterRegex!!.matcher(id).matches()) {
                 println("Found ${asset.name}")
                 if (assetType.supportedForDeletion()) {
-                    //TODO Avoid listing  that we can't possibly delete, like Disks attached to Instances or default GAE services
+                    //TODO Avoid listing assets that we can't possibly delete, like Disks attached to Instances or default GAE services
                     callback.call(asset.name)
                 } else {
                     System.err.println("$assetTypeIdentifier not supported for deletion")

@@ -1,69 +1,69 @@
-# CloudBlaster
+# Cloud Blaster
 
-CloudBlaster helps you delete the unwanted resources in your Google Cloud Platform project, 
+Cloud Blaster helps you delete the unwanted resources in your Google Cloud Platform project, 
 leaving it clean of confusing clutter and saving you money.
 
 # TODO
 1. Bundle app in container, wqith scripts and instructions for running.
-1. Drdering of dependent resources, e.g. GAE Service, Version, Instace
 
-# Safe Scrub
 
-[Safe Scrub](https://github.come/doitintl/SafeScrub) was an earlier project that does the same thing. See [the blog post](https://blog.doit-intl.com/safe-scrub-clean-up-your-google-cloud-projects-f90f18aca311)
-                                                                                                     for an explanation.
+# Compared to Safe Scrub
 
-The advantages of Safe Scrub:
-* It is in pure bash. You see exactly what it is doing. 
-* It does not delete anything. It just outputs a bash script (with `delete` statements) that does the deletion. 
-You then review it and run it as code that you wrote (actually, generated), so you see
-exactly what it does
+[Safe Scrub](https://github.come/doitintl/SafeScrub) was an earlier project that does the same thing. 
+See [the blog post](https://blog.doit-intl.com/safe-scrub-clean-up-your-google-cloud-projects-f90f18aca311)
+for an explanation of Safe Scrub
 
-The advantages of CloudBlaster:
-* It supports more complexity, as it is in Java/Kotlin rather than bash. For example,
-if you want to add lots of asset types, some with special deletion commands (e.g., regional
-assets), you need a language that can support that.
-* Though CloudBlaster is not as transparent as Safe Scrub's bash, it has safety features, listed below.
+The advantages of Safe Scrub over Cloud Blaster:
+* Safe Scrub  is in pure bash. You may have more confidence as you see just the code that it running.
+* It does not delete anything. It just outputs a bash script with a simple list of `delete` statements 
+that does the deletion. You then review it and run it as code that you generated.
+
+The advantages of Cloud Blaster:
+* It supports more complexity, since it is in Kotlin rather than bash. 
+
+Though Cloud Blaster is not as transparent as Safe Scrub's bash, it has safety features, listed below.
  
 Other than that, the use case is the same.
 
 ## Use case
 - It is intended for development and QA projects, where you want to start fresh at the end of the day or before a new test run.
-- It is unlikely to be useful for production projects, where you should determine the potential dependencies between components before deleting
+- It is less likely to be useful for production projects, where you should determine the potential dependencies between components before deleting
 anything.
 
 ## Safety First 
-To keep it safe, CloudBlaster has these features.
+To keep it safe, Cloud Blaster has these features.
 1. The first step, the Lister, does *not* delete resources; rather, it just lists resources in a file that you can review.
-1. It requires you to explicitly state a project, to avoid accidentally listing resources that come from
+1. The Lister requires you to explicitly state a project, to avoid accidentally listing resources that come from
  a default project.
-1.  The Lister and the Deleter require that you  specify the project in the deletion script, so that deletion is not run against  your current default project.
-1. CloudBlaster supports the filtering by regex in the `list-filter.yaml` file, so you only 
-list files relevant for deletion. And after that, you review and manually edit the list of assets for deletion, just to be sure.
+1. You can filter to choose the resources that you want to *not* list for potential deletion, using 
+the  `list-filter.yaml` file, 
+1. And after that, you review and manually edit the list of assets for deletion, just to be sure.
  
 ## Instructions
 
 ### Listing step
-* Edit `list-filter.yaml`. Include the asset types you want to list, and a regex that indicates which
- assets to list. (Full-string match on their  local asset name, like Disk name  or Topic Name.)
+* Edit `list-filter.yaml`. Write  regex for the asset types you don't want to list for deletion
+(Full-string match on the  local asset name, like Disk name  or Topic Name.)
 See the top of that yaml for detailed instructions. 
-* Run `java com.doitintl.blaster.Lister -p <GCP_PROJECT>`. This outputs `assets-to-delete.txt`.
-
-* (If you just want to print, to standard output, a list of *all* GCP assets, whether 
+* Run `java com.doitintl.blaster.Lister -p <GCP_PROJECT>`. This outputs `assets-to-delete.txt`
+* (If you just want to print, to standard output, a list of *all* GCP assets, whether  of a type
 supported for deletion by Cloud Blaster or not, use
 the `--print-all-assets` flag.)
 
 ### Deletion step
-* Review `assets-to-delete.txt` and remove lines for any resources that you want to keep.
+* Review `assets-to-delete.txt` and remove lines for any resources that you do not want to delete.
 * Run `java com.doitintl.blaster.Deleter` to delete all resources listed in `assets-to-delete.txt`.
+* Note that some resources cannot be deleted. There is no harm in having them in `assets-to-delete.txt` -- you will
+just get an exception.
+
 ## Features
-- I focused on the common important resource types that are set up and torn down
- in typical development and QA.
+- I focused on the common important resource types that are set up and torn down in typical development and QA.
 - If you want more services or resource types, please submit a pull request or issue at GitHub.
 
 ## Usage
  For usage text,  
-- run `java com.doitintl.cloudblaster.Lister`.
-- or  `java com.doitintl.cloudblaster.Deleter`.
+- run `java com.doitintl.Cloud Blaster.Lister`.
+- or  `java com.doitintl.Cloud Blaster.Deleter`.
 
 # Other projects and approaches
 - [Safe Scrub](https://github.come/doitintl/SafeScrub) was an earlier bash-only project that does the same thing. 

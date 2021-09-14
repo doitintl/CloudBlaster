@@ -24,7 +24,7 @@ class AssetType(
     fun setFilterRegex(regex_: String?) {
         var regex = regex_
         if (regex == null || "" == regex) {
-            regex = ".*"
+            regex = "$-never-matches-so-we-list-ALL-resources"
         }
         filterRegex = Pattern.compile(regex)
     }
