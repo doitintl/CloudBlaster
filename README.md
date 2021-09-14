@@ -1,6 +1,6 @@
 # Cloud Blaster
 
-Cloud Blaster helps you delete the unwanted resources in your Google Cloud Platform project, 
+Cloud Blaster helps you delete the unwanted assets in your Google Cloud Platform project, 
 leaving it clean of confusing clutter and saving you money.
 
 # Compared to Safe Scrub
@@ -28,8 +28,8 @@ anything.
 
 ## Safety First 
 To keep it safe, Cloud Blaster has these features.
-1. The first step, the Lister, does *not* delete resources; rather, it just lists resources in a file that you can review.
-1. The Lister requires you to explicitly state a project, to avoid accidentally listing resources that come from
+1. The first step, the Lister, does *not* delete assets; rather, it just lists assets in a file that you can review.
+1. The Lister requires you to explicitly state a project, to avoid accidentally listing assets that come from
  a default project.
 1. The Lister can be filtered (see `list-filter.yaml` file) so that certain assets are skipped when 
 building the `to-be-deleted.txt` file.
@@ -45,26 +45,27 @@ See the top of that yaml for detailed instructions.)
    * (In this script, Maven just builds if needed, then executes `java com.doitintl.blaster.Lister` ). 
    * The Lister outputs `assets-to-delete.txt`
    * (If instead you just want to print, to standard output, a list of *all* GCP assets, whether  of a type
-supported for deletion by Cloud Blaster or not, add the `-a` or `--print-all-assets` flag.)
+   supported by Cloud Blaster or not, add the `-a` or `--print-all-assets` flag.)
 
 ### Deletion step
-* Review `assets-to-delete.txt` and remove lines for any resources that you do not want to delete.
+* Review `assets-to-delete.txt` and remove lines for any assets that you do not want to delete.
 * Run `./deleter.sh` 
   * (In this script, Maven just builds if needed, then executes `com.doitintl.blaster.Deleter`.). 
-  * The Deleter  deletes  resources listed in `assets-to-delete.txt`. 
+  * The Deleter  deletes  assets listed in `assets-to-delete.txt`. 
   * You do not need to specify the project, as this is included in every asset path in  `assets-to-delete.txt`.
-  * Note that some resources cannot be deleted, such as attached Disks or the default GAE Service.
+  * Note that some assets cannot be deleted, such as attached Disks or the default GAE Service.
    There is no harm in having them in `assets-to-delete.txt` -- you will just get an exception.
 
 ## Features
-* I focused on the common important resource types that are set up and torn down in typical development and QA.
+* I focused on the common important asset types that are set up and torn down in typical development and QA.
     * This includes Google Compute Engine Instances and Disks, PubSub Topics and Subscriptions, 
     Google Kubernetes Engine  regional and zonal clusters,
     Google App Engine Services and Versions, and Google Cloud Storage Buckets.
     * For the most up-to-date list of supported asset types, see `list-filter.yaml`
-* If you want more services or resource types, please either
+* If you want more services or asset types, please either
     * Or submit an issue at GitHub.
-    * Add support and submit a pull request. 
+    * Add support for the asset type and submit a pull request. 
+    * Add support for the asset type and submit a pull request. 
         * To do this, use existing asset types as an example.
         * Uncomment the asset type in `asset-types.yaml`. See the documentation at the top of that file.
         * Add the asset type to `list-filter.yamls`.
@@ -72,6 +73,6 @@ supported for deletion by Cloud Blaster or not, add the `-a` or `--print-all-ass
 
 # Other projects and approaches
 - [Safe Scrub](https://github.come/doitintl/SafeScrub) was an earlier bash-only project that does the same thing. 
-- [Travis CI GCloud Cleanup](https://github.com/travis-ci/gcloud-cleanup) and [Bazooka](https://github.com/enxebre/bazooka) also delete GCE resources.
+- [Travis CI GCloud Cleanup](https://github.com/travis-ci/gcloud-cleanup) and [Bazooka](https://github.com/enxebre/bazooka) also delete GCE assets.
 - [Cloud Nuke](https://blog.gruntwork.io/cloud-nuke-how-we-reduced-our-aws-bill-by-85-f3aced4e5876) does this for AWS.
  
