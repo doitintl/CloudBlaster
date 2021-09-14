@@ -24,13 +24,12 @@ class Deleter : Callable<Int> {
             if (line!!.isBlank()) {
                 continue
             }
-            val at: AssetType = AssetTypeMap.instance.pathToAssetType(line)
-                ?: throw NullPointerException("$line does not match any path regex")
+            val at: AssetType = AssetTypeMap.instance.pathToAssetType(line)!!
             val deleter = at.deleterClass!!.getConstructor().newInstance()
             deleter.setPathPatterns(at.getPathPatterns())
             try {
                 deleter.delete(line)
-                println("Deleted "+line)
+                println("Deleted $line")
             } catch (e: Exception) {
                 System.err.println("Error in deleting $line:$e")// Just continue
             }

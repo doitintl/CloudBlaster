@@ -5,13 +5,8 @@ class GCEInstanceDeleter : GCEAbstractDeleter() {
         get() = arrayOf("project", "zone", "id")
 
     override fun doDelete(p: Map<String?, String?>) {
-        try {
-            val computeService = createComputeService()
-            val request = computeService.instances().delete(p["project"], p["zone"], p["id"])
-            val response = request.execute()
-
-        } catch (e: Exception) {
-            throw RuntimeException(e)
-        }
+        val computeService = createComputeService()
+        val request = computeService.instances().delete(p["project"], p["zone"], p["id"])
+        val response = request.execute()
     }
 }

@@ -5,15 +5,14 @@ import com.doitintl.blaster.shared.Callback
 import com.doitintl.blaster.shared.Constants
 import picocli.CommandLine
 import java.io.FileWriter
-import java.io.IOException
 import java.util.concurrent.Callable
 import kotlin.system.exitProcess
 
 @CommandLine.Command(
-        name = "checksum",
-        mixinStandardHelpOptions = true,
-        version = ["0.1"],
-        description = ["Cleans up a GCP project."]
+    name = "checksum",
+    mixinStandardHelpOptions = true,
+    version = ["0.1"],
+    description = ["Cleans up a GCP project."]
 )
 class Lister : Callable<Any?> {
     @CommandLine.Option(names = ["-p", "--project"], required = true)
@@ -40,19 +39,10 @@ class Lister : Callable<Any?> {
     }
 }
 
-internal class FileWritingCallback(filename: String?) : Callback<String> {
+internal class FileWritingCallback(filename: String) : Callback<String> {
     private var fw: FileWriter? = null
     override fun call(s: String) {
-        try {
-            fw!!.write(
-                    """
-    $s
-    
-    """.trimIndent()
-            )
-        } catch (e: IOException) {
-            throw RuntimeException()
-        }
+        fw!!.write(" $s\n")
     }
 
 
@@ -61,10 +51,6 @@ internal class FileWritingCallback(filename: String?) : Callback<String> {
     }
 
     init {
-        fw = try {
-            FileWriter(filename)
-        } catch (e: IOException) {
-            throw RuntimeException(e)
-        }
+        fw = FileWriter(filename)
     }
 }

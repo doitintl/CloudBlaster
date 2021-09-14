@@ -23,7 +23,7 @@ class AssetType(
 
     fun setFilterRegex(regex_: String?) {
         var regex = regex_
-        if (regex == null || "" == regex) {
+        if (regex == null || regex.isEmpty()) {
             regex = "$-never-matches-so-we-list-ALL-resources"
         }
         filterRegex = Pattern.compile(regex)
@@ -68,11 +68,8 @@ class AssetType(
             return
         }
         val cls: String = if (deleterClass.contains(".")) deleterClass else "com.doitintl.blaster.deleter.$deleterClass"
-        try {
-            this.deleterClass = Class.forName(cls) as Class<AssetDeleter>
-        } catch (cnfe: ClassNotFoundException) {
-            throw RuntimeException(cnfe)
-        }
+        this.deleterClass = Class.forName(cls) as Class<AssetDeleter>
+
     }
 
     override fun toString(): String {

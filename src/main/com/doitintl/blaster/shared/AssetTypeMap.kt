@@ -2,7 +2,6 @@ package com.doitintl.blaster.shared
 
 import org.yaml.snakeyaml.Yaml
 import java.io.FileInputStream
-import java.io.IOException
 import java.util.*
 import java.util.stream.Collectors
 
@@ -39,32 +38,26 @@ class AssetTypeMap private constructor() {
         private const val ASSET_TYPES_YAML = "asset-types.yaml"
         private const val LIST_FILTER_YAML = "list-filter.yaml"
         private fun loadAssetTypesFromYaml(): Map<String, AssetType> {
-            return try {
-                compareYamls()
-                val map = loadAssetTypesYaml()
-                loadListFilterYaml(map) //inout
-                for (at in map.values) {
-                    //assert that EVERY item in asset-types.yaml has a filter
-                    assert(null != at.filterRegex)
-                }
-                map
-            } catch (e: IOException) {
-                throw RuntimeException(e)
+
+            compareYamls()
+            val map = loadAssetTypesYaml()
+            loadListFilterYaml(map) //inout
+            for (at in map.values) {
+                //assert that EVERY item in asset-types.yaml has a filter
+                assert(null != at.filterRegex)
             }
+            return map
+
         }
 
 
         private fun loadListFilterYaml(map: Map<String, AssetType>) {
             FileInputStream(LIST_FILTER_YAML).use { `in` ->
-                val yaml = Yaml()
-                val itr = yaml.loadAll(`in`)
-                for (o in itr) {
-                    val filtersFromYaml = o as Map<String, String>
-                    for (k in filtersFromYaml.keys) {
-                        val filterRegex = filtersFromYaml[k]
-                        val at = map[k]
-                            ?: error("All asset types in $LIST_FILTER_YAML  should have been in $ASSET_TYPES_YAML")
-                        at.setFilterRegex(filterRegex)
+                for (o in Yaml().loadAll(`in`)) {
+                    for (e in (o as Map<String, String>).entries) {
+                        val at = map[e.key]
+                            ?: error("All asset types in $LIST_FILTER_YAML should have been in $ASSET_TYPES_YAML")
+                        at.setFilterRegex(e.value)
                     }
                 }
             }
@@ -74,14 +67,10 @@ class AssetTypeMap private constructor() {
         private fun loadAssetTypesYaml(): Map<String, AssetType> {
             val ret: MutableMap<String, AssetType> = HashMap()
             FileInputStream(ASSET_TYPES_YAML).use { `in` ->
-                val yaml = Yaml()
-                val itr = yaml.loadAll(`in`)
-                for (o in itr) {
+                for (o in Yaml().loadAll(`in`)) {
                     val assetTypesFromYaml = o as Map<String, Map<String, Any>>
                     for (assetTypeId in assetTypesFromYaml.keys) {
-                        val assetType =
-                            assetTypesFromYaml[assetTypeId]
-                                ?: throw IllegalArgumentException("For key $assetTypeId, no value in yaml")
+                        val assetType = assetTypesFromYaml[assetTypeId] ?: error("$assetTypeId not found")
                         val deleterClass = deleterClassName(assetTypeId, assetType)
                         val pathPatterns = pathPatterns(assetType)
                         val otherLegalCharsInId = assetType["otherLegalCharsInId"] as String?
@@ -103,24 +92,21 @@ class AssetTypeMap private constructor() {
         }
 
         private fun compareYamls() {
-            try {
-                var errMessage = ""
-                val at = loadAssetTypeIds(ASSET_TYPES_YAML)
-                val lf = loadAssetTypeIds(LIST_FILTER_YAML)
-                val atCopy = HashSet(at)
-                atCopy.removeAll(lf)
-                if (atCopy.isNotEmpty()) {
-                    errMessage += "Missing in $LIST_FILTER_YAML: $atCopy"
-                }
-                val lfCopy = HashSet(lf)
-                lfCopy.removeAll(at)
-                if (lfCopy.isNotEmpty()) {
-                    errMessage += "Missing in $ASSET_TYPES_YAML: $atCopy"
-                }
-                check("" == errMessage) { errMessage }
-            } catch (e: IOException) {
-                throw RuntimeException("Cannot load config file $e")
+
+            var errMessage = ""
+            val at = loadAssetTypeIds(ASSET_TYPES_YAML)
+            val lf = loadAssetTypeIds(LIST_FILTER_YAML)
+
+            val missingInFilter = at subtract lf
+            if (missingInFilter.isNotEmpty()) {
+                errMessage += "Missing in $LIST_FILTER_YAML: $missingInFilter"
             }
+            val missingInAssetTypes = lf subtract at
+            if (missingInAssetTypes.isNotEmpty()) {
+                errMessage += "Missing in $ASSET_TYPES_YAML: $missingInAssetTypes"
+            }
+            check(errMessage.isEmpty()) { errMessage }
+
         }
 
 
@@ -141,20 +127,18 @@ class AssetTypeMap private constructor() {
 
             when (val pathPatternObj = aType["pathPattern"]) { //can be null
                 null -> {
-                    //will be empty and asserted as broken, later
-
+                    //pathPatterns is be empty and later asserted as broken
                 }
                 is String -> {
                     pathPatterns.add(pathPatternObj)
                 }
-                is List<*> -> { //todo List<String>
-                    for (pathPatternList in pathPatternObj) {
-                        val pathPattern = pathPatternList as String
-                        pathPatterns.add(pathPattern)
+                is List<*> -> {
+                    for (pathPatternStr in pathPatternObj) {
+                        pathPatterns.add(pathPatternStr as String)
                     }
                 }
                 else -> {
-                    throw RuntimeException("" + pathPatternObj)
+                    throw IllegalStateException("Unexpected type: $pathPatternObj")
                 }
             }
             return pathPatterns

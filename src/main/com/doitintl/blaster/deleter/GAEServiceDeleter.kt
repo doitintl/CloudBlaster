@@ -1,5 +1,6 @@
 package com.doitintl.blaster.deleter
 
+import com.doitintl.blaster.shared.Constants
 import com.google.api.client.googleapis.javanet.GoogleNetHttpTransport
 import com.google.api.client.http.HttpRequestInitializer
 import com.google.api.client.json.jackson2.JacksonFactory
@@ -16,10 +17,8 @@ class GAEServiceDeleter : AbstractDeleter() {
         val credentials = GoogleCredentials.getApplicationDefault()
         val requestInitializer: HttpRequestInitializer = HttpCredentialsAdapter(credentials)
         val engine = Appengine.Builder(
-                GoogleNetHttpTransport.newTrustedTransport(), JacksonFactory(), requestInitializer
-        )
-            //. setApplicationName("application")
-            .build()
+            GoogleNetHttpTransport.newTrustedTransport(), JacksonFactory(), requestInitializer
+        ).setApplicationName(Constants.CLOUD_BLASTER).build()
         val services = engine.apps().services()
         val del = services.delete(p["project"], p["id"])
         val result = del.execute()
