@@ -3,9 +3,11 @@ package com.doitintl.blaster
 import com.doitintl.blaster.shared.AssetTypeMap
 import com.doitintl.blaster.shared.Constants.CLOUD_BLASTER
 import com.doitintl.blaster.shared.Constants.LISTED_ASSETS_FILENAME
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.runBlocking
 import picocli.CommandLine
-import java.io.BufferedReader
-import java.io.FileReader
+import java.io.File
 import java.util.concurrent.Callable
 import kotlin.system.exitProcess
 
@@ -17,23 +19,37 @@ import kotlin.system.exitProcess
 class Deleter : Callable<Int> {
 
     override fun call(): Int {
-        val br = BufferedReader(FileReader(LISTED_ASSETS_FILENAME))
-        var line: String?
-        while (br.readLine().also { line = it } != null) {
-            if (line!!.isBlank()) {
-                continue
-            }
-            val assetType = AssetTypeMap.instance.pathToAssetType(line!!)!!
-            val deleter = assetType.deleterClass.getConstructor().newInstance()
-            deleter.setPathPatterns(assetType.getPathPatterns())
-            try {
-                deleter.delete(line!!)
-                println("Deleted $line")
-            } catch (e: Exception) {
-                System.err.println("Error in deleting $line:$e")// Just continue
+        val lines = File(LISTED_ASSETS_FILENAME).readLines()
+        var counter = 0
+        runBlocking {
+            lines.forEach { line ->
+                launch(Dispatchers.IO) {
+                    if (line.isNotBlank()) {
+                        deleteAsset(line)
+                        counter++
+                    }
+                }
             }
         }
+
+        println("Done: $counter assets")
         return 0
+    }
+
+    private fun deleteAsset(line: String) {
+        if (line.isBlank()) {
+            return
+        }
+        val assetType = AssetTypeMap.instance.pathToAssetType(line)
+            ?: throw IllegalArgumentException("No asset type found for \"$line\"")
+        val deleter = assetType.deleterClass.getConstructor().newInstance()
+        deleter.setPathPatterns(assetType.getPathPatterns())
+        try {
+            deleter.delete(line)
+            println("Deleted $line")
+        } catch (e: Exception) {
+            System.err.println("Error in deleting $line:$e")// Just continue
+        }
     }
 
     companion object {

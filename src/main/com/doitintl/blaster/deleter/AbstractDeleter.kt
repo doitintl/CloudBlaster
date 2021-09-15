@@ -29,7 +29,7 @@ abstract class AbstractDeleter : AssetDeleter {
                 break
             }
         }
-        assert(keys.all { params[it] != null })
+        assert(keys.all { params[it] != null }) { "Some expected params not set" }
 
         return params
     }

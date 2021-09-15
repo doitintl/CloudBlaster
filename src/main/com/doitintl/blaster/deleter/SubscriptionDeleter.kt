@@ -16,7 +16,6 @@ class SubscriptionDeleter : AbstractDeleter() {
             .use { subscriptionAdminClient ->
                 val subscriptionName = ProjectSubscriptionName.of(p[PROJECT], p[ID])
                 subscriptionAdminClient.deleteSubscription(subscriptionName)
-
             }
     }
 }

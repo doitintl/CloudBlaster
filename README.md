@@ -7,12 +7,12 @@ leaving it clean of confusing clutter and saving you money.
 
 [Safe Scrub](https://github.come/doitintl/SafeScrub) is  another project that does the same thing. 
 See [the blog post](https://blog.doit-intl.com/safe-scrub-clean-up-your-google-cloud-projects-f90f18aca311)
-for an explanation of Safe Scrub
+for an explanation of Safe Scrub.
 
 The advantages of Safe Scrub over Cloud Blaster:
 * Safe Scrub  does not delete anything. It just outputs a Bash script with a simple list of `delete` statements. 
 You then review it and run it.
-* Safe Scrub  is in pure Bash. You may have more confidence as you see the code that it running, without a compilation step. 
+* Safe Scrub  is in pure Bash. You may have more confidence as you see the code that it is running, without a compilation step. 
 * Safe Scrub supports more asset types (for now).
 
 The advantages of Cloud Blaster:
@@ -58,7 +58,7 @@ See the top of that yaml for detailed instructions.)
   * You do not need to specify the project, as this is included in every asset path in  `assets-to-delete.txt`.
   * Note that some assets cannot be deleted, such as attached Disks or the default GAE Service.
    There is no harm in having them in `assets-to-delete.txt` -- you will just get an exception.
-
+  * Deletion is executed concurrently, since it is slow and IO-bound.
 ## Features
 * I focused on the common important asset types that are set up and torn down in typical development and QA.
     * This includes Google Compute Engine Instances and Disks, PubSub Topics and Subscriptions, 
@@ -75,10 +75,11 @@ See the top of that yaml for detailed instructions.)
         * Implement a subclass of `Abstract Deleter`.  
 
 # Future features
-    * Parallelize some fo the deletion for speed
-    * More asset types
-    * Track dependencies, so that if you want to delete asset A, but it is undeletable until 
-    asset B is gone, you delete B first, then A. 
+* More asset types
+* Track dependencies, so that if you want to delete asset A, but it is undeletable until 
+asset B is gone, you delete B first, then A. 
+* More user verification: "Are you sure. Still, we have to trust the user. A sloppy user will bypass
+such checks, and a careful user already has the opportunity to edit the `assets-to-delete.txt`.
 # Other projects and approaches
 - [Safe Scrub](https://github.come/doitintl/SafeScrub) was an earlier bash-only project that does the same thing. 
 - [Travis CI GCloud Cleanup](https://github.com/travis-ci/gcloud-cleanup) and [Bazooka](https://github.com/enxebre/bazooka) also delete GCE assets.

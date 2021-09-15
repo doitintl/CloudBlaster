@@ -13,9 +13,8 @@
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <kotlin.version>1.4.21</kotlin.version>
+        <kotlin.version>1.5.30</kotlin.version>
         <kotlin.code.style>official</kotlin.code.style>
-
     </properties>
 <!--TODO Check if this can be used to unite the use of Google Cloud Libraries   <dependencyManagement>-->
 <!--        <dependencies>-->
@@ -28,6 +27,7 @@
 <!--        </dependencies>-->
 <!--    </dependencyManagement>-->
     <dependencies>
+
         <dependency>
             <groupId>org.yaml</groupId>
             <artifactId>snakeyaml</artifactId>
@@ -48,14 +48,11 @@
             <artifactId>kotlin-stdlib-jdk8</artifactId>
             <version>${kotlin.version}</version>
         </dependency>
-
         <dependency>
-            <groupId>org.jetbrains.kotlin</groupId>
-            <artifactId>kotlin-test-junit</artifactId>
-            <version>${kotlin.version}</version>
-            <scope>test</scope>
+            <groupId>org.jetbrains.kotlinx</groupId>
+            <artifactId>kotlinx-coroutines-core</artifactId>
+            <version>1.5.2</version>
         </dependency>
-
         <dependency>
             <groupId>com.google.cloud</groupId>
             <artifactId>google-cloud-asset</artifactId>
