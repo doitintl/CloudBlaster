@@ -8,8 +8,6 @@
 # that implements AssetDeleter (usually subclassing AbstractDeleter).
 # If omitted, XDeleter is used, where X is the local part of the asset type, e.g. BucketDeleter.
 #
-# Optional key   otherLegalCharsInId holds characters, other than alphanumerical, dash and underscore,
-# that are legal for the asset type. In most cases it is omitted.
 #
 
 #aiplatform.googleapis.com/BatchPredictionJob: {}
@@ -145,10 +143,8 @@ container.googleapis.com/Cluster:
 #pubsub.googleapis.com/Snapshot: {}
 pubsub.googleapis.com/Subscription:
   pathPattern: //pubsub.googleapis.com/projects/PROJECT/subscriptions/ID
-  otherLegalCharsInId: ".~%+"
 pubsub.googleapis.com/Topic:
   pathPattern: //pubsub.googleapis.com/projects/PROJECT/topics/ID
-  otherLegalCharsInId: ".~%+"
 #redis.googleapis.com/Instance: {}
 #run.googleapis.com/DomainMapping: {}
 #run.googleapis.com/Revision: {}
@@ -165,6 +161,5 @@ pubsub.googleapis.com/Topic:
 #gpu.googleapis.com/Node: {}
 storage.googleapis.com/Bucket:
   pathPattern: //storage.googleapis.com/ID
-  otherLegalCharsInId: "."
 
 #vpcaccess.googleapis.com/Connector: {}

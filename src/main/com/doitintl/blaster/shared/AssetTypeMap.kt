@@ -68,8 +68,8 @@ class AssetTypeMap private constructor() {
                         val assetType = assetTypesFromYaml[assetTypeId] ?: error("$assetTypeId not found")
                         val deleterClass = deleterClassName(assetTypeId, assetType)
                         val pathPatterns = pathPatterns(assetType)
-                        val otherLegalCharsInId = assetType["otherLegalCharsInId"] as String?
-                        ret[assetTypeId] = AssetType(assetTypeId, pathPatterns, deleterClass, otherLegalCharsInId)
+
+                        ret[assetTypeId] = AssetType(assetTypeId, pathPatterns, deleterClass)
                     }
                 }
                 return ret

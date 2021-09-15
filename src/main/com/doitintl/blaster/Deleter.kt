@@ -41,7 +41,7 @@ class Deleter : Callable<Int> {
             return
         }
         val assetType = AssetTypeMap.instance.pathToAssetType(line)
-            ?: throw IllegalArgumentException("No asset type found for \"$line\"")
+            ?: throw IllegalArgumentException("No asset type found matching \"$line\"")
         val deleter = assetType.deleterClass.getConstructor().newInstance()
         deleter.setPathPatterns(assetType.getPathPatterns())
         try {

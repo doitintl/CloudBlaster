@@ -7,8 +7,7 @@ import java.util.regex.Pattern
 class AssetType(
     val apiIdentifier: String,
     pathPatterns: List<String>,
-    deleterClass: String,
-    otherLegalCharsInId: String?
+    deleterClass: String
 ) {
     private val pathPatterns: MutableList<Pattern> = ArrayList()
     lateinit var filterRegex: Pattern
@@ -31,15 +30,14 @@ class AssetType(
         return pathPatterns
     }
 
-    private fun setPathPatterns(pathPatterns: List<String>, otherLegalCharsInId_: String?) {
-        val otherLegalCharsInId = otherLegalCharsInId_ ?: ""
-        for (pathPattern in pathPatterns) {
-            val regex = createIdentifierRegexes(pathPattern, otherLegalCharsInId)
+    private fun setPathPatterns(pathPatterns: List<String>) {
+         for (pathPattern in pathPatterns) {
+            val regex = createIdentifierRegexes(pathPattern)
             this.pathPatterns.add(Pattern.compile(regex))
         }
     }
 
-    private fun createIdentifierRegexes(pathPattern_: String, otherLegalCharsInId: String): String {
+    private fun createIdentifierRegexes(pathPattern_: String): String {
 
         var pathPattern = pathPattern_.replace("PROJECT", "(?<project>[a-z0-9-_]+)")
         while (true) {
@@ -47,7 +45,7 @@ class AssetType(
             pathPattern = if (m.matches()) {
                 val identifier = m.group(1)
                 assert(identifier.toUpperCase() == identifier) { identifier }
-                pathPattern.replace(identifier, identifierRegex(identifier.toLowerCase(), otherLegalCharsInId))
+                pathPattern.replace(identifier, identifierRegex(identifier.toLowerCase()))
             } else {
                 break
             }
@@ -55,9 +53,10 @@ class AssetType(
         return pathPattern
     }
 
-    private fun identifierRegex(identifier: String, otherLegalCharsInId: String?): String {
-        assert(otherLegalCharsInId != null)
-        return "(?<$identifier>[a-z0-9-_$otherLegalCharsInId]+)"
+    private fun identifierRegex(identifier: String ): String {
+        // For some asset types, some of these chars are illegal. But the goal
+        // is to capture the identifer, so a too-broad regex is OK so long as it is accurate and precise.
+        return "(?<$identifier>[a-z0-9-_.~%+]+)"
     }
 
     private fun setDeleterClass(deleterClass: String?) {
@@ -79,7 +78,7 @@ class AssetType(
 
     init {
 
-        setPathPatterns(pathPatterns, otherLegalCharsInId)
+        setPathPatterns(pathPatterns)
         setDeleterClass(deleterClass)
     }
 }
