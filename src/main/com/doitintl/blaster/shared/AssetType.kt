@@ -31,6 +31,7 @@ class AssetType(
     }
 
     private fun setPathPatterns(pathPatterns: List<String>) {
+        if (pathPatterns.isEmpty()){ throw  IllegalArgumentException("Must specify pathpattern(s)")}
          for (pathPattern in pathPatterns) {
             val regex = createIdentifierRegexes(pathPattern)
             this.pathPatterns.add(Pattern.compile(regex))
@@ -39,14 +40,16 @@ class AssetType(
 
     private fun createIdentifierRegexes(pathPattern_: String): String {
 
-        var pathPattern = pathPattern_.replace("PROJECT", "(?<project>[a-z0-9-_]+)")
+        var pathPattern = pathPattern_.replace("{PROJECT}", "(?<project>[a-z0-9-_]+)")
         while (true) {
-            val m = UPPER_CASE_WORD.matcher(pathPattern)
+            val m = UPPER_CASE_WORD_IN_CURLIES.matcher(pathPattern)
             pathPattern = if (m.matches()) {
-                val identifier = m.group(1)
-                assert(identifier.toUpperCase() == identifier) { identifier }
-                pathPattern.replace(identifier, identifierRegex(identifier.toLowerCase()))
+                val idWIthCurlies = m.group(1)
+                assert(idWIthCurlies.toUpperCase() == idWIthCurlies) { idWIthCurlies }
+                val identifier=idWIthCurlies.substring(1,idWIthCurlies.length-1)
+                  pathPattern.replace(idWIthCurlies, identifierRegex(identifier.toLowerCase()))
             } else {
+                //no more upper-case values left, can exit
                 break
             }
         }
@@ -73,7 +76,8 @@ class AssetType(
     }
 
     companion object {
-        private val UPPER_CASE_WORD = Pattern.compile(".*\\b([A-Z]+)\\b.*")
+
+        private  val UPPER_CASE_WORD_IN_CURLIES = Pattern.compile(""".*(\{[A-Z]+\}).*""")
     }
 
     init {

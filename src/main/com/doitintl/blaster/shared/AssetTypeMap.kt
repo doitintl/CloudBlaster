@@ -2,10 +2,15 @@ package com.doitintl.blaster.shared
 
 import org.yaml.snakeyaml.Yaml
 import java.io.FileInputStream
+import java.io.FileReader
 import java.util.*
+import java.util.regex.Pattern
 import java.util.stream.Collectors
 
+val assetTypePattern=Pattern.compile("""[a-z]+\.googleapis\.com/[a-zA-Z]+""")
+
 class AssetTypeMap private constructor() {
+
     private val assetTypeMap: Map<String, AssetType>
     fun pathToAssetType(line: String): AssetType? {
         var ret: AssetType? = null
@@ -35,25 +40,24 @@ class AssetTypeMap private constructor() {
     companion object {
         val instance = AssetTypeMap()
         private const val ASSET_TYPES_YAML = "asset-types.yaml"
-        private const val LIST_FILTER_YAML = "list-filter.yaml"
+        private const val LIST_FILTER_PROPERTIES = "list-filter.properties"
         private fun loadAssetTypesFromYaml(): Map<String, AssetType> {
 
             compareYamls()
             val map = loadAssetTypesYaml()
-            loadListFilterYaml(map) //inout
+            loadListFilterFile(map) //inout
             return map
 
         }
 
 
-        private fun loadListFilterYaml(map: Map<String, AssetType>) {
-            FileInputStream(LIST_FILTER_YAML).use { `in` ->
-                for (o in Yaml().loadAll(`in`)) {
-                    for (e in (o as Map<String, String>).entries) {
-                        val at = map[e.key]
-                            ?: error("All asset types in $LIST_FILTER_YAML should have been in $ASSET_TYPES_YAML")
-                        at.setFilterRegex(e.value)
-                    }
+        private fun loadListFilterFile(map: Map<String, AssetType>) {
+            FileReader(LIST_FILTER_PROPERTIES).use { `in` ->
+                val props=Properties();
+                props.load(`in`);
+                for (e in props.entries) {
+                    val at = map[e.key]
+                    at?.setFilterRegex(e.value as String)
                 }
             }
         }
@@ -66,6 +70,10 @@ class AssetTypeMap private constructor() {
                     val assetTypesFromYaml = o as Map<String, Map<String, Any>>
                     for (assetTypeId in assetTypesFromYaml.keys) {
                         val assetType = assetTypesFromYaml[assetTypeId] ?: error("$assetTypeId not found")
+
+                        if (! assetTypePattern.matcher(assetTypeId).matches()){
+                            throw  IllegalArgumentException("Unsupported asset type id $assetTypeId")
+                        }
                         val deleterClass = deleterClassName(assetTypeId, assetType)
                         val pathPatterns = pathPatterns(assetType)
 
@@ -83,6 +91,7 @@ class AssetTypeMap private constructor() {
                 val assetTypeShortName = parts[parts.size - 1]
                 deleterClass = assetTypeShortName + "Deleter"
             }
+
             return deleterClass
         }
 
@@ -90,11 +99,11 @@ class AssetTypeMap private constructor() {
 
             var errMessage = ""
             val at = loadAssetTypeIds(ASSET_TYPES_YAML)
-            val lf = loadAssetTypeIds(LIST_FILTER_YAML)
+            val lf = loadAssetTypeIds(LIST_FILTER_PROPERTIES)
 
             val missingInFilter = at subtract lf
             if (missingInFilter.isNotEmpty()) {
-                errMessage += "Missing in $LIST_FILTER_YAML: $missingInFilter"
+                errMessage += "Missing in $LIST_FILTER_PROPERTIES: $missingInFilter\n"
             }
             val missingInAssetTypes = lf subtract at
             if (missingInAssetTypes.isNotEmpty()) {
@@ -122,7 +131,7 @@ class AssetTypeMap private constructor() {
 
             when (val pathPatternObj = aType["pathPattern"]) { //can be null
                 null -> {
-                    //pathPatterns is be empty and later asserted as broken
+                    throw  IllegalArgumentException("Must specify pathpattern(s)")
                 }
                 is String -> {
                     pathPatterns.add(pathPatternObj)

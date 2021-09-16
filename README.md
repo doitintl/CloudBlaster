@@ -34,15 +34,18 @@ To keep it safe, Cloud Blaster has these features.
 1. The first step, the Lister, does *not* delete assets; rather, it just lists assets in a file, `assets-to-delete.txt`,
 that you review.
 1. The Lister requires you to explicitly state a project. It does not implicitly use your `gcloud`  default project.
-1. The Lister can be filtered (see `list-filter.yaml` file) so that specified assets are skipped when 
+1. The Lister can be filtered (see `list-filter.properties` file) so that specified assets are skipped when 
 building the `assets-to-delete.txt` file.
 1. After running the Lister, you review and manually edit the list of assets for deletion, before running the Deleter.
  
 ## Instructions
 
+### Prerequesites
+* Install Maven
+
 ### Listing step
-* Edit `list-filter.yaml`. Write  regex for the asset types you don't want to list.
-(This is a full-string match on the  local asset name, like the Disk name  or Topic Name.
+* Edit `list-filter.properties`. Write  regex for the asset types you don't want to list.
+(This is a full-string match on the  local asset name, such as the Disk name  or Topic Name.
 See the top of that yaml for detailed instructions.)
 * Run `./lister.sh -p <GCP_PROJECT>` 
    * (In this script, Maven just builds if needed, then executes `java com.doitintl.blaster.Lister` ). 
@@ -64,7 +67,7 @@ See the top of that yaml for detailed instructions.)
     * This includes Google Compute Engine Instances and Disks, PubSub Topics and Subscriptions, 
     Google Kubernetes Engine  regional and zonal clusters,
     Google App Engine Services and Versions, and Google Cloud Storage Buckets.
-    * For the most up-to-date list of supported asset types, see `list-filter.yaml`
+    * For the most up-to-date list of supported asset types, see `list-filter.properties`
 * If you want more services or asset types, please either
     * Or submit an issue at GitHub.
     * Add support for the asset type and submit a pull request. 
@@ -76,9 +79,11 @@ See the top of that yaml for detailed instructions.)
 
 # Future features
 * More asset types
-* Track dependencies, so that if you want to delete asset A, but it is undeletable until 
+* Track asset dependencies, so that if you want to delete asset A, but it is undeletable until 
 asset B is gone, you delete B first, then A. 
-* More user verification: "Are you sure. Still, we have to trust the user. A sloppy user will bypass
+* Better error messages in `malformed list-filter.properties` (and, though less important because it is 
+not edited by users, in `asset-types.yaml`)
+* More runtime verification by user: "Are you sure. Still, we have to trust the user. A sloppy user will bypass
 such checks, and a careful user already has the opportunity to edit the `assets-to-delete.txt`.
 # Other projects and approaches
 - [Safe Scrub](https://github.come/doitintl/SafeScrub) was an earlier bash-only project that does the same thing. 

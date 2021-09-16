@@ -2,7 +2,7 @@
 # though if you only want to generate a listing of all assets, you can do tht, using switch `--print-all-assets`.
 #
 # Mandatory key pathPattern (string- or list-valued) is one or more patterns of the path
-# used to identify such assets, where upper-case words like PROJECT and ID will be substituted for a regex.
+# used to identify such assets, where upper-case words like {PROJECT} and {ID} will be substituted for a regex.
 #
 # Optional key deleterClass is the Java class (default package com.doitintl.blaster)
 # that implements AssetDeleter (usually subclassing AbstractDeleter).
@@ -24,10 +24,10 @@
 #apigateway.googleapis.com/Gateway: {}
 # Impossible to  delete this: appengine.googleapis.com/Application: {}
 appengine.googleapis.com/Service:
-  pathPattern: //appengine.googleapis.com/apps/PROJECT/services/ID
+  pathPattern: //appengine.googleapis.com/apps/{PROJECT}/services/{ID}
   deleterClass: GAEServiceDeleter
 appengine.googleapis.com/Version:
-  pathPattern: //appengine.googleapis.com/apps/PROJECT/services/SERVICE/versions/ID
+  pathPattern: //appengine.googleapis.com/apps/{PROJECT}/services/{SERVICE}/versions/{ID}
   deleterClass: GAEVersionDeleter
 #artifactregistry.googleapis.com/DockerImage: {}
 #artifactregistry.googleapis.com/Repository: {}
@@ -55,7 +55,7 @@ appengine.googleapis.com/Version:
 #compute.googleapis.com/BackendService: {}
 #compute.googleapis.com/Commitment: {}
 compute.googleapis.com/Disk:
-  pathPattern: //compute.googleapis.com/projects/PROJECT/zones/ZONE/disks/ID
+  pathPattern: //compute.googleapis.com/projects/{PROJECT}/zones/ZONE/disks/{ID}
 #compute.googleapis.com/ExternalVpnGateway: {}
 #compute.googleapis.com/Firewall: {}
 #compute.googleapis.com/ForwardingRule: {}
@@ -66,7 +66,7 @@ compute.googleapis.com/Disk:
 #compute.googleapis.com/HttpsHealthCheck: {}
 #compute.googleapis.com/Image: {}
 compute.googleapis.com/Instance:
-  pathPattern: //compute.googleapis.com/projects/PROJECT/zones/ZONE/instances/ID
+  pathPattern: //compute.googleapis.com/projects/{PROJECT}/zones/ZONE/instances/{ID}
   deleterClass: GCEInstanceDeleter
 #compute.googleapis.com/InstanceGroup: {}
 #compute.googleapis.com/InstanceGroupManager: {}
@@ -103,8 +103,8 @@ compute.googleapis.com/Instance:
 #compute.googleapis.com/VpnTunnel: {}
 container.googleapis.com/Cluster:
   pathPattern:
-  - //container.googleapis.com/projects/PROJECT/zones/LOCATION/clusters/ID
-  - //container.googleapis.com/projects/PROJECT/locations/LOCATION/clusters/ID
+  - //container.googleapis.com/projects/{PROJECT}/zones/{LOCATION}/clusters/{ID}
+  - //container.googleapis.com/projects/{PROJECT}/locations/{LOCATION}/clusters/{ID}
   deleterClass: GKEClusterDeleter
 #container.googleapis.com/NodePool: {}
 #containerregistry.googleapis.com/Image: {}
@@ -142,9 +142,9 @@ container.googleapis.com/Cluster:
 #privateca.googleapis.com/CertificateTemplate: {}
 #pubsub.googleapis.com/Snapshot: {}
 pubsub.googleapis.com/Subscription:
-  pathPattern: //pubsub.googleapis.com/projects/PROJECT/subscriptions/ID
+  pathPattern: //pubsub.googleapis.com/projects/{PROJECT}/subscriptions/{ID}
 pubsub.googleapis.com/Topic:
-  pathPattern: //pubsub.googleapis.com/projects/PROJECT/topics/ID
+  pathPattern: //pubsub.googleapis.com/projects/{PROJECT}/topics/{ID}
 #redis.googleapis.com/Instance: {}
 #run.googleapis.com/DomainMapping: {}
 #run.googleapis.com/Revision: {}
@@ -160,6 +160,6 @@ pubsub.googleapis.com/Topic:
 #sqladmin.googleapis.com/Instance: {}
 #gpu.googleapis.com/Node: {}
 storage.googleapis.com/Bucket:
-  pathPattern: //storage.googleapis.com/ID
+  pathPattern: //storage.googleapis.com/{ID}
 
 #vpcaccess.googleapis.com/Connector: {}
