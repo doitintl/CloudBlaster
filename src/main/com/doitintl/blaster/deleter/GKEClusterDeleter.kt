@@ -11,8 +11,6 @@ import com.google.auth.http.HttpCredentialsAdapter
 import com.google.auth.oauth2.GoogleCredentials
 
 class GKEClusterDeleter : AbstractDeleter() {
-    override val pathKeys: Array<String>
-        get() = arrayOf(PROJECT, LOCATION, ID)
     override val pathPatterns: Array<String>
         get() = arrayOf(
             "//container.googleapis.com/projects/{PROJECT}/zones/{LOCATION}/clusters/{ID}",

@@ -11,8 +11,7 @@ import com.google.auth.http.HttpCredentialsAdapter
 import com.google.auth.oauth2.GoogleCredentials
 
 class GAEServiceDeleter : AbstractDeleter() {
-    override val pathKeys: Array<String>
-        get() = arrayOf(PROJECT, ID)
+
     override val pathPatterns: Array<String>
         get() = arrayOf("//appengine.googleapis.com/apps/{PROJECT}/services/{ID}")
 

@@ -11,8 +11,6 @@ import com.google.auth.http.HttpCredentialsAdapter
 import com.google.auth.oauth2.GoogleCredentials
 
 class CloudFunctionDeleter : AbstractDeleter() {
-    override val pathKeys: Array<String>
-        get() = arrayOf(PROJECT, LOCATION, ID)
 
     override val pathPatterns: Array<String>
         get() = arrayOf("//cloudfunctions.googleapis.com/projects/{PROJECT}/locations/{LOCATION}/functions/{ID}")

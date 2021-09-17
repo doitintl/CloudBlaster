@@ -6,8 +6,6 @@ import com.google.cloud.pubsub.v1.TopicAdminClient
 import com.google.pubsub.v1.TopicName
 
 class TopicDeleter : AbstractDeleter() {
-    override val pathKeys: Array<String>
-        get() = arrayOf(PROJECT, ID)
 
     override val pathPatterns: Array<String>
         get() = arrayOf("//pubsub.googleapis.com/projects/{PROJECT}/topics/{ID}")

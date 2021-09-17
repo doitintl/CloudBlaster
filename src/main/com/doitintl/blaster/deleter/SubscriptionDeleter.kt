@@ -6,8 +6,6 @@ import com.google.cloud.pubsub.v1.SubscriptionAdminClient
 import com.google.pubsub.v1.ProjectSubscriptionName
 
 class SubscriptionDeleter : AbstractDeleter() {
-    override val pathKeys: Array<String>
-        get() = arrayOf(PROJECT, ID)
 
     override val pathPatterns: Array<String>
         get() = arrayOf("//pubsub.googleapis.com/projects/{PROJECT}/subscriptions/{ID}")

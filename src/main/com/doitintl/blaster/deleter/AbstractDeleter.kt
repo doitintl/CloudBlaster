@@ -37,9 +37,10 @@ abstract class AbstractDeleter : AssetDeleter {
 
     override fun paramsFromPath(path: String): Map<String, String> {
         val params: MutableMap<String, String> = HashMap()
-        val keys = pathKeys
+
         //There's probably a better way to match the multiple regexes than this weird loop
         for (pathPattern in pathRegexes()) {
+            val keys = groupNames(pathPattern)
             val matcher = pathPattern.matcher(path)
             if (matcher.matches()) {
                 for (k in keys) {
@@ -48,9 +49,20 @@ abstract class AbstractDeleter : AssetDeleter {
                 break
             }
         }
-        assert(keys.all { params[it] != null }) { "Some expected params not set" }
 
         return params
+    }
+
+    private fun groupNames(pathPattern: Pattern): Set<String> {
+        val patternS = pathPattern.pattern()
+        val namedGroups: MutableSet<String> = TreeSet<String>()
+        val matcher = Pattern.compile("\\(\\?<([a-zA-Z][a-zA-Z0-9]*)>").matcher(patternS)
+        while (matcher.find()) {
+            namedGroups.add(matcher.group(1))
+        }
+        println("Pattern $patternS, groups $namedGroups")
+        return namedGroups
+
     }
 
     override fun pathRegexes(): List<Pattern> {

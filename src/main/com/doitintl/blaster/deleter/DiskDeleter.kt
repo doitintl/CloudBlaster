@@ -5,8 +5,7 @@ import com.doitintl.blaster.shared.Constants.LOCATION
 import com.doitintl.blaster.shared.Constants.PROJECT
 
 class DiskDeleter : GCEAbstractDeleter() {
-    override val pathKeys: Array<String>
-        get() = arrayOf(PROJECT, LOCATION, ID)
+
     override val pathPatterns: Array<String>
         get() = arrayOf("//compute.googleapis.com/projects/{PROJECT}/zones/{LOCATION}/disks/{ID}")
 
