@@ -29,11 +29,6 @@
     <dependencies>
 
         <dependency>
-            <groupId>org.yaml</groupId>
-            <artifactId>snakeyaml</artifactId>
-            <version>1.26</version>
-        </dependency>
-        <dependency>
             <groupId>info.picocli</groupId>
             <artifactId>picocli</artifactId>
             <version>4.6.1</version>
@@ -63,12 +58,11 @@
             <artifactId>google-cloud-storage</artifactId>
             <version>2.1.1</version>
         </dependency>
-        <!-- https://mvnrepository.com/artifact/com.google.apis/google-api-services-container -->
-        <dependency>
-            <groupId>com.google.apis</groupId>
-            <artifactId>google-api-services-container</artifactId>
-            <version>v1-rev93-1.25.0</version>
-        </dependency>
+         <dependency>
+             <groupId>com.google.apis</groupId>
+             <artifactId>google-api-services-container</artifactId>
+             <version>v1-rev93-1.25.0</version>
+         </dependency>
 
         <dependency>
             <groupId>com.google.apis</groupId>
@@ -80,17 +74,32 @@
             <artifactId>google-api-services-appengine</artifactId>
             <version>v1-rev20210827-1.32.1</version>
         </dependency>
-         <dependency>
+        <dependency>
             <groupId>com.google.apis</groupId>
             <artifactId>google-api-services-cloudfunctions</artifactId>
             <version>v1-rev96-1.25.0</version>
         </dependency>
-
+        <dependency>
+            <groupId>com.google.cloud</groupId>
+            <artifactId>google-cloud-aiplatform</artifactId>
+            <version>2.2.1</version>
+        </dependency>
         <dependency>
             <groupId>com.google.api-client</groupId>
             <artifactId>google-api-client-jackson2</artifactId>
             <version>1.20.0</version>
 
+        </dependency>
+        <!--         <dependency>-->
+        <!--            <groupId>com.google.cloud</groupId>-->
+        <!--            <artifactId>google-cloud-monitoring</artifactId>-->
+        <!--            <version>3.0.4</version>-->
+        <!--        </dependency>-->
+
+        <dependency>
+            <groupId>com.google.apis</groupId>
+            <artifactId>google-api-services-logging</artifactId>
+            <version>v2-rev662-1.18.0-rc</version>
         </dependency>
 
     </dependencies>

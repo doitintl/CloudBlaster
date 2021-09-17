@@ -48,7 +48,7 @@ building the `assets-to-delete.txt` file.
 (This is a full-string match on the  local asset name, such as the Disk name  or Topic Name.
 See the top of that file for detailed instructions.)
 * Run `./lister.sh -p <GCP_PROJECT>` 
-   * (In this script, Maven just builds if needed, then executes `java com.doitintl.blaster.lister.Lister` ). 
+   * (In `lister.sh`, Maven builds if needed, then executes `java com.doitintl.blaster.lister.Lister` .) 
    * The Lister outputs `assets-to-delete.txt`
    * (If instead you just want to print, to standard output, a list of *all* GCP assets, whether  of a type
    supported by Cloud Blaster or not, add the `-a` or `--print-all-assets` flag.)
@@ -56,35 +56,41 @@ See the top of that file for detailed instructions.)
 ### Deletion step
 * Review `assets-to-delete.txt` and remove lines for any assets that you do not want to delete.
 * Run `./deleter.sh` 
-  * (In this script, Maven just builds if needed, then executes `com.doitintl.blaster.deleter.Deleter`.). 
-  * The Deleter  deletes  assets listed in `assets-to-delete.txt`. 
+  * (In `deleter.sh`, Maven just builds if needed, then executes `com.doitintl.blaster.deleter.Deleter`.). 
+  * The Deleter tries to delete the assets listed in `assets-to-delete.txt`. 
   * You do not need to specify the project, as this is included in every asset path in  `assets-to-delete.txt`.
   * Note that some assets cannot be deleted, such as attached Disks or the default GAE Service.
    There is no harm in having them in `assets-to-delete.txt` -- you will just get an exception.
-  * Deletion is executed concurrently, since it is slow and IO-bound.
+  * For speed, deletion is executed concurrently, since it is slow and IO-bound.
+  
 ## Features
-* I focused on the common important asset types that are set up and torn down in typical development and QA.
-    * This includes Google Compute Engine Instances and Disks, PubSub Topics and Subscriptions, 
-    Google Kubernetes Engine  regional and zonal clusters,
-    Google App Engine Services and Versions, and Google Cloud Storage Buckets.
-    * For the most up-to-date list of supported asset types, see `list-filter.properties`
+* I focused on the common important asset types that are set up and torn down in typical development and QA.  This includes 
+    * Google Compute Engine instances, disks, and firewalls
+    * Google Cloud PubSub topics and Subscriptions 
+    * Google Kubernetes Engine regional and zonal clusters
+    * Google Cloud Operations log metrics
+    * Google Cloud functions
+    * Google App Engine services and versions
+    * Google Cloud Storage buckets
+    
+     For the most up-to-date list of supported asset types, see `list-filter.properties`
+    
 * If you want more services or asset types, please either
     * Or submit an issue at GitHub.
     * Add support for the asset type and submit a pull request. 
     * Add support for the asset type and submit a pull request. 
         * To do this, use existing asset types as an example.
-        * Uncomment the asset type in `asset-types.properties`. See the documentation at the top of that file.
-        * Add the asset type to `list-filter.yamls`.
-        * Implement a subclass of `Abstract Deleter`.  
+        * Uncomment the asset type in `asset-types.properties`. 
+            * See the documentation at the top of that file about specifying the Deleter class if needed.
+        * Add the asset type to `list-filter.properties`.
+        * Implement a subclass of `AbstractDeleter`.  
 
 # Future features
-* More asset types
+* More asset types.
 * Track asset dependencies, so that if you want to delete asset A, but it is undeletable until 
 asset B is gone, you delete B first, then A. 
-* Better error messages in `malformed list-filter.properties` (and, though less important because it is 
-not edited by users, in `asset-types.properties`)
-* More runtime verification by user: "Are you sure. Still, we have to trust the user. A sloppy user will bypass
-such checks, and a careful user already has the opportunity to edit the `assets-to-delete.txt`.
+* More runtime verification by user along the lines of "Are you sure". Still, we have to trust the user. A sloppy user will bypass
+such checks, and a careful user already has the opportunity to edit  `assets-to-delete.txt`.
 # Other projects and approaches
 - [Safe Scrub](https://github.come/doitintl/SafeScrub) was an earlier bash-only project that does the same thing. 
 - [Travis CI GCloud Cleanup](https://github.com/travis-ci/gcloud-cleanup) and [Bazooka](https://github.com/enxebre/bazooka) also delete GCE assets.
