@@ -7,6 +7,7 @@ abstract class AbstractDeleter : AssetDeleter {
     /*pathPatterns is nullable because the constructor does not take pathPatterns; and that
      is because we want a no-arg constructor (otherwise every subclass will need a one-arg constructor).
     */
+    //todo define pathPatterns in deleter class
     private var pathPatterns: List<Pattern>? = null
     override fun setPathPatterns(pathPatterns: List<Pattern>) {
         this.pathPatterns = pathPatterns

@@ -40,7 +40,9 @@ appengine.googleapis.com/Version:
 #bigtableadmin.googleapis.com/Instance: {}
 #bigtableadmin.googleapis.com/Table: {}
 #cloudbilling.googleapis.com/BillingAccount: {}
-#cloudfunctions.googleapis.com/CloudFunction: {}
+cloudfunctions.googleapis.com/CloudFunction:
+  pathPattern: //cloudfunctions.googleapis.com/projects/{PROJECT}/locations/{LOCATION}/functions/{ID}
+
 #cloudkms.googleapis.com/CryptoKey: {}
 #cloudkms.googleapis.com/CryptoKeyVersion: {}
 #cloudkms.googleapis.com/ImportJob: {}
@@ -55,7 +57,7 @@ appengine.googleapis.com/Version:
 #compute.googleapis.com/BackendService: {}
 #compute.googleapis.com/Commitment: {}
 compute.googleapis.com/Disk:
-  pathPattern: //compute.googleapis.com/projects/{PROJECT}/zones/ZONE/disks/{ID}
+  pathPattern: //compute.googleapis.com/projects/{PROJECT}/zones/{LOCATION}/disks/{ID}
 #compute.googleapis.com/ExternalVpnGateway: {}
 #compute.googleapis.com/Firewall: {}
 #compute.googleapis.com/ForwardingRule: {}
@@ -66,7 +68,7 @@ compute.googleapis.com/Disk:
 #compute.googleapis.com/HttpsHealthCheck: {}
 #compute.googleapis.com/Image: {}
 compute.googleapis.com/Instance:
-  pathPattern: //compute.googleapis.com/projects/{PROJECT}/zones/ZONE/instances/{ID}
+  pathPattern: //compute.googleapis.com/projects/{PROJECT}/zones/{LOCATION}/instances/{ID}
   deleterClass: GCEInstanceDeleter
 #compute.googleapis.com/InstanceGroup: {}
 #compute.googleapis.com/InstanceGroupManager: {}

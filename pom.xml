@@ -80,6 +80,12 @@
             <artifactId>google-api-services-appengine</artifactId>
             <version>v1-rev20210827-1.32.1</version>
         </dependency>
+         <dependency>
+            <groupId>com.google.apis</groupId>
+            <artifactId>google-api-services-cloudfunctions</artifactId>
+            <version>v1-rev96-1.25.0</version>
+        </dependency>
+
         <dependency>
             <groupId>com.google.api-client</groupId>
             <artifactId>google-api-client-jackson2</artifactId>

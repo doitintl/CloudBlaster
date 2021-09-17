@@ -59,9 +59,9 @@ class AssetType(
     }
 
     private fun identifierRegex(identifier: String): String {
-        // For some asset types, some of these chars are illegal. But the goal
+        // The identifiers have restructions beyond just "not-slash" as below. But the goal
         // is to capture the identifer, so a too-broad regex is OK so long as it is accurate and precise.
-        return "(?<$identifier>[a-z0-9-_.~%+]+)"
+        return "(?<$identifier>[^/]+)"
     }
 
     private fun setDeleterClass(deleterClass: String?) {

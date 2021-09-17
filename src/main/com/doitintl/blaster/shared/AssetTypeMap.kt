@@ -69,7 +69,7 @@ class AssetTypeMap private constructor() {
                 for (o in Yaml().loadAll(`in`)) {
                     val assetTypesFromYaml = o as Map<String, Map<String, Any>>
                     for (assetTypeId in assetTypesFromYaml.keys) {
-                        val assetType = assetTypesFromYaml[assetTypeId] ?: error("$assetTypeId not found")
+                        val assetType: Map<String, Any> = assetTypesFromYaml[assetTypeId] ?: error("$assetTypeId not found")
 
                         if (!assetTypePattern.matcher(assetTypeId).matches()) {
                             throw  IllegalArgumentException("Unsupported asset type id $assetTypeId")
@@ -129,20 +129,21 @@ class AssetTypeMap private constructor() {
         private fun pathPatterns(aType: Map<String, Any>): List<String> {
             val pathPatterns: MutableList<String> = ArrayList()
 
-            when (val pathPatternObj = aType["pathPattern"]) { //can be null
+            when (val pathPattern = aType["pathPattern"]) { //can be null
                 null -> {
                     throw  IllegalArgumentException("Must specify pathpattern(s)")
                 }
                 is String -> {
-                    pathPatterns.add(pathPatternObj)
+
+                    pathPatterns.add(pathPattern.trim())
                 }
                 is List<*> -> {
-                    for (pathPatternStr in pathPatternObj) {
-                        pathPatterns.add(pathPatternStr as String)
+                    for (pathPatternObj in pathPattern) {
+                        pathPatterns.add((pathPatternObj as String).trim())
                     }
                 }
                 else -> {
-                    throw IllegalStateException("Unexpected type: $pathPatternObj")
+                    throw IllegalStateException("Unexpected type: $pathPattern")
                 }
             }
             return pathPatterns

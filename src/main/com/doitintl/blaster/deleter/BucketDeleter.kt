@@ -5,6 +5,7 @@ import com.google.auth.oauth2.GoogleCredentials
 import com.google.cloud.storage.StorageOptions
 
 class BucketDeleter : AbstractDeleter() {
+    //todo test on regional buckets
     override val pathKeys: Array<String>
         get() = arrayOf(ID)
 
