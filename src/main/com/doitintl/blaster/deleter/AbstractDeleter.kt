@@ -3,6 +3,7 @@ package com.doitintl.blaster.deleter
 import java.util.*
 import java.util.regex.Pattern
 
+//todo Maybe use Kotlin Regex rather than Java Pattern, throughout.
 private val UPPERCASE_IN_CURLIES = Pattern.compile(""".*(\{[A-Z]+\}).*""")
 private val GROUP_NAMES_IN_REGEX = Pattern.compile("\\(\\?<([a-zA-Z][a-zA-Z0-9]*)>")
 abstract class AbstractDeleter : AssetDeleter {
@@ -13,23 +14,28 @@ abstract class AbstractDeleter : AssetDeleter {
 
 
     private fun createIdentifierRegex(pathPattern_: String): Pattern {
-        var regexStr = pathPattern_
+        var pathPattern = pathPattern_.trim()
+
+        if (!pathPattern.startsWith("//")) {
+            throw IllegalArgumentException("$pathPattern should start with //")
+        }
+
         while (true) {
-            val m = UPPERCASE_IN_CURLIES.matcher(regexStr)
-            regexStr = if (m.matches()) {
+            val m = UPPERCASE_IN_CURLIES.matcher(pathPattern)
+            pathPattern = if (m.matches()) {
                 val idWIthCurlies = m.group(1)
                 assert(idWIthCurlies.toUpperCase() == idWIthCurlies) { idWIthCurlies }
                 val id = idWIthCurlies.substring(1, idWIthCurlies.length - 1)
                 // The identifiers have restrictions beyond just "not-slash" as below. But the goal
                 // is to capture the identifer, so a too-broad regex is OK so long as it is accurate and precise.
                 val idRegex = "(?<${id.toLowerCase()}>[^/]+)"
-                regexStr.replace(idWIthCurlies, idRegex)
+                pathPattern.replace(idWIthCurlies, idRegex)
             } else {
                 //no more upper-case values left, can exit
                 break
             }
         }
-        return Pattern.compile(regexStr)
+        return Pattern.compile(pathPattern)
 
     }
 

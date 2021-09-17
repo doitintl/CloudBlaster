@@ -21,7 +21,7 @@ class AssetTypeMap private constructor() {
                 val matcher = regex.matcher(line.trim())
                 if (matcher.matches()) {
                     if (ret != null) {
-                        throw RuntimeException("We do not expect multiple patterns to match one path: $ret and $assetType both found for pattern $regex")
+                        throw RuntimeException("Only one pattern should match each path: ${ret.javaClass.name} and ${assetType.deleterClass.name} both found for pattern $regex")
                     }
                     ret = deleter
                 }
@@ -61,9 +61,9 @@ class AssetTypeMap private constructor() {
             FileReader(LIST_FILTER_PROPERTIES).use { `in` ->
                 val props = Properties()
                 props.load(`in`)
-                for (e in props.entries) {
-                    val at = assetTypeMap_[e.key]!!
-                    at.setFilterRegex(e.value as String)
+                for ((k, v) in props.entries) {
+                    val at = assetTypeMap_[k]!!
+                    at.setFilterRegex(v as String)
                 }
             }
         }
@@ -74,13 +74,13 @@ class AssetTypeMap private constructor() {
             FileInputStream(ASSET_TYPES_FILE).use { `in` ->
                 val props = Properties()
                 props.load(`in`)
-                for (e in props.entries) {
-                    val assetTypeId = e.key as String
+                for ((k, v) in props.entries) {
+                    val assetTypeId = k as String
                     if (!assetTypePattern.matcher(assetTypeId).matches()) {
                         throw  IllegalArgumentException("Unsupported asset type id $assetTypeId")
                     }
 
-                    val optionalDeleterClassName = e.value as String
+                    val optionalDeleterClassName = v as String
                     ret[assetTypeId] = AssetType(assetTypeId, optionalDeleterClassName)
                 }
             }

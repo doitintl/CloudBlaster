@@ -47,6 +47,7 @@ class Deleter : Callable<Int> {
             println("Deleted $line")
         } catch (e: Exception) {
             System.err.println("Error in deleting $line: $e")// Just continue
+            e.printStackTrace()
         }
     }
 

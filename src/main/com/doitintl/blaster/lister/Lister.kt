@@ -1,9 +1,7 @@
-package com.doitintl.blaster
+package com.doitintl.blaster.lister
 
 import com.doitintl.blaster.Constants.CLOUD_BLASTER
 import com.doitintl.blaster.Constants.LISTED_ASSETS_FILENAME
-import com.doitintl.blaster.lister.AssetIterator
-import com.doitintl.blaster.lister.Callback
 import picocli.CommandLine
 import java.io.FileWriter
 import java.util.concurrent.Callable
