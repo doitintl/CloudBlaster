@@ -1,8 +1,8 @@
-package com.doitintl.blaster
+package com.doitintl.blaster.deleter
 
-import com.doitintl.blaster.shared.AssetTypeMap
-import com.doitintl.blaster.shared.Constants.CLOUD_BLASTER
-import com.doitintl.blaster.shared.Constants.LISTED_ASSETS_FILENAME
+import com.doitintl.blaster.Constants.CLOUD_BLASTER
+import com.doitintl.blaster.Constants.LISTED_ASSETS_FILENAME
+import com.doitintl.blaster.lister.AssetTypeMap
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking

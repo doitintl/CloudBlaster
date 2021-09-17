@@ -48,7 +48,7 @@ building the `assets-to-delete.txt` file.
 (This is a full-string match on the  local asset name, such as the Disk name  or Topic Name.
 See the top of that file for detailed instructions.)
 * Run `./lister.sh -p <GCP_PROJECT>` 
-   * (In this script, Maven just builds if needed, then executes `java com.doitintl.blaster.Lister` ). 
+   * (In this script, Maven just builds if needed, then executes `java com.doitintl.blaster.lister.Lister` ). 
    * The Lister outputs `assets-to-delete.txt`
    * (If instead you just want to print, to standard output, a list of *all* GCP assets, whether  of a type
    supported by Cloud Blaster or not, add the `-a` or `--print-all-assets` flag.)
@@ -56,7 +56,7 @@ See the top of that file for detailed instructions.)
 ### Deletion step
 * Review `assets-to-delete.txt` and remove lines for any assets that you do not want to delete.
 * Run `./deleter.sh` 
-  * (In this script, Maven just builds if needed, then executes `com.doitintl.blaster.Deleter`.). 
+  * (In this script, Maven just builds if needed, then executes `com.doitintl.blaster.deleter.Deleter`.). 
   * The Deleter  deletes  assets listed in `assets-to-delete.txt`. 
   * You do not need to specify the project, as this is included in every asset path in  `assets-to-delete.txt`.
   * Note that some assets cannot be deleted, such as attached Disks or the default GAE Service.

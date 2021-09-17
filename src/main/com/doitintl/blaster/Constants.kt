@@ -1,4 +1,4 @@
-package com.doitintl.blaster.shared
+package com.doitintl.blaster
 
 object Constants {
     const val CLOUD_BLASTER: String = "CloudBlaster"

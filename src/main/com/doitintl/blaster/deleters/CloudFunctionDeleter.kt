@@ -1,9 +1,10 @@
-package com.doitintl.blaster.deleter
+package com.doitintl.blaster.deleters
 
-import com.doitintl.blaster.shared.Constants.CLOUD_BLASTER
-import com.doitintl.blaster.shared.Constants.ID
-import com.doitintl.blaster.shared.Constants.LOCATION
-import com.doitintl.blaster.shared.Constants.PROJECT
+import com.doitintl.blaster.Constants.CLOUD_BLASTER
+import com.doitintl.blaster.Constants.ID
+import com.doitintl.blaster.Constants.LOCATION
+import com.doitintl.blaster.Constants.PROJECT
+import com.doitintl.blaster.deleter.AbstractDeleter
 import com.google.api.client.googleapis.javanet.GoogleNetHttpTransport
 import com.google.api.client.json.jackson2.JacksonFactory
 import com.google.api.services.cloudfunctions.v1.CloudFunctions

@@ -1,7 +1,8 @@
-package com.doitintl.blaster.deleter
+package com.doitintl.blaster.deleters
 
-import com.doitintl.blaster.shared.Constants.ID
-import com.doitintl.blaster.shared.Constants.PROJECT
+import com.doitintl.blaster.Constants.ID
+import com.doitintl.blaster.Constants.PROJECT
+import com.doitintl.blaster.deleter.AbstractDeleter
 import com.google.cloud.pubsub.v1.TopicAdminClient
 import com.google.pubsub.v1.TopicName
 

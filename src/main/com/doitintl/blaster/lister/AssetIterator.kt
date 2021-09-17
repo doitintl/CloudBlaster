@@ -1,4 +1,4 @@
-package com.doitintl.blaster.shared
+package com.doitintl.blaster.lister
 
 import com.google.cloud.asset.v1.AssetServiceClient
 import com.google.cloud.asset.v1.ContentType
@@ -12,21 +12,21 @@ class AssetIterator {
         val client = AssetServiceClient.create()
         val contentType = ContentType.CONTENT_TYPE_UNSPECIFIED
         var apiIdentifiers: List<String> = AssetTypeMap.instance.identifiers()
-        if (justPrintAll) {
+        if (justPrintAll || apiIdentifiers.isEmpty()) { //if "-a" arg was used or if asset-types is empty
             apiIdentifiers = emptyList()
+            justPrintAll = true
+            if (justPrintAll) {
+                println("Printing all assets, even if deletion is not supported, to stdout")
+            }
         }
+
+
         var request = ListAssetsRequest.newBuilder()
             .setParent(ProjectName.of(projectId).toString())
             .addAllAssetTypes(apiIdentifiers)
             .setContentType(contentType)
             .build()
-        if (apiIdentifiers.isEmpty()) {//Will also be empty if   asset-types.properties is empty
-            justPrintAll = true
-        }
-        if (justPrintAll) {
-            println("Just printing all assets of all types to stout")
-        }
-        // Repeatedly call ListAssets until page token is empty.
+
         var response = client.listAssets(request)
         iterateListingResponse(response, callback, justPrintAll)
         while (response.nextPageToken.isNotEmpty()) {
@@ -49,8 +49,7 @@ class AssetIterator {
             val parts = asset.name.split("/").toTypedArray()
             val id = parts[parts.size - 1]
             val assetTypeIdentifier = asset.assetType
-            val assetType: AssetType = AssetTypeMap.instance[assetTypeIdentifier]
-            val filterRegex = assetType.filterRegex
+            val filterRegex = AssetTypeMap.instance.getFilterRegex(assetTypeIdentifier)
             if (!filterRegex.matcher(id).matches()) {
                 println("Found ${asset.name}")
 

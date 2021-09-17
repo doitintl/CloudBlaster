@@ -3,9 +3,8 @@ package com.doitintl.blaster.deleter
 import java.util.*
 import java.util.regex.Pattern
 
-
 private val UPPERCASE_IN_CURLIES = Pattern.compile(""".*(\{[A-Z]+\}).*""")
-
+private val GROUP_NAMES_IN_REGEX = Pattern.compile("\\(\\?<([a-zA-Z][a-zA-Z0-9]*)>")
 abstract class AbstractDeleter : AssetDeleter {
 
     override fun delete(line: String) {
@@ -54,13 +53,13 @@ abstract class AbstractDeleter : AssetDeleter {
     }
 
     private fun groupNames(pathPattern: Pattern): Set<String> {
-        val patternS = pathPattern.pattern()
         val namedGroups: MutableSet<String> = TreeSet<String>()
-        val matcher = Pattern.compile("\\(\\?<([a-zA-Z][a-zA-Z0-9]*)>").matcher(patternS)
+
+        val matcher = GROUP_NAMES_IN_REGEX.matcher(pathPattern.pattern())
         while (matcher.find()) {
             namedGroups.add(matcher.group(1))
         }
-        println("Pattern $patternS, groups $namedGroups")
+
         return namedGroups
 
     }

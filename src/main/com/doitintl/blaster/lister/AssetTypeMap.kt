@@ -1,4 +1,4 @@
-package com.doitintl.blaster.shared
+package com.doitintl.blaster.lister
 
 import com.doitintl.blaster.deleter.AssetDeleter
 import java.io.FileInputStream
@@ -37,8 +37,13 @@ class AssetTypeMap private constructor() {
         return assetTypeMap.values.stream().map { it.assetTypeId }.collect(Collectors.toList())
     }
 
-    operator fun get(assetTypeIdentifier: String): AssetType {
+    private operator fun get(assetTypeIdentifier: String): AssetType {
         return assetTypeMap[assetTypeIdentifier] ?: error(assetTypeIdentifier + "not found")
+    }
+
+    fun getFilterRegex(assetTypeIdentifier: String): Pattern {
+        return get(assetTypeIdentifier).filterRegex
+
     }
 
     companion object {
@@ -112,5 +117,55 @@ class AssetTypeMap private constructor() {
 
     init {
         assetTypeMap = loadAssetTypesFromFile()
+    }
+}
+
+
+private class AssetType(
+    val assetTypeId: String,
+    deleterClassName: String
+) {
+    lateinit var filterRegex: Pattern
+        private set
+
+    lateinit var deleterClass: Class<AssetDeleter>
+        private set
+
+
+    //NonNullable param even thought the regex can be omitted in that config file (and you get a blank string)
+    fun setFilterRegex(regex: String) {
+        filterRegex = Pattern.compile(
+            if (regex.isBlank()) {
+                regex
+            } else {
+                "$-never-matches-so-we-list-ALL-assets"
+            }
+        )
+    }
+
+    private fun setDeleterClass(deleterClassName_: String) {
+        fun deleterClassName(assetTypeId: String, optionalClassName: String): String {
+            val className =
+                if (optionalClassName.isBlank()) {//use defaults
+                    val parts = assetTypeId.split("/").toTypedArray()
+                    val assetTypeShortName = parts[parts.size - 1]
+                    assetTypeShortName + "Deleter"
+                } else {
+                    optionalClassName
+                }
+            return if (className.contains(".")) className else "com.doitintl.blaster.deleters.$className"
+        }
+
+        val deleterClassName = deleterClassName(assetTypeId, deleterClassName_)
+        this.deleterClass = Class.forName(deleterClassName) as Class<AssetDeleter>
+    }
+
+
+    override fun toString(): String {
+        return "$assetTypeId,$filterRegex,$deleterClass"
+    }
+
+    init {
+        setDeleterClass(deleterClassName)
     }
 }

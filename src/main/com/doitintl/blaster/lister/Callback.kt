@@ -1,4 +1,4 @@
-package com.doitintl.blaster.shared
+package com.doitintl.blaster.lister
 
 import java.io.Closeable
 
