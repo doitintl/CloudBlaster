@@ -1,13 +1,6 @@
 # Cloud Blaster
 
-Cloud Blaster helps you delete the unwanted 
-
-
-
-
-
-
-assets in your Google Cloud Platform project, 
+Cloud Blaster helps you delete the unwanted assets in your Google Cloud Platform project, 
 leaving it clean of confusing clutter and saving you money.
 
 # Compared to Safe Scrub
@@ -53,7 +46,7 @@ building the `assets-to-delete.txt` file.
 ### Listing step
 * Edit `list-filter.properties`. Write  regex for the asset types you don't want to list.
 (This is a full-string match on the  local asset name, such as the Disk name  or Topic Name.
-See the top of that yaml for detailed instructions.)
+See the top of that file for detailed instructions.)
 * Run `./lister.sh -p <GCP_PROJECT>` 
    * (In this script, Maven just builds if needed, then executes `java com.doitintl.blaster.Lister` ). 
    * The Lister outputs `assets-to-delete.txt`
@@ -80,7 +73,7 @@ See the top of that yaml for detailed instructions.)
     * Add support for the asset type and submit a pull request. 
     * Add support for the asset type and submit a pull request. 
         * To do this, use existing asset types as an example.
-        * Uncomment the asset type in `asset-types.yaml`. See the documentation at the top of that file.
+        * Uncomment the asset type in `asset-types.properties`. See the documentation at the top of that file.
         * Add the asset type to `list-filter.yamls`.
         * Implement a subclass of `Abstract Deleter`.  
 
@@ -89,7 +82,7 @@ See the top of that yaml for detailed instructions.)
 * Track asset dependencies, so that if you want to delete asset A, but it is undeletable until 
 asset B is gone, you delete B first, then A. 
 * Better error messages in `malformed list-filter.properties` (and, though less important because it is 
-not edited by users, in `asset-types.yaml`)
+not edited by users, in `asset-types.properties`)
 * More runtime verification by user: "Are you sure. Still, we have to trust the user. A sloppy user will bypass
 such checks, and a careful user already has the opportunity to edit the `assets-to-delete.txt`.
 # Other projects and approaches

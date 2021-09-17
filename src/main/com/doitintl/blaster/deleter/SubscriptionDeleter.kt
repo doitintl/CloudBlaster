@@ -9,14 +9,17 @@ class SubscriptionDeleter : AbstractDeleter() {
     override val pathKeys: Array<String>
         get() = arrayOf(PROJECT, ID)
 
+    override val pathPatterns: Array<String>
+        get() = arrayOf("//pubsub.googleapis.com/projects/{PROJECT}/subscriptions/{ID}")
+
 
     override fun doDelete(p: Map<String, String>) {
         SubscriptionAdminClient.create()
 
-                .use { subscriptionAdminClient ->
-                    val subscriptionName = ProjectSubscriptionName.of(p[PROJECT], p[ID])
-                    subscriptionAdminClient.deleteSubscription(subscriptionName)
-                }
+            .use { subscriptionAdminClient ->
+                val subscriptionName = ProjectSubscriptionName.of(p[PROJECT], p[ID])
+                subscriptionAdminClient.deleteSubscription(subscriptionName)
+            }
     }
 }
 

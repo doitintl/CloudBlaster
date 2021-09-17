@@ -13,16 +13,17 @@ import com.google.auth.oauth2.GoogleCredentials
 
 class GAEVersionDeleter : AbstractDeleter() {
     override val pathKeys: Array<String>
-        get() {
-            return arrayOf(PROJECT, SERVICE, ID)
-        }
+        get() = arrayOf(PROJECT, SERVICE, ID)
+
+    override val pathPatterns: Array<String>
+        get() = arrayOf("//appengine.googleapis.com/apps/{PROJECT}/services/{SERVICE}/versions/{ID}")
 
 
     override fun doDelete(p: Map<String, String>) {
         val credentials = GoogleCredentials.getApplicationDefault()
         val requestInitializer: HttpRequestInitializer = HttpCredentialsAdapter(credentials)
         val engine = Appengine.Builder(
-                GoogleNetHttpTransport.newTrustedTransport(), JacksonFactory(), requestInitializer
+            GoogleNetHttpTransport.newTrustedTransport(), JacksonFactory(), requestInitializer
         ).setApplicationName(CLOUD_BLASTER).build()
         val versions = engine.apps().services().versions()
         val del = versions.delete(p[PROJECT], p[SERVICE], p[ID])

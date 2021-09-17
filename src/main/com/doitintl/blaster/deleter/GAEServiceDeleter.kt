@@ -13,13 +13,15 @@ import com.google.auth.oauth2.GoogleCredentials
 class GAEServiceDeleter : AbstractDeleter() {
     override val pathKeys: Array<String>
         get() = arrayOf(PROJECT, ID)
+    override val pathPatterns: Array<String>
+        get() = arrayOf("//appengine.googleapis.com/apps/{PROJECT}/services/{ID}")
 
 
     override fun doDelete(p: Map<String, String>) {
         val credentials = GoogleCredentials.getApplicationDefault()
         val requestInitializer: HttpRequestInitializer = HttpCredentialsAdapter(credentials)
         val engine = Appengine.Builder(
-                GoogleNetHttpTransport.newTrustedTransport(), JacksonFactory(), requestInitializer
+            GoogleNetHttpTransport.newTrustedTransport(), JacksonFactory(), requestInitializer
         ).setApplicationName(CLOUD_BLASTER).build()
         val services = engine.apps().services()
         val del = services.delete(p[PROJECT], p[ID])

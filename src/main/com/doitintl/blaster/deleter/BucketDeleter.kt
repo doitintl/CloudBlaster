@@ -8,13 +8,18 @@ class BucketDeleter : AbstractDeleter() {
     //todo test on regional buckets
     override val pathKeys: Array<String>
         get() = arrayOf(ID)
+    override val pathPatterns: Array<String>
+        get() = arrayOf("//storage.googleapis.com/{ID}")
 
 
     override fun doDelete(p: Map<String, String>) {
         val id = p[ID]
         val credentials = GoogleCredentials.getApplicationDefault()
         val storage = StorageOptions.newBuilder().setCredentials(credentials).build().service
-        val bucket = storage[id]!!
+
+
+        val bucket = storage[id] ?: throw IllegalArgumentException("Cannot find bucket $id")
+
         var page = bucket.list()
         var counter = 0
         while (true) {

@@ -3,25 +3,43 @@ package com.doitintl.blaster.deleter
 import java.util.*
 import java.util.regex.Pattern
 
+
+private val UPPERCASE_IN_CURLIES = Pattern.compile(""".*(\{[A-Z]+\}).*""")
+
 abstract class AbstractDeleter : AssetDeleter {
-    /*pathPatterns is nullable because the constructor does not take pathPatterns; and that
-     is because we want a no-arg constructor (otherwise every subclass will need a one-arg constructor).
-    */
-    //todo define pathPatterns in deleter class
-    private var pathPatterns: List<Pattern>? = null
-    override fun setPathPatterns(pathPatterns: List<Pattern>) {
-        this.pathPatterns = pathPatterns
-    }
 
     override fun delete(line: String) {
         doDelete(paramsFromPath(line))
     }
 
+
+    private fun createIdentifierRegex(pathPattern_: String): Pattern {
+        var regexStr = pathPattern_
+        while (true) {
+            val m = UPPERCASE_IN_CURLIES.matcher(regexStr)
+            regexStr = if (m.matches()) {
+                val idWIthCurlies = m.group(1)
+                assert(idWIthCurlies.toUpperCase() == idWIthCurlies) { idWIthCurlies }
+                val id = idWIthCurlies.substring(1, idWIthCurlies.length - 1)
+                // The identifiers have restrictions beyond just "not-slash" as below. But the goal
+                // is to capture the identifer, so a too-broad regex is OK so long as it is accurate and precise.
+                val idRegex = "(?<${id.toLowerCase()}>[^/]+)"
+                regexStr.replace(idWIthCurlies, idRegex)
+            } else {
+                //no more upper-case values left, can exit
+                break
+            }
+        }
+        return Pattern.compile(regexStr)
+
+    }
+
+
     override fun paramsFromPath(path: String): Map<String, String> {
         val params: MutableMap<String, String> = HashMap()
         val keys = pathKeys
         //There's probably a better way to match the multiple regexes than this weird loop
-        for (pathPattern in pathPatterns!!) {
+        for (pathPattern in pathRegexes()) {
             val matcher = pathPattern.matcher(path)
             if (matcher.matches()) {
                 for (k in keys) {
@@ -33,5 +51,9 @@ abstract class AbstractDeleter : AssetDeleter {
         assert(keys.all { params[it] != null }) { "Some expected params not set" }
 
         return params
+    }
+
+    override fun pathRegexes(): List<Pattern> {
+        return pathPatterns.map(this::createIdentifierRegex)
     }
 }

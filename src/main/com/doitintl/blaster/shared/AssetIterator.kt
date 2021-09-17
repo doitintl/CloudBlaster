@@ -16,11 +16,11 @@ class AssetIterator {
             apiIdentifiers = emptyList()
         }
         var request = ListAssetsRequest.newBuilder()
-                .setParent(ProjectName.of(projectId).toString())
-                .addAllAssetTypes(apiIdentifiers)
-                .setContentType(contentType)
-                .build()
-        if (apiIdentifiers.isEmpty()) {//Will also be empty if   asset-types.yaml is empty
+            .setParent(ProjectName.of(projectId).toString())
+            .addAllAssetTypes(apiIdentifiers)
+            .setContentType(contentType)
+            .build()
+        if (apiIdentifiers.isEmpty()) {//Will also be empty if   asset-types.properties is empty
             justPrintAll = true
         }
         if (justPrintAll) {
@@ -37,9 +37,9 @@ class AssetIterator {
     }
 
     private fun iterateListingResponse(
-            response: AssetServiceClient.ListAssetsPagedResponse,
-            callback: Callback<String>,
-            allAssetTypes: Boolean
+        response: AssetServiceClient.ListAssetsPagedResponse,
+        callback: Callback<String>,
+        allAssetTypes: Boolean
     ) {
         for (asset in response.iterateAll()) {
             if (allAssetTypes) {//Just printing ALL assets

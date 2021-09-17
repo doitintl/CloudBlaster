@@ -12,9 +12,9 @@ import java.util.concurrent.Callable
 import kotlin.system.exitProcess
 
 @CommandLine.Command(
-        name = CLOUD_BLASTER,
-        mixinStandardHelpOptions = true,
-        description = ["Deletes assets listed in assets-to-delete.txt"]
+    name = CLOUD_BLASTER,
+    mixinStandardHelpOptions = true,
+    description = ["Deletes assets listed in assets-to-delete.txt"]
 )
 class Deleter : Callable<Int> {
 
@@ -40,15 +40,13 @@ class Deleter : Callable<Int> {
         if (line.isBlank()) {
             return
         }
-        val assetType = AssetTypeMap.instance.pathToAssetType(line)
-                ?: throw IllegalArgumentException("No asset type found matching \"$line\"")
-        val deleter = assetType.deleterClass.getConstructor().newInstance()
-        deleter.setPathPatterns(assetType.getPathPatterns())
+        val deleter = AssetTypeMap.instance.deleterClass(line)
+
         try {
             deleter.delete(line)
             println("Deleted $line")
         } catch (e: Exception) {
-            System.err.println("Error in deleting $line:$e")// Just continue
+            System.err.println("Error in deleting $line: $e")// Just continue
         }
     }
 
