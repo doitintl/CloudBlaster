@@ -16,6 +16,6 @@ abstract class GCEAbstractDeleter : AbstractDeleter() {
             credential = credential.createScoped(listOf("https://www.googleapis.com/auth/cloud-platform"))
         }
         return Compute.Builder(httpTransport, jsonFactory, credential).setApplicationName(CLOUD_BLASTER)
-            .build()
+                .build()
     }
 }

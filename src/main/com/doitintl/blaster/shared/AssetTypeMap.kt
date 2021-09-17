@@ -7,7 +7,7 @@ import java.util.*
 import java.util.regex.Pattern
 import java.util.stream.Collectors
 
-val assetTypePattern=Pattern.compile("""[a-z]+\.googleapis\.com/[a-zA-Z]+""")
+val assetTypePattern = Pattern.compile("""[a-z]+\.googleapis\.com/[a-zA-Z]+""")
 
 class AssetTypeMap private constructor() {
 
@@ -53,8 +53,8 @@ class AssetTypeMap private constructor() {
 
         private fun loadListFilterFile(map: Map<String, AssetType>) {
             FileReader(LIST_FILTER_PROPERTIES).use { `in` ->
-                val props=Properties();
-                props.load(`in`);
+                val props = Properties()
+                props.load(`in`)
                 for (e in props.entries) {
                     val at = map[e.key]
                     at?.setFilterRegex(e.value as String)
@@ -71,7 +71,7 @@ class AssetTypeMap private constructor() {
                     for (assetTypeId in assetTypesFromYaml.keys) {
                         val assetType = assetTypesFromYaml[assetTypeId] ?: error("$assetTypeId not found")
 
-                        if (! assetTypePattern.matcher(assetTypeId).matches()){
+                        if (!assetTypePattern.matcher(assetTypeId).matches()) {
                             throw  IllegalArgumentException("Unsupported asset type id $assetTypeId")
                         }
                         val deleterClass = deleterClassName(assetTypeId, assetType)

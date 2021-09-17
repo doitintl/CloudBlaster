@@ -19,7 +19,7 @@ class GAEServiceDeleter : AbstractDeleter() {
         val credentials = GoogleCredentials.getApplicationDefault()
         val requestInitializer: HttpRequestInitializer = HttpCredentialsAdapter(credentials)
         val engine = Appengine.Builder(
-            GoogleNetHttpTransport.newTrustedTransport(), JacksonFactory(), requestInitializer
+                GoogleNetHttpTransport.newTrustedTransport(), JacksonFactory(), requestInitializer
         ).setApplicationName(CLOUD_BLASTER).build()
         val services = engine.apps().services()
         val del = services.delete(p[PROJECT], p[ID])

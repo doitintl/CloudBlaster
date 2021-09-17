@@ -13,10 +13,10 @@ class SubscriptionDeleter : AbstractDeleter() {
     override fun doDelete(p: Map<String, String>) {
         SubscriptionAdminClient.create()
 
-            .use { subscriptionAdminClient ->
-                val subscriptionName = ProjectSubscriptionName.of(p[PROJECT], p[ID])
-                subscriptionAdminClient.deleteSubscription(subscriptionName)
-            }
+                .use { subscriptionAdminClient ->
+                    val subscriptionName = ProjectSubscriptionName.of(p[PROJECT], p[ID])
+                    subscriptionAdminClient.deleteSubscription(subscriptionName)
+                }
     }
 }
 

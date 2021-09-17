@@ -22,7 +22,7 @@ class GAEVersionDeleter : AbstractDeleter() {
         val credentials = GoogleCredentials.getApplicationDefault()
         val requestInitializer: HttpRequestInitializer = HttpCredentialsAdapter(credentials)
         val engine = Appengine.Builder(
-            GoogleNetHttpTransport.newTrustedTransport(), JacksonFactory(), requestInitializer
+                GoogleNetHttpTransport.newTrustedTransport(), JacksonFactory(), requestInitializer
         ).setApplicationName(CLOUD_BLASTER).build()
         val versions = engine.apps().services().versions()
         val del = versions.delete(p[PROJECT], p[SERVICE], p[ID])

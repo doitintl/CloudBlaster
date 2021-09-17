@@ -103,8 +103,8 @@ compute.googleapis.com/Instance:
 #compute.googleapis.com/VpnTunnel: {}
 container.googleapis.com/Cluster:
   pathPattern:
-  - //container.googleapis.com/projects/{PROJECT}/zones/{LOCATION}/clusters/{ID}
-  - //container.googleapis.com/projects/{PROJECT}/locations/{LOCATION}/clusters/{ID}
+    - //container.googleapis.com/projects/{PROJECT}/zones/{LOCATION}/clusters/{ID}
+    - //container.googleapis.com/projects/{PROJECT}/locations/{LOCATION}/clusters/{ID}
   deleterClass: GKEClusterDeleter
 #container.googleapis.com/NodePool: {}
 #containerregistry.googleapis.com/Image: {}

@@ -5,9 +5,9 @@ import java.util.*
 import java.util.regex.Pattern
 
 class AssetType(
-    val apiIdentifier: String,
-    pathPatterns: List<String>,
-    deleterClass: String
+        val apiIdentifier: String,
+        pathPatterns: List<String>,
+        deleterClass: String
 ) {
     private val pathPatterns: MutableList<Pattern> = ArrayList()
     lateinit var filterRegex: Pattern
@@ -31,8 +31,10 @@ class AssetType(
     }
 
     private fun setPathPatterns(pathPatterns: List<String>) {
-        if (pathPatterns.isEmpty()){ throw  IllegalArgumentException("Must specify pathpattern(s)")}
-         for (pathPattern in pathPatterns) {
+        if (pathPatterns.isEmpty()) {
+            throw  IllegalArgumentException("Must specify pathpattern(s)")
+        }
+        for (pathPattern in pathPatterns) {
             val regex = createIdentifierRegexes(pathPattern)
             this.pathPatterns.add(Pattern.compile(regex))
         }
@@ -40,23 +42,23 @@ class AssetType(
 
     private fun createIdentifierRegexes(pathPattern_: String): String {
 
-        var pathPattern = pathPattern_.replace("{PROJECT}", "(?<project>[a-z0-9-_]+)")
+        var ret=pathPattern_
         while (true) {
-            val m = UPPER_CASE_WORD_IN_CURLIES.matcher(pathPattern)
-            pathPattern = if (m.matches()) {
+            val m = UPPERCASE_IN_CURLIES.matcher(ret)
+            ret = if (m.matches()) {
                 val idWIthCurlies = m.group(1)
                 assert(idWIthCurlies.toUpperCase() == idWIthCurlies) { idWIthCurlies }
-                val identifier=idWIthCurlies.substring(1,idWIthCurlies.length-1)
-                  pathPattern.replace(idWIthCurlies, identifierRegex(identifier.toLowerCase()))
+                val identifier = idWIthCurlies.substring(1, idWIthCurlies.length - 1)
+                ret.replace(idWIthCurlies, identifierRegex(identifier.toLowerCase()))
             } else {
                 //no more upper-case values left, can exit
                 break
             }
         }
-        return pathPattern
+        return ret
     }
 
-    private fun identifierRegex(identifier: String ): String {
+    private fun identifierRegex(identifier: String): String {
         // For some asset types, some of these chars are illegal. But the goal
         // is to capture the identifer, so a too-broad regex is OK so long as it is accurate and precise.
         return "(?<$identifier>[a-z0-9-_.~%+]+)"
@@ -77,7 +79,7 @@ class AssetType(
 
     companion object {
 
-        private  val UPPER_CASE_WORD_IN_CURLIES = Pattern.compile(""".*(\{[A-Z]+\}).*""")
+        private val UPPERCASE_IN_CURLIES = Pattern.compile(""".*(\{[A-Z]+\}).*""")
     }
 
     init {

@@ -1,6 +1,13 @@
 # Cloud Blaster
 
-Cloud Blaster helps you delete the unwanted assets in your Google Cloud Platform project, 
+Cloud Blaster helps you delete the unwanted 
+
+
+
+
+
+
+assets in your Google Cloud Platform project, 
 leaving it clean of confusing clutter and saving you money.
 
 # Compared to Safe Scrub

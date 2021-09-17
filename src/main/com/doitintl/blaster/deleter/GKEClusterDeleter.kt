@@ -18,9 +18,9 @@ class GKEClusterDeleter : AbstractDeleter() {
     override fun doDelete(p: Map<String, String>) {
         val requestInitializer = HttpCredentialsAdapter(GoogleCredentials.getApplicationDefault())
         val containerApi = Container.Builder(
-            GoogleNetHttpTransport.newTrustedTransport(), JacksonFactory(), requestInitializer
+                GoogleNetHttpTransport.newTrustedTransport(), JacksonFactory(), requestInitializer
         ).setApplicationName(CLOUD_BLASTER)
-            .build()
+                .build()
         val clusters = containerApi.projects().locations().clusters()
         val idTriplet = "projects/${p[PROJECT]}/locations/${p[LOCATION]}/clusters/${p[ID]}"
         val delete = clusters.delete(idTriplet)
