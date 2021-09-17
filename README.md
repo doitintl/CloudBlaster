@@ -72,6 +72,7 @@ See the top of that file for detailed instructions.)
     * Google Cloud functions
     * Google App Engine services and versions
     * Google Cloud Storage buckets
+    * Vertex AI Training pipelines
     
      For the most up-to-date list of supported asset types, see `list-filter.properties`
     
