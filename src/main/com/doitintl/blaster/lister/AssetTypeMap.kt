@@ -4,10 +4,10 @@ import com.doitintl.blaster.deleter.AssetDeleter
 import java.io.FileInputStream
 import java.io.FileReader
 import java.util.*
-import java.util.regex.Pattern
+
 import java.util.stream.Collectors
 
-val assetTypePattern: Pattern = Pattern.compile("""[a-z]+\.googleapis\.com/[a-zA-Z]+""")
+val assetTypeRegex: Regex = Regex("""[a-z]+\.googleapis\.com/[a-zA-Z]+""")
 
 class AssetTypeMap private constructor() {
 
@@ -18,8 +18,8 @@ class AssetTypeMap private constructor() {
         for (assetType in assetTypeMap.values) {
             val deleter = assetType.deleterClass.getConstructor().newInstance()
             for (regex in deleter.pathRegexes()) {
-                val matcher = regex.matcher(line.trim())
-                if (matcher.matches()) {
+
+                if (regex.matches(line.trim())) {
                     if (ret != null) {
                         throw RuntimeException("Only one pattern should match each path: ${ret.javaClass.name} and ${assetType.deleterClass.name} both found for pattern $regex")
                     }
@@ -41,7 +41,7 @@ class AssetTypeMap private constructor() {
         return assetTypeMap[assetTypeIdentifier] ?: error(assetTypeIdentifier + "not found")
     }
 
-    fun getFilterRegex(assetTypeIdentifier: String): Pattern {
+    fun getFilterRegex(assetTypeIdentifier: String): Regex {
         return get(assetTypeIdentifier).filterRegex
 
     }
@@ -76,7 +76,7 @@ class AssetTypeMap private constructor() {
                 props.load(`in`)
                 for ((k, v) in props.entries) {
                     val assetTypeId = k as String
-                    if (!assetTypePattern.matcher(assetTypeId).matches()) {
+                    if (!assetTypeRegex.matches(assetTypeId)) {
                         throw  IllegalArgumentException("Unsupported asset type id $assetTypeId")
                     }
 
@@ -125,7 +125,7 @@ private class AssetType(
     val assetTypeId: String,
     deleterClassName: String
 ) {
-    lateinit var filterRegex: Pattern
+    lateinit var filterRegex: Regex
         private set
 
     lateinit var deleterClass: Class<AssetDeleter>
@@ -134,7 +134,7 @@ private class AssetType(
 
     //NonNullable param even thought the regex can be omitted in that config file (and you get a blank string)
     fun setFilterRegex(regex: String) {
-        filterRegex = Pattern.compile(
+        filterRegex = Regex(
             if (regex.isBlank()) {
                 regex
             } else {

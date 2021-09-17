@@ -50,7 +50,7 @@ class AssetIterator {
             val id = parts[parts.size - 1]
             val assetTypeIdentifier = asset.assetType
             val filterRegex = AssetTypeMap.instance.getFilterRegex(assetTypeIdentifier)
-            if (!filterRegex.matcher(id).matches()) {
+            if (!filterRegex.matches(id)) {
                 println(asset.name)
 
                 //TODO Avoid listing assets that we can't possibly delete, like Disks attached to Instances or default GAE services

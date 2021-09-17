@@ -1,13 +1,12 @@
 package com.doitintl.blaster.deleter
 
-import java.util.regex.Pattern
 
 interface AssetDeleter {
+    fun paramsFromPath(path: String): Map<String, String> //subclasses invoke this
+    fun pathRegexes(): List<Regex>//invoke this
+    val pathPatterns: Array<String>//subclasses implement this
+    fun delete(line: String)//invoke this
+    fun doDelete(p: Map<String, String>)//subclassess implement this
 
-    fun doDelete(p: Map<String, String>)
-    fun paramsFromPath(path: String): Map<String, String>
 
-    val pathPatterns: Array<String>
-    fun pathRegexes(): List<Pattern>
-    fun delete(line: String)
 }
