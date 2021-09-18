@@ -3,3 +3,4 @@ target/
 *.iml
 /assets-to-delete.txt
 .DS_Store
+/assets-del.txt
