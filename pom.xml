@@ -143,12 +143,20 @@
             <artifactId>google-api-services-logging</artifactId>
             <version>v2-rev662-1.18.0-rc</version>
         </dependency>
+
+
+        <!--        <dependency>-->
+        <!--            <groupId>org.jetbrains.kotlin</groupId>-->
+        <!--            <artifactId>kotlin-test-testng</artifactId>-->
+        <!--            <version>1.5.30-RC</version>-->
+        <!--        </dependency>-->
         <dependency>
             <groupId>org.jetbrains.kotlin</groupId>
-            <artifactId>kotlin-test-junit</artifactId>
-            <version>1.4.21</version>
+            <artifactId>kotlin-test-junit5</artifactId>
+            <version>1.5.30</version>
             <scope>test</scope>
         </dependency>
+
     </dependencies>
 
     <build>

@@ -15,7 +15,8 @@ import kotlin.system.exitProcess
 @CommandLine.Command(
     name = CLOUD_BLASTER,
     mixinStandardHelpOptions = true,
-    description = ["Deletes assets listed in assets-to-delete.txt"]
+    version = ["1.0"],
+    description = ["Deletes assets listed in file (by default assets-to-delete.txt)"]
 )
 class Deleter : Callable<Int> {
 
@@ -58,11 +59,11 @@ class Deleter : Callable<Int> {
         }
     }
 
-    companion object {
-        @JvmStatic
+
         fun main(args: Array<String>) {
             val exitCode = CommandLine(Deleter()).execute(*args)
             exitProcess(exitCode)
         }
-    }
+
+
 }

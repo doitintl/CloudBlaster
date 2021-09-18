@@ -11,6 +11,7 @@ import kotlin.system.exitProcess
 @CommandLine.Command(
     name = CLOUD_BLASTER,
     mixinStandardHelpOptions = true,
+    version = ["1.0"],
     description = ["Lists assets in a GCP project."]
 )
 class Lister : Callable<Any> {
@@ -35,12 +36,10 @@ class Lister : Callable<Any> {
         }
     }
 
-    companion object {
-        @JvmStatic
-        fun main(args: Array<String>) {
-            val exitCode = CommandLine(Lister()).execute(*args)
-            exitProcess(exitCode)
-        }
+    fun main(args: Array<String>) {
+        val exitCode = CommandLine(Lister()).execute(*args)
+        exitProcess(exitCode)
+
     }
 }
 

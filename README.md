@@ -41,21 +41,20 @@ building the `assets-to-delete.txt` file.
  
 ## Instructions
 
-### Prerequesites
+### Prerequisites
 * Install Maven
 
-### Listing step
-* Edit `list-filter.properties`. Write  regex for the asset types you don't want to list.
-(This is a full-string match on the  local asset name, such as the Disk name  or Topic Name.
-See the top of that file for detailed instructions.)
+### Listing the assets
+* Edit `list-filter.properties`. You can add filters to specify assets that you don't want to list.
+(See the top of that file for detailed instructions.)
 * Run `./lister.sh -p <GCP_PROJECT>` 
    * (In `lister.sh`, Maven builds if needed, then executes `java com.doitintl.blaster.lister.Lister` .) 
    * The Lister outputs `assets-to-delete.txt`
    * Note:
        * If instead you just want to print, to standard output, a list of *all* GCP assets, whether or not of a type
        supported by Cloud Blaster, add the `-a` or `--print-all-assets` flag.
-
-### Deletion step
+* Command line flags: Run `./lister.sh -h`
+### Deleting listed assets
 * Review `assets-to-delete.txt` and remove lines for any assets that you do not want to delete.
 * Run `./deleter.sh` 
   * (In `deleter.sh`, Maven just builds if needed, then executes `com.doitintl.blaster.deleter.Deleter`.). 
@@ -65,6 +64,7 @@ See the top of that file for detailed instructions.)
   * Note that some assets cannot be deleted, such as attached Disks or the default GAE Service.
    There is no harm in having them in `assets-to-delete.txt` -- you will just get an exception.
   * For speed, deletion is executed concurrently, since it is slow and IO-bound.
+* Command line flags: Run `./deleter.sh -h`
   
 ## Features
 * I focused on the common important asset types that are set up and torn down in typical development and QA.  This includes 
@@ -83,11 +83,7 @@ See the top of that file for detailed instructions.)
 * If you want more asset types or new features, please either
     * Submit an issue at GitHub.
     * Or dd support for the asset type and submit a pull request. 
-        * To do this, use existing asset types as an example.
-        * Uncomment the asset type in `asset-types.properties`. 
-            * See the documentation at the top of that file about specifying the Deleter class if needed.
-        * Add the asset type to `list-filter.properties`.
-        * Implement a subclass of `AbstractDeleter` alongside the others..  
+        * To do this, see the  comment in `asset-types.properties`.
 
 # Future features
 * More asset types.
