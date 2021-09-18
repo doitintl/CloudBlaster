@@ -7,11 +7,12 @@ import com.google.cloud.asset.v1.ProjectName
 
 class AssetIterator {
 
-    fun listAssets(projectId: String, callback: Callback<String>, justPrintAllAssets: Boolean) {
+    fun listAssets(projectId: String, callback: Callback<String>, justPrintAllAssets: Boolean, filterFile: String) {
         var justPrintAll = justPrintAllAssets
         val client = AssetServiceClient.create()
         val contentType = ContentType.CONTENT_TYPE_UNSPECIFIED
-        var apiIdentifiers: List<String> = AssetTypeMap.instance.identifiers()
+        val assetTypeMap = AssetTypeMap(filterFile)
+        var apiIdentifiers: List<String> = assetTypeMap.identifiers()
         if (justPrintAll || apiIdentifiers.isEmpty()) { //if "-a" arg was used or if asset-types is empty
             apiIdentifiers = emptyList()
             justPrintAll = true
@@ -20,7 +21,6 @@ class AssetIterator {
             }
         }
 
-
         var request = ListAssetsRequest.newBuilder()
             .setParent(ProjectName.of(projectId).toString())
             .addAllAssetTypes(apiIdentifiers)
@@ -28,18 +28,20 @@ class AssetIterator {
             .build()
 
         var response = client.listAssets(request)
-        iterateListingResponse(response, callback, justPrintAll)
+        iterateListingResponse(response, callback, justPrintAll, assetTypeMap)
         while (response.nextPageToken.isNotEmpty()) {
             request = request.toBuilder().setPageToken(response.nextPageToken).build()
             response = client.listAssets(request)
-            iterateListingResponse(response, callback, justPrintAll)
+            iterateListingResponse(response, callback, justPrintAll, assetTypeMap)
         }
+
     }
 
     private fun iterateListingResponse(
         response: AssetServiceClient.ListAssetsPagedResponse,
         callback: Callback<String>,
-        allAssetTypes: Boolean
+        allAssetTypes: Boolean,
+        assetTypeMap: AssetTypeMap
     ) {
         for (asset in response.iterateAll()) {
             if (allAssetTypes) {//Just printing ALL assets
@@ -49,7 +51,7 @@ class AssetIterator {
             val parts = asset.name.split("/").toTypedArray()
             val id = parts[parts.size - 1]
             val assetTypeIdentifier = asset.assetType
-            val filterRegex = AssetTypeMap.instance.getFilterRegex(assetTypeIdentifier)
+            val filterRegex = assetTypeMap.getFilterRegex(assetTypeIdentifier)
             if (!filterRegex.matches(id)) {
                 println(asset.name)
 

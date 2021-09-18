@@ -9,7 +9,7 @@ import java.util.stream.Collectors
 
 val assetTypeRegex: Regex = Regex("""[a-z]+\.googleapis\.com/[a-zA-Z]+""")
 
-class AssetTypeMap private constructor() {
+class AssetTypeMap(val filterFile: String) {
 
     private val assetTypeMap: Map<String, AssetType>
 
@@ -46,77 +46,77 @@ class AssetTypeMap private constructor() {
 
     }
 
-    companion object {
-        val instance = AssetTypeMap()
-        private const val ASSET_TYPES_FILE = "asset-types.properties"
-        private const val LIST_FILTER_PROPERTIES = "list-filter.properties"
-        private fun loadAssetTypesFromFile(): Map<String, AssetType> {
-            compareKeys()
-            val ret = loadAssetTypesFile()
-            loadListFilterFile(ret) //inout
-            return ret
-        }
 
-        private fun loadListFilterFile(assetTypeMap_: Map<String, AssetType>) {
-            FileReader(LIST_FILTER_PROPERTIES).use { `in` ->
+    private fun loadAssetTypesFromFile(): Map<String, AssetType> {
+        compareKeys()
+        val ret = loadAssetTypesFile()
+        loadListFilterFile(ret) //inout
+        return ret
+    }
+
+    private fun loadListFilterFile(assetTypeMap_: Map<String, AssetType>) {
+        FileReader(filterFile).use { `in` ->
+            val props = Properties()
+            props.load(`in`)
+            for ((k, v) in props.entries) {
+                val at = assetTypeMap_[k]!!
+                at.setFilterRegex(v as String)
+            }
+        }
+    }
+
+
+    private fun loadAssetTypesFile(): Map<String, AssetType> {
+        val ret: MutableMap<String, AssetType> = TreeMap()
+        FileInputStream(Companion.ASSET_TYPES_FILE).use { `in` ->
+            val props = Properties()
+            props.load(`in`)
+            for ((k, v) in props.entries) {
+                val assetTypeId = k as String
+                if (!assetTypeRegex.matches(assetTypeId)) {
+                    throw  IllegalArgumentException("Unsupported asset type id $assetTypeId")
+                }
+
+                val optionalDeleterClassName = v as String
+                ret[assetTypeId] = AssetType(assetTypeId, optionalDeleterClassName)
+            }
+        }
+        return ret
+    }
+
+
+    private fun compareKeys() {
+        fun loadAssetTypeIds(fileName: String): List<String> {
+            FileReader(fileName).use { `in` ->
                 val props = Properties()
                 props.load(`in`)
-                for ((k, v) in props.entries) {
-                    val at = assetTypeMap_[k]!!
-                    at.setFilterRegex(v as String)
-                }
+                return props.keys.map { it as String }
             }
         }
 
+        var errMessage = ""
+        val at = loadAssetTypeIds(Companion.ASSET_TYPES_FILE)
+        val lf = loadAssetTypeIds(filterFile)
 
-        private fun loadAssetTypesFile(): Map<String, AssetType> {
-            val ret: MutableMap<String, AssetType> = TreeMap()
-            FileInputStream(ASSET_TYPES_FILE).use { `in` ->
-                val props = Properties()
-                props.load(`in`)
-                for ((k, v) in props.entries) {
-                    val assetTypeId = k as String
-                    if (!assetTypeRegex.matches(assetTypeId)) {
-                        throw  IllegalArgumentException("Unsupported asset type id $assetTypeId")
-                    }
-
-                    val optionalDeleterClassName = v as String
-                    ret[assetTypeId] = AssetType(assetTypeId, optionalDeleterClassName)
-                }
-            }
-            return ret
+        val missingInFilter = at subtract lf
+        if (missingInFilter.isNotEmpty()) {
+            errMessage += "Missing in $filterFile: $missingInFilter\n"
         }
-
-
-        private fun compareKeys() {
-            fun loadAssetTypeIds(fileName: String): List<String> {
-                FileReader(fileName).use { `in` ->
-                    val props = Properties()
-                    props.load(`in`)
-                    return props.keys.map { it as String }
-                }
-            }
-
-            var errMessage = ""
-            val at = loadAssetTypeIds(ASSET_TYPES_FILE)
-            val lf = loadAssetTypeIds(LIST_FILTER_PROPERTIES)
-
-            val missingInFilter = at subtract lf
-            if (missingInFilter.isNotEmpty()) {
-                errMessage += "Missing in $LIST_FILTER_PROPERTIES: $missingInFilter\n"
-            }
-            val missingInAssetTypes = lf subtract at
-            if (missingInAssetTypes.isNotEmpty()) {
-                errMessage += "Missing in $ASSET_TYPES_FILE: $missingInAssetTypes"
-            }
-            check(errMessage.isEmpty()) { errMessage }
-
+        val missingInAssetTypes = lf subtract at
+        if (missingInAssetTypes.isNotEmpty()) {
+            errMessage += "Missing in ${Companion.ASSET_TYPES_FILE}: $missingInAssetTypes"
         }
+        check(errMessage.isEmpty()) { errMessage }
 
     }
 
+
     init {
         assetTypeMap = loadAssetTypesFromFile()
+    }
+
+    companion object {
+        private const val ASSET_TYPES_FILE = "asset-types.properties"
     }
 }
 

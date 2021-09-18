@@ -1,7 +1,8 @@
 package com.doitintl.blaster.deleter
 
+import com.doitintl.blaster.Constants.ASSETS_TO_DELETE_DFLT
 import com.doitintl.blaster.Constants.CLOUD_BLASTER
-import com.doitintl.blaster.Constants.LISTED_ASSETS_FILENAME
+import com.doitintl.blaster.Constants.LIST_FILTER_PROPERTIES
 import com.doitintl.blaster.lister.AssetTypeMap
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -18,8 +19,14 @@ import kotlin.system.exitProcess
 )
 class Deleter : Callable<Int> {
 
+    @CommandLine.Option(names = ["-d", "--assets-to-delete-file"])
+    private var assetsToDeleteFile: String = ASSETS_TO_DELETE_DFLT
+
+    @CommandLine.Option(names = ["-f", "--filter-file"])
+    private var filterFile: String = LIST_FILTER_PROPERTIES
+
     override fun call(): Int {
-        val lines = File(LISTED_ASSETS_FILENAME).readLines()
+        val lines = File(assetsToDeleteFile).readLines()
         var counter = 0
         runBlocking {
             lines.forEach { line ->
@@ -40,7 +47,7 @@ class Deleter : Callable<Int> {
         if (line.isBlank()) {
             return
         }
-        val deleter = AssetTypeMap.instance.deleterClass(line)
+        val deleter = AssetTypeMap(filterFile).deleterClass(line)
 
         try {
             deleter.delete(line)

@@ -1,7 +1,8 @@
 package com.doitintl.blaster.lister
 
+import com.doitintl.blaster.Constants
+import com.doitintl.blaster.Constants.ASSETS_TO_DELETE_DFLT
 import com.doitintl.blaster.Constants.CLOUD_BLASTER
-import com.doitintl.blaster.Constants.LISTED_ASSETS_FILENAME
 import picocli.CommandLine
 import java.io.FileWriter
 import java.util.concurrent.Callable
@@ -16,13 +17,20 @@ class Lister : Callable<Any> {
     @CommandLine.Option(names = ["-p", "--project"], required = true)
     private lateinit var project: String
 
+    @CommandLine.Option(names = ["-o", "--output"])
+    private var outputFile: String = ASSETS_TO_DELETE_DFLT
+
+    @CommandLine.Option(names = ["-f", "--filter-file"])
+    private var filterFile: String = Constants.LIST_FILTER_PROPERTIES
+
+
     @CommandLine.Option(names = ["-a", "--print-all-assets"])
     private var allAssetTypes = false
 
 
     override fun call(): Int {
-        FileWritingCallback(LISTED_ASSETS_FILENAME).use { callback ->
-            AssetIterator().listAssets(project, callback, allAssetTypes)
+        FileWritingCallback(outputFile).use { callback ->
+            AssetIterator().listAssets(project, callback, allAssetTypes, filterFile)
             return 0
         }
     }

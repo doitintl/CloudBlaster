@@ -16,8 +16,9 @@ You then review it and run it.
 * Safe Scrub supports more asset types (for now).
 
 The advantages of Cloud Blaster:
-* It supports more complexity, since it is in Kotlin rather than bash. 
-
+* It supports more complexity, since it is in Kotlin rather than bash. This makes it easier to  add new asset types
+ and make other changes. Safe Scrub is at the limit of the complexity that can be accomodted in Bash.
+ 
 Cloud Blaster has its own safety features, listed below. It also supports some of the most common asset types (see below),
 with the possibility of easily adding more (see below).
  
@@ -50,14 +51,16 @@ See the top of that file for detailed instructions.)
 * Run `./lister.sh -p <GCP_PROJECT>` 
    * (In `lister.sh`, Maven builds if needed, then executes `java com.doitintl.blaster.lister.Lister` .) 
    * The Lister outputs `assets-to-delete.txt`
-   * (If instead you just want to print, to standard output, a list of *all* GCP assets, whether  of a type
-   supported by Cloud Blaster or not, add the `-a` or `--print-all-assets` flag.)
+   * Note:
+       * If instead you just want to print, to standard output, a list of *all* GCP assets, whether or not of a type
+       supported by Cloud Blaster, add the `-a` or `--print-all-assets` flag.
 
 ### Deletion step
 * Review `assets-to-delete.txt` and remove lines for any assets that you do not want to delete.
 * Run `./deleter.sh` 
   * (In `deleter.sh`, Maven just builds if needed, then executes `com.doitintl.blaster.deleter.Deleter`.). 
   * The Deleter tries to delete the assets listed in `assets-to-delete.txt`. 
+* Notes:
   * You do not need to specify the project, as this is included in every asset path in  `assets-to-delete.txt`.
   * Note that some assets cannot be deleted, such as attached Disks or the default GAE Service.
    There is no harm in having them in `assets-to-delete.txt` -- you will just get an exception.
@@ -69,22 +72,22 @@ See the top of that file for detailed instructions.)
     * Google Cloud PubSub topics and Subscriptions 
     * Google Kubernetes Engine regional and zonal clusters
     * Google Cloud Operations log metrics
-    * Google Cloud functions
+    * Google Cloud Functions
+    * Cloud Run Services
     * Google App Engine services and versions
     * Google Cloud Storage buckets
     * Vertex AI Training pipelines
     
      For the most up-to-date list of supported asset types, see `list-filter.properties`
     
-* If you want more services or asset types, please either
-    * Or submit an issue at GitHub.
-    * Add support for the asset type and submit a pull request. 
-    * Add support for the asset type and submit a pull request. 
+* If you want more asset types or new features, please either
+    * Submit an issue at GitHub.
+    * Or dd support for the asset type and submit a pull request. 
         * To do this, use existing asset types as an example.
         * Uncomment the asset type in `asset-types.properties`. 
             * See the documentation at the top of that file about specifying the Deleter class if needed.
         * Add the asset type to `list-filter.properties`.
-        * Implement a subclass of `AbstractDeleter`.  
+        * Implement a subclass of `AbstractDeleter` alongside the others..  
 
 # Future features
 * More asset types.
@@ -92,6 +95,7 @@ See the top of that file for detailed instructions.)
 asset B is gone, you delete B first, then A. 
 * More runtime verification by user along the lines of "Are you sure". Still, we have to trust the user. A sloppy user will bypass
 such checks, and a careful user already has the opportunity to edit  `assets-to-delete.txt`.
+
 # Other projects and approaches
 - [Safe Scrub](https://github.come/doitintl/SafeScrub) was an earlier bash-only project that does the same thing. 
 - [Travis CI GCloud Cleanup](https://github.com/travis-ci/gcloud-cleanup) and [Bazooka](https://github.com/enxebre/bazooka) also delete GCE assets.

@@ -7,6 +7,7 @@ import com.doitintl.blaster.deleter.AbstractDeleter
 import com.google.cloud.aiplatform.v1.PipelineServiceClient
 import com.google.cloud.aiplatform.v1.PipelineServiceSettings
 import com.google.cloud.aiplatform.v1.TrainingPipelineName
+import java.util.concurrent.TimeUnit
 
 
 class TrainingPipelineDeleter : AbstractDeleter() {
@@ -26,8 +27,8 @@ class TrainingPipelineDeleter : AbstractDeleter() {
         PipelineServiceClient.create(pipelineServiceSettings).use { pipelineServiceClient ->
 
             val trainingPipelineName = TrainingPipelineName.of(p.get(PROJECT), p.get(LOCATION), p.get(ID))
-            val result = pipelineServiceClient.deleteTrainingPipelineAsync(trainingPipelineName)
-
+            val future = pipelineServiceClient.deleteTrainingPipelineAsync(trainingPipelineName)
+            val result = future.get(300, TimeUnit.SECONDS)
 
         }
 
