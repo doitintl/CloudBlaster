@@ -7,18 +7,18 @@ import com.google.cloud.asset.v1.ProjectName
 
 class AssetIterator {
 
-    fun listAssets(projectId: String, callback: Callback<String>, justPrintAllAssets: Boolean, filterFile: String) {
-        var justPrintAll = justPrintAllAssets
+    fun listAssets(projectId: String, callback: Callback<String>, noFilter: Boolean, filterFile: String) {
+
         val client = AssetServiceClient.create()
         val contentType = ContentType.CONTENT_TYPE_UNSPECIFIED
         val assetTypeMap = AssetTypeMap(filterFile)
         var apiIdentifiers: List<String> = assetTypeMap.identifiers()
-        if (justPrintAll || apiIdentifiers.isEmpty()) { //if "-a" arg was used or if asset-types is empty
+        if (apiIdentifiers.isEmpty()) {
+            throw IllegalStateException("No asset types in config file3")
+        }
+        if (noFilter) {
             apiIdentifiers = emptyList()
-            justPrintAll = true
-            if (justPrintAll) {
-                println("Printing all assets, even if deletion is not supported, to stdout")
-            }
+
         }
 
         var request = ListAssetsRequest.newBuilder()
@@ -28,11 +28,11 @@ class AssetIterator {
             .build()
 
         var response = client.listAssets(request)
-        iterateListingResponse(response, callback, justPrintAll, assetTypeMap)
+        iterateListingResponse(response, callback, noFilter, assetTypeMap)
         while (response.nextPageToken.isNotEmpty()) {
             request = request.toBuilder().setPageToken(response.nextPageToken).build()
             response = client.listAssets(request)
-            iterateListingResponse(response, callback, justPrintAll, assetTypeMap)
+            iterateListingResponse(response, callback, noFilter, assetTypeMap)
         }
 
     }
@@ -40,24 +40,25 @@ class AssetIterator {
     private fun iterateListingResponse(
         response: AssetServiceClient.ListAssetsPagedResponse,
         callback: Callback<String>,
-        allAssetTypes: Boolean,
+        noFilter: Boolean,
         assetTypeMap: AssetTypeMap
     ) {
         for (asset in response.iterateAll()) {
-            if (allAssetTypes) {//Just printing ALL assets
-                println(asset.name)
-                continue
-            }
-            val parts = asset.name.split("/").toTypedArray()
-            val id = parts[parts.size - 1]
-            val assetTypeIdentifier = asset.assetType
-            val filterRegex = assetTypeMap.getFilterRegex(assetTypeIdentifier)
-            if (!filterRegex.matches(id)) {
-                println(asset.name)
+            val matched: Boolean =
+                if (noFilter) {//Just printing ALL assets
+                    callback.call(asset.name)
+                    true
+                } else {
+                    val parts = asset.name.split("/").toTypedArray()
+                    val id = parts[parts.size - 1]
+                    val assetTypeIdentifier = asset.assetType
+                    val (filterRegex, isWhitelist) = assetTypeMap.getFilterRegex(assetTypeIdentifier)
 
-                //TODO Avoid listing assets that we can't possibly delete, like Disks attached to Instances or default GAE services
+                    val match = filterRegex.matches(id)
+                    match == isWhitelist
+                }
+            if (matched) {
                 callback.call(asset.name)
-
             }
         }
     }

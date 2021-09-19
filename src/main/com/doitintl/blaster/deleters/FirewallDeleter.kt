@@ -9,10 +9,9 @@ class FirewallDeleter : GCEAbstractDeleter() {
         get() = arrayOf("//compute.googleapis.com/projects/{PROJECT}/global/firewalls/{ID}")
 
 
-
     override fun doDelete(p: Map<String, String>) {
         val computeService = createComputeService()
-         val request = computeService.firewalls().delete(p[PROJECT], p[ID])
+        val request = computeService.firewalls().delete(p[PROJECT], p[ID])
         val response = request.execute()
-     }
+    }
 }

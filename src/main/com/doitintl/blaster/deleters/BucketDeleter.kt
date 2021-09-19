@@ -7,7 +7,7 @@ import com.google.cloud.storage.Bucket
 import com.google.cloud.storage.StorageOptions
 
 class BucketDeleter : AbstractDeleter() {
-    //todo test on regional buckets
+    //todo test on regional and multiregional buckets
 
     override val pathPatterns: Array<String>
         get() = arrayOf("//storage.googleapis.com/{ID}")

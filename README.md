@@ -32,11 +32,11 @@ between components before deleting anything.
 
 ## Safety First 
 To keep it safe, Cloud Blaster has these features.
-1. The first step, the Lister, does *not* delete assets; rather, it just lists assets in a file, `assets-to-delete.txt`,
+1. The first step, the Lister, does *not* delete assets; rather, it just lists assets in a file, `asset-list.txt`,
 that you review.
 1. The Lister requires you to explicitly state a project. It does not implicitly use your `gcloud`  default project.
-1. The Lister can be filtered (see `list-filter.properties` file) so that specified assets are skipped when 
-building the `assets-to-delete.txt` file.
+1. The Lister can be filtered (see `list-filter.yaml` file) so that specified assets are skipped when 
+building the `asset-list.txt` file.
 1. After running the Lister, you review and manually edit the list of assets for deletion, before running the Deleter.
  
 ## Instructions
@@ -45,25 +45,27 @@ building the `assets-to-delete.txt` file.
 * Install Maven
 
 ### Listing the assets
-* Edit `list-filter.properties`. You can add filters to specify assets that you don't want to list.
+* Edit `list-filter.yaml` (configurable). You can add filters to specify assets that you don't 
 (See the top of that file for detailed instructions.)
 * Run `./lister.sh -p <GCP_PROJECT>` 
    * (In `lister.sh`, Maven builds if needed, then executes `java com.doitintl.blaster.lister.Lister` .) 
-   * The Lister outputs `assets-to-delete.txt`
+   * The Lister outputs `asset-list.txt` (configurable)
    * Note:
-       * If instead you just want to print, to standard output, a list of *all* GCP assets, whether or not of a type
-       supported by Cloud Blaster, add the `-a` or `--print-all-assets` flag.
-* Command line flags: Run `./lister.sh -h`
+       * If instead you   want to print  a list of *all* GCP assets, whether or not of a type
+       supported by Cloud Blaster, add the `-n` flag.
+* Command line flags: Run `./lister.sh -h`  
 ### Deleting listed assets
-* Review `assets-to-delete.txt` and remove lines for any assets that you do not want to delete.
+* Review `asset-list.txt` (or the other file you plan to use) and remove lines for any assets 
+that you do not want to delete.
 * Run `./deleter.sh` 
   * (In `deleter.sh`, Maven just builds if needed, then executes `com.doitintl.blaster.deleter.Deleter`.). 
-  * The Deleter tries to delete the assets listed in `assets-to-delete.txt`. 
+  * The Deleter tries to delete the assets listed in `asset-list.txt` (configurable). 
 * Notes:
-  * You do not need to specify the project, as this is included in every asset path in  `assets-to-delete.txt`.
-  * Note that some assets cannot be deleted, such as attached Disks or the default GAE Service.
-   There is no harm in having them in `assets-to-delete.txt` -- you will just get an exception.
-  * For speed, deletion is executed concurrently, since it is slow and IO-bound.
+  * You do not need to specify the project, as this is included in every asset path in `asset-list.txt`.
+  * Note that some assets cannot be deleted, such as attached Disks or the default GAE Service; or where
+  permission is not available.  There is no harm in having them in `asset-list.txt` -- you 
+  will just get an exception.
+  * For speed, deletion is executed concurrently.
 * Command line flags: Run `./deleter.sh -h`
   
 ## Features
@@ -73,24 +75,25 @@ building the `assets-to-delete.txt` file.
     * Google Kubernetes Engine regional and zonal clusters
     * Google Cloud Operations log metrics
     * Google Cloud Functions
-    * Cloud Run Services
+    * Cloud Run services
     * Google App Engine services and versions
     * Google Cloud Storage buckets
     * Vertex AI Training pipelines
     
-     For the most up-to-date list of supported asset types, see `list-filter.properties`
+     For the most up-to-date list of supported asset types, see `list-filter.yaml`
     
 * If you want more asset types or new features, please either
     * Submit an issue at GitHub.
-    * Or dd support for the asset type and submit a pull request. 
+    * Or add support for the asset type and submit a pull request. 
         * To do this, see the  comment in `asset-types.properties`.
 
 # Future features
 * More asset types.
 * Track asset dependencies, so that if you want to delete asset A, but it is undeletable until 
 asset B is gone, you delete B first, then A. 
-* More runtime verification by user along the lines of "Are you sure". Still, we have to trust the user. A sloppy user will bypass
-such checks, and a careful user already has the opportunity to edit  `assets-to-delete.txt`.
+* Runtime verification by user along the lines of "Are you sure". Still, we have to trust the user. 
+A sloppy user will bypass such checks, and a careful user already has the opportunity 
+to edit  `asset-list.txt`.
 
 # Other projects and approaches
 - [Safe Scrub](https://github.come/doitintl/SafeScrub) was an earlier bash-only project that does the same thing. 

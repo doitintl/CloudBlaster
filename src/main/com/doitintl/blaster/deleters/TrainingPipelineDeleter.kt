@@ -21,12 +21,12 @@ class TrainingPipelineDeleter : AbstractDeleter() {
 
         //At this stage, the only location is us-central1
         val pipelineServiceSettings: PipelineServiceSettings = PipelineServiceSettings.newBuilder()
-                .setEndpoint("${p.get(LOCATION)}-aiplatform.googleapis.com:443")
-                .build()
+            .setEndpoint("${p[LOCATION]}-aiplatform.googleapis.com:443")
+            .build()
 
         PipelineServiceClient.create(pipelineServiceSettings).use { pipelineServiceClient ->
 
-            val trainingPipelineName = TrainingPipelineName.of(p.get(PROJECT), p.get(LOCATION), p.get(ID))
+            val trainingPipelineName = TrainingPipelineName.of(p[PROJECT], p[LOCATION], p[ID])
             val future = pipelineServiceClient.deleteTrainingPipelineAsync(trainingPipelineName)
             val result = future.get(300, TimeUnit.SECONDS)
 

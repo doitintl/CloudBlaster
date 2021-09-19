@@ -1,12 +1,11 @@
 package com.doitintl.blaster.lister
 
 import com.doitintl.blaster.Constants
-import com.doitintl.blaster.Constants.ASSETS_TO_DELETE_DFLT
+import com.doitintl.blaster.Constants.ASSET_LIST_FILE
 import com.doitintl.blaster.Constants.CLOUD_BLASTER
 import picocli.CommandLine
 import java.io.FileWriter
 import java.util.concurrent.Callable
-import kotlin.system.exitProcess
 
 @CommandLine.Command(
     name = CLOUD_BLASTER,
@@ -19,28 +18,27 @@ class Lister : Callable<Any> {
     private lateinit var project: String
 
     @CommandLine.Option(names = ["-o", "--output"])
-    private var outputFile: String = ASSETS_TO_DELETE_DFLT
+    private var outputFile: String = ASSET_LIST_FILE
 
     @CommandLine.Option(names = ["-f", "--filter-file"])
-    private var filterFile: String = Constants.LIST_FILTER_PROPERTIES
+    private var filterFile: String = Constants.LIST_FILTER_YAML
 
 
-    @CommandLine.Option(names = ["-a", "--print-all-assets"])
-    private var allAssetTypes = false
+    @CommandLine.Option(names = ["-n", "--no-filter"])
+    private var noFilter: Boolean = false
 
 
     override fun call(): Int {
+        if (noFilter) {
+            println("Outputting all assets, even for types where deletion is not supported, to file $outputFile ")
+        }
         FileWritingCallback(outputFile).use { callback ->
-            AssetIterator().listAssets(project, callback, allAssetTypes, filterFile)
+            AssetIterator().listAssets(project, callback, noFilter, filterFile)
             return 0
         }
     }
 
-    fun main(args: Array<String>) {
-        val exitCode = CommandLine(Lister()).execute(*args)
-        exitProcess(exitCode)
 
-    }
 }
 
 internal class FileWritingCallback(filename: String) : Callback<String> {
@@ -54,5 +52,14 @@ internal class FileWritingCallback(filename: String) : Callback<String> {
         fw.close()
     }
 
+
+}
+
+
+fun main(args: Array<String>) {
+    val exitCode = CommandLine(Lister()).execute(*args)
+    if (exitCode != 0) {
+        throw RuntimeException("" + exitCode)
+    }
 
 }

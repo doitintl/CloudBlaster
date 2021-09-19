@@ -27,6 +27,12 @@
     <!--        </dependencies>-->
     <!--    </dependencyManagement>-->
     <dependencies>
+
+        <dependency>
+            <groupId>org.yaml</groupId>
+            <artifactId>snakeyaml</artifactId>
+            <version>1.26</version>
+        </dependency>
         <dependency>
             <groupId>com.google.api.grpc</groupId>
             <artifactId>proto-google-common-protos</artifactId>
@@ -156,6 +162,7 @@
             <version>1.5.30</version>
             <scope>test</scope>
         </dependency>
+
 
     </dependencies>
 

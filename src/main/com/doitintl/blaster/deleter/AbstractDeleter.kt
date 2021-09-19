@@ -51,7 +51,7 @@ abstract class AbstractDeleter : AssetDeleter {
             val matchResult = regex.find(path)
             if (matchResult != null) {
                 for (k in keys) {
-                    params[k] = matchResult.groups.get(k)!!.value
+                    params[k] = matchResult.groups[k]!!.value
                 }
                 break
             }
