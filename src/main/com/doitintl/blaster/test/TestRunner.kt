@@ -1,19 +1,25 @@
 package com.doitintl.blaster.test
 
 import com.doitintl.blaster.test.tests.BucketTest
-import com.doitintl.blaster.test.tests.InstanceTest
+import com.doitintl.blaster.test.tests.GCETest
+import com.doitintl.blaster.test.tests.PubSubTest
+import kotlin.system.exitProcess
 
 
 fun main(vararg args: String) {
     if (args.isEmpty()) {
         println("Must provide project id")
-        System.exit(1)
+        exitProcess(1)
     }
     val project = args[0]
     println("Project $project")
-
-    BucketTest(project).createListDeleteTest(project)
-    InstanceTest(project).createListDeleteTest(project)
-
-    println("DONE")
+    val results = ArrayList<String>()
+    results.add(GCETest(project).test())
+    results.add(BucketTest(project).test())
+    results.add(PubSubTest(project).test())
+    if (!results.all { it.isBlank() }) {
+        println(results.joinToString("\n"))
+    } else {
+        println("Finished  test")
+    }
 }

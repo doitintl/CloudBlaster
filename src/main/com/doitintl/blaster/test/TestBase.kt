@@ -10,6 +10,7 @@ import org.yaml.snakeyaml.Yaml
 import java.io.FileInputStream
 import java.io.FileWriter
 import java.util.*
+import kotlin.system.exitProcess
 import com.doitintl.blaster.deleter.main as deleter
 import com.doitintl.blaster.lister.main as lister
 
@@ -18,21 +19,25 @@ abstract class TestBase(val project: String, private val sfx: String = randomStr
     abstract fun assetTypeIds(): List<String>
 
     init {
+        println("Suffix $sfx")
         try {
             assert(false)
             println("Must enable assertions")
-            System.exit(1)
+            exitProcess(1)
         } catch (ae: AssertionError) {
             //ok
         }
     }
 
-    fun createListDeleteTest(project: String) {
-
-
-        val assets = creationPhase(sfx, project)
-        val (tempAssetToDeleteFile, tempFilterFile) = listResultsWithFilter(sfx, project, assets)
-        deletionPhase(tempAssetToDeleteFile, tempFilterFile, assets)
+    fun test(): String {
+        return try {
+            val assets = creationPhase(sfx, project)
+            val (tempAssetToDeleteFile, tempFilterFile) = listResultsWithFilter(sfx, project, assets)
+            deletionPhase(tempAssetToDeleteFile, tempFilterFile, assets)
+            ""
+        } catch (th: Throwable) {
+            th.stackTraceToString()
+        }
     }
 
     fun assetName(type: String): String {
@@ -42,17 +47,17 @@ abstract class TestBase(val project: String, private val sfx: String = randomStr
     private fun creationPhase(sfx: String, project: String): List<String> {
         val assets = createAssets(sfx, project)
 
-        val conditionNotAll = { allAssets: String, assets_: List<String> -> !assets_.all { asset -> allAssets.contains(asset) } }
+        val notAll = { allAssets: String, assets_: List<String> -> !assets_.all { asset -> allAssets.contains(asset) } }
 
-        waitOnUnfilteredOutput(conditionNotAll, assets)
+        waitOnUnfilteredOutput(notAll, assets)
         return assets
     }
 
 
     private fun deletionPhase(tempAssetToDeleteFile: String, tempFilterFile: String, assets: List<String>) {
         deleter(arrayOf("-d", tempAssetToDeleteFile, "-f", tempFilterFile))
-        val conditionSome = { allAssets: String, assets_: List<String> -> !assets_.none { asset -> allAssets.contains(asset) } }
-        waitOnUnfilteredOutput(conditionSome, assets)
+        val some = { fullListing: String, delThese: List<String> -> !delThese.none { asset -> fullListing.contains(asset) } }
+        waitOnUnfilteredOutput(some, assets)
     }
 
 
@@ -64,7 +69,7 @@ abstract class TestBase(val project: String, private val sfx: String = randomStr
         val outputRaw = tempAssetsToDeleteFile.readText()
         val output = noComment(outputRaw)
         assert(expected.all { output.contains(it) }) { "expected $expected \nbut output $output" }
-        var lines = output.split("\n").filter { it.isNotBlank() }
+        val lines = output.split("\n").filter { it.isNotBlank() }
 
         //can have an extra line when a disk is generated alongside its instnace
         assert(lines.size == expected.size || lines.size == expected.size + 1) { "expected $expected\noutput $output" }
@@ -92,7 +97,7 @@ abstract class TestBase(val project: String, private val sfx: String = randomStr
             print(". ")
         } while (counter++ < loopLimit && waitCondition(allAssets, expected))
         println()
-        assert(counter <= loopLimit, { "Timed out" })
+        assert(counter <= loopLimit) { "Timed out" }
     }
 
 

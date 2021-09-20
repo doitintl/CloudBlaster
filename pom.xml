@@ -73,6 +73,11 @@
             <artifactId>picocli</artifactId>
             <version>4.6.1</version>
         </dependency>
+        <!--        <dependency>-->
+        <!--            <groupId>com.google.cloud</groupId>-->
+        <!--            <artifactId>google-cloud-compute</artifactId>-->
+        <!--            <version>1.4.1-alpha</version>-->
+        <!--        </dependency>-->
         <dependency>
             <groupId>com.google.cloud</groupId>
             <artifactId>google-cloud-pubsub</artifactId>

@@ -8,15 +8,17 @@ import com.google.api.client.json.jackson2.JacksonFactory
 import com.google.api.services.compute.Compute
 
 abstract class GCEAbstractDeleter : AbstractDeleter() {
+    companion object {
 
-    protected fun createComputeService(): Compute {
-        val httpTransport = GoogleNetHttpTransport.newTrustedTransport()
-        val jsonFactory = JacksonFactory.getDefaultInstance()
-        var credential = GoogleCredential.getApplicationDefault()
-        if (credential.createScopedRequired()) {
-            credential = credential.createScoped(listOf("https://www.googleapis.com/auth/cloud-platform"))
+        fun createComputeService(): Compute {
+            val httpTransport = GoogleNetHttpTransport.newTrustedTransport()
+            val jsonFactory = JacksonFactory.getDefaultInstance()
+            var credential = GoogleCredential.getApplicationDefault()
+            if (credential.createScopedRequired()) {
+                credential = credential.createScoped(listOf("https://www.googleapis.com/auth/cloud-platform"))
+            }
+
+            return Compute.Builder(httpTransport, jsonFactory, credential).setApplicationName(CLOUD_BLASTER).build()
         }
-        return Compute.Builder(httpTransport, jsonFactory, credential).setApplicationName(CLOUD_BLASTER)
-                .build()
     }
 }
