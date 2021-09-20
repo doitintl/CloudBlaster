@@ -1,6 +1,6 @@
 package com.doitintl.blaster.deleters
 
-import com.doitintl.blaster.deleter.AbstractDeleter
+import com.doitintl.blaster.deleter.BaseDeleter
 import com.doitintl.blaster.shared.Constants.CLOUD_BLASTER
 import com.doitintl.blaster.shared.Constants.ID
 import com.doitintl.blaster.shared.Constants.LOCATION
@@ -11,7 +11,7 @@ import com.google.api.services.container.Container
 import com.google.auth.http.HttpCredentialsAdapter
 import com.google.auth.oauth2.GoogleCredentials
 
-class GKEClusterDeleter : AbstractDeleter() {
+class GKEClusterDeleter : BaseDeleter() {
     override val pathPatterns: Array<String>
         get() = arrayOf(
             "//container.googleapis.com/projects/{PROJECT}/zones/{LOCATION}/clusters/{ID}",
@@ -20,15 +20,19 @@ class GKEClusterDeleter : AbstractDeleter() {
 
 
     override fun doDelete(p: Map<String, String>) {
-        val requestInitializer = HttpCredentialsAdapter(GoogleCredentials.getApplicationDefault())
-        val containerApi = Container.Builder(
-            GoogleNetHttpTransport.newTrustedTransport(), JacksonFactory(), requestInitializer
-        ).setApplicationName(CLOUD_BLASTER)
-            .build()
+        val containerApi = getContainerService()
         val clusters = containerApi.projects().locations().clusters()
         val idTriplet = "projects/${p[PROJECT]}/locations/${p[LOCATION]}/clusters/${p[ID]}"
         val delete = clusters.delete(idTriplet)
         val result = delete.execute()
 
+    }
+
+    private fun getContainerService(): Container {
+        val requestInitializer = HttpCredentialsAdapter(GoogleCredentials.getApplicationDefault())
+        return Container.Builder(
+            GoogleNetHttpTransport.newTrustedTransport(), JacksonFactory(), requestInitializer
+        ).setApplicationName(CLOUD_BLASTER)
+            .build()
     }
 }

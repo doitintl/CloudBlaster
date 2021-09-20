@@ -1,7 +1,7 @@
 package com.doitintl.blaster.deleter
 
 
-interface AssetDeleter {
+interface AssetTypeDeleter {
     fun paramsFromPath(path: String): Map<String, String> //subclasses invoke this
     fun pathRegexes(): List<Regex>//invoke this
     val pathPatterns: Array<String>//subclasses implement this

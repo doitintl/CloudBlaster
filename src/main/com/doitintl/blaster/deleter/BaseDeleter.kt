@@ -5,7 +5,7 @@ import java.util.*
 private val UPPERCASE_IN_CURLIES = Regex(""".*(\{[A-Z]+\}).*""")
 private val GROUP_NAMES_IN_REGEX = Regex("""\?<([a-zA-Z][a-zA-Z0-9]*)>""")
 
-abstract class AbstractDeleter : AssetDeleter {
+abstract class BaseDeleter : AssetTypeDeleter {
 
     override fun delete(line: String) {
         doDelete(paramsFromPath(line))

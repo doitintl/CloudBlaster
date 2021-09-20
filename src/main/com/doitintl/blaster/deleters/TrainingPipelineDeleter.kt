@@ -1,6 +1,6 @@
 package com.doitintl.blaster.deleters
 
-import com.doitintl.blaster.deleter.AbstractDeleter
+import com.doitintl.blaster.deleter.BaseDeleter
 import com.doitintl.blaster.shared.Constants.ID
 import com.doitintl.blaster.shared.Constants.LOCATION
 import com.doitintl.blaster.shared.Constants.PROJECT
@@ -10,7 +10,7 @@ import com.google.cloud.aiplatform.v1.TrainingPipelineName
 import java.util.concurrent.TimeUnit
 
 
-class TrainingPipelineDeleter : AbstractDeleter() {
+class TrainingPipelineDeleter : BaseDeleter() {
 
     override val pathPatterns: Array<String>
         get() = arrayOf("//aiplatform.googleapis.com/projects/{PROJECT}/locations/{LOCATION}/trainingPipelines/{ID}")

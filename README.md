@@ -37,8 +37,12 @@ that you review.
 1. The Lister requires you to explicitly state a project. It does not implicitly use your `gcloud`  default project.
 1. The Lister can be filtered (see `list-filter.yaml` file) so that specified assets are skipped when 
 building the `asset-list.txt` file.
-1. After running the Lister, you review and manually edit the list of assets for deletion, before running the Deleter.
- 
+1. After running the Lister, you reviewthe list of assets for deletion
+       * Manually edit it.
+       * Add a comment line `# Ready to delete` to the top 
+       * If you like danger, write a script to add this comment between steps.
+       * Then run the Deleter. 
+
 ## Instructions
 
 ### Prerequisites

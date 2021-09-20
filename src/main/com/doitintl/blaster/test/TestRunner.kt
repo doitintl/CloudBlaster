@@ -19,7 +19,9 @@ fun main(vararg args: String) {
     results.add(PubSubTest(project).test())
     if (!results.all { it.isBlank() }) {
         println(results.joinToString("\n"))
+        exitProcess(1)
     } else {
-        println("Finished  test")
+        println("Success in test")
+
     }
 }

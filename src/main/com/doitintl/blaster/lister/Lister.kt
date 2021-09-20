@@ -1,6 +1,7 @@
 package com.doitintl.blaster.lister
 
 import com.doitintl.blaster.shared.Constants
+import com.doitintl.blaster.shared.Constants.ALL_ASSETS_ALL_TYPES
 import com.doitintl.blaster.shared.Constants.ASSET_LIST_FILE
 import com.doitintl.blaster.shared.Constants.CLOUD_BLASTER
 import picocli.CommandLine
@@ -44,9 +45,9 @@ internal class FileWritingCallback(filename: String, noFilter: Boolean) : Callba
 
     init {
         val s = if (noFilter) {
-            "All assets of all types, even if not eligible for deletion"
+            ALL_ASSETS_ALL_TYPES
         } else {
-            "Assets of types supported for deletion, after filtering. Review and edit before passing this to the deleter"
+            "Assets after filtering. Review, edit, then add the comment indicating readiness to delete, before passing this to the deleter"
         }
 
         fw.write("# $s\n")

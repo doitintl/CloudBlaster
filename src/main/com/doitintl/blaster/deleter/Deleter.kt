@@ -1,8 +1,10 @@
 package com.doitintl.blaster.deleter
 
 import com.doitintl.blaster.lister.AssetTypeMap
+import com.doitintl.blaster.shared.Constants.ALL_ASSETS_ALL_TYPES
 import com.doitintl.blaster.shared.Constants.ASSET_LIST_FILE
 import com.doitintl.blaster.shared.Constants.CLOUD_BLASTER
+import com.doitintl.blaster.shared.Constants.COMMENT_READY_TO_DELETE
 import com.doitintl.blaster.shared.Constants.LIST_FILTER_YAML
 import com.doitintl.blaster.shared.noComment
 import kotlinx.coroutines.Dispatchers
@@ -28,10 +30,20 @@ class Deleter : Callable<Int> {
 
     override fun call(): Int {
         val allLines = File(assetsToDeleteFile).readLines()
-        val lines = noComment(allLines)
-        if (lines.isEmpty()) {
+        if (noComment(allLines).isEmpty()) {
             throw IllegalStateException("Nothing to delete")
         }
+        if (allLines.filter { l -> l.contains(ALL_ASSETS_ALL_TYPES) }.isNotEmpty()) {
+            throw  IllegalStateException("Cannot process a listing of $ALL_ASSETS_ALL_TYPES; see supported types in filter file")
+        }
+
+        val readyToGo = COMMENT_READY_TO_DELETE.substring(2, COMMENT_READY_TO_DELETE.length - 2)
+        if (!allLines[0].contains(readyToGo)) {
+            throw   IllegalStateException("Must add \"$COMMENT_READY_TO_DELETE\" comment to top of $assetsToDeleteFile to enable deletion.")
+        }
+
+        val lines = noComment(allLines)
+
         var counter = 0
         runBlocking {
             lines.forEach { line ->

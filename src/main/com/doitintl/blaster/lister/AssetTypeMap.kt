@@ -1,6 +1,6 @@
 package com.doitintl.blaster.lister
 
-import com.doitintl.blaster.deleter.AssetDeleter
+import com.doitintl.blaster.deleter.AssetTypeDeleter
 import org.yaml.snakeyaml.Yaml
 import java.io.FileInputStream
 import java.io.FileReader
@@ -15,8 +15,8 @@ class AssetTypeMap(private val filterFile: String) {
 
     private val assetTypeMap: Map<String, AssetType>
 
-    fun deleterClass(line: String): AssetDeleter {
-        var ret: AssetDeleter? = null
+    fun deleterClass(line: String): AssetTypeDeleter {
+        var ret: AssetTypeDeleter? = null
         for (assetType in assetTypeMap.values) {
             val deleter = assetType.deleterClass.getConstructor().newInstance()
             for (regex in deleter.pathRegexes()) {
@@ -177,7 +177,7 @@ private class AssetType(
     var regexIsWhitelist: Boolean = false
         private set
 
-    lateinit var deleterClass: Class<AssetDeleter>
+    lateinit var deleterClass: Class<AssetTypeDeleter>
         private set
 
 
@@ -202,7 +202,7 @@ private class AssetType(
         }
 
         val deleterClassName = deleterClassName(assetTypeId, deleterClassName_)
-        this.deleterClass = Class.forName(deleterClassName) as Class<AssetDeleter>
+        this.deleterClass = Class.forName(deleterClassName) as Class<AssetTypeDeleter>
     }
 
 

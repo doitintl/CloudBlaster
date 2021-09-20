@@ -1,6 +1,6 @@
 package com.doitintl.blaster.deleters
 
-import com.doitintl.blaster.deleter.AbstractDeleter
+import com.doitintl.blaster.deleter.BaseDeleter
 import com.doitintl.blaster.shared.Constants
 import com.doitintl.blaster.shared.Constants.ID
 import com.doitintl.blaster.shared.Constants.LOCATION
@@ -12,7 +12,7 @@ import com.google.api.services.run.v1.CloudRun
 import com.google.auth.http.HttpCredentialsAdapter
 import com.google.auth.oauth2.GoogleCredentials
 
-class CloudRunServiceDeleter : AbstractDeleter() {
+class CloudRunServiceDeleter : BaseDeleter() {
 
     override val pathPatterns: Array<String>
         get() = arrayOf("//run.googleapis.com/projects/{PROJECT}/locations/{LOCATION}/services/{ID}")

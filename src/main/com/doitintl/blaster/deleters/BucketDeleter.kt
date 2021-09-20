@@ -1,12 +1,12 @@
 package com.doitintl.blaster.deleters
 
-import com.doitintl.blaster.deleter.AbstractDeleter
+import com.doitintl.blaster.deleter.BaseDeleter
 import com.doitintl.blaster.shared.Constants.ID
 import com.google.auth.oauth2.GoogleCredentials
 import com.google.cloud.storage.Bucket
 import com.google.cloud.storage.StorageOptions
 
-class BucketDeleter : AbstractDeleter() {
+class BucketDeleter : BaseDeleter() {
     //todo test on regional and multiregional buckets
 
     override val pathPatterns: Array<String>

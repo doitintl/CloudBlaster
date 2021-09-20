@@ -3,10 +3,12 @@ package com.doitintl.blaster.test
 import com.doitintl.blaster.lister.LIST_THESE
 import com.doitintl.blaster.lister.REGEX
 import com.doitintl.blaster.shared.Constants
+import com.doitintl.blaster.shared.Constants.COMMENT_READY_TO_DELETE
 import com.doitintl.blaster.shared.noComment
 import com.doitintl.blaster.shared.randomString
 import org.yaml.snakeyaml.DumperOptions
 import org.yaml.snakeyaml.Yaml
+import java.io.File
 import java.io.FileInputStream
 import java.io.FileWriter
 import java.util.*
@@ -33,6 +35,16 @@ abstract class TestBase(val project: String, private val sfx: String = randomStr
         return try {
             val assets = creationPhase(sfx, project)
             val (tempAssetToDeleteFile, tempFilterFile) = listResultsWithFilter(sfx, project, assets)
+            val content = File(tempAssetToDeleteFile).readText()
+
+            FileWriter(tempAssetToDeleteFile).use { fw ->
+                fw.write(
+                    COMMENT_READY_TO_DELETE +
+                            "\n" +
+                            content
+                )
+            }
+
             deletionPhase(tempAssetToDeleteFile, tempFilterFile, assets)
             ""
         } catch (th: Throwable) {
@@ -66,6 +78,7 @@ abstract class TestBase(val project: String, private val sfx: String = randomStr
         val tempAssetsToDeleteFile = createTempFile("${Constants.ASSET_LIST_FILE}-$sfx", ".txt")
         tempAssetsToDeleteFile.deleteOnExit()
         lister(arrayOf("-p", project, "-o", tempAssetsToDeleteFile.absolutePath, "-f", tempFilterFilePath))
+
         val outputRaw = tempAssetsToDeleteFile.readText()
         val output = noComment(outputRaw)
         assert(expected.all { output.contains(it) }) { "expected $expected \nbut output $output" }
