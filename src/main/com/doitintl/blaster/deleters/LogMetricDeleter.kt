@@ -23,7 +23,7 @@ class LogMetricDeleter : AbstractDeleter() {
         val credentials = GoogleCredentials.getApplicationDefault()
         val requestInitializer: HttpRequestInitializer = HttpCredentialsAdapter(credentials)
         val logging = Logging.Builder(
-                GoogleNetHttpTransport.newTrustedTransport(), JacksonFactory(), requestInitializer
+            GoogleNetHttpTransport.newTrustedTransport(), JacksonFactory(), requestInitializer
         ).setApplicationName(CLOUD_BLASTER).build()
         val metrics = logging.Projects().metrics()
         val del = metrics.delete("projects/$project/metrics/$id")

@@ -72,7 +72,7 @@ class AssetTypeMap(private val filterFile: String) {
                     val filter = filtersFromYaml[assetTypeId]!!
                     val sz = filter.size
                     val error =
-                            "$assetTypeId has keys ${filter.keys.toList()} but should have either none or \"$REGEX\" and \"$LIST_THESE\""
+                        "$assetTypeId has keys ${filter.keys.toList()} but should have either none or \"$REGEX\" and \"$LIST_THESE\""
                     val at = assetTypeMap_inout[assetTypeId] ?: error("$assetTypeId not found")
                     when (sz) {
                         0 -> {
@@ -168,8 +168,8 @@ class AssetTypeMap(private val filterFile: String) {
 
 
 private class AssetType(
-        val assetTypeId: String,
-        deleterClassName: String
+    val assetTypeId: String,
+    deleterClassName: String
 ) {
     lateinit var filterRegex: Regex
         private set
@@ -191,13 +191,13 @@ private class AssetType(
     private fun setDeleterClass(deleterClassName_: String) {
         fun deleterClassName(assetTypeId: String, optionalClassName: String): String {
             val className =
-                    if (optionalClassName.isBlank()) {//use defaults
-                        val parts = assetTypeId.split("/").toTypedArray()
-                        val assetTypeShortName = parts[parts.size - 1]
-                        assetTypeShortName + "Deleter"
-                    } else {
-                        optionalClassName
-                    }
+                if (optionalClassName.isBlank()) {//use defaults
+                    val parts = assetTypeId.split("/").toTypedArray()
+                    val assetTypeShortName = parts[parts.size - 1]
+                    assetTypeShortName + "Deleter"
+                } else {
+                    optionalClassName
+                }
             return if (className.contains(".")) className else "com.doitintl.blaster.deleters.$className"
         }
 

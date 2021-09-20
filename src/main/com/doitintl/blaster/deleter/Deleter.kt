@@ -13,10 +13,10 @@ import java.io.File
 import java.util.concurrent.Callable
 
 @CommandLine.Command(
-        name = CLOUD_BLASTER,
-        mixinStandardHelpOptions = true,
-        version = ["1.0"],
-        description = ["Deletes assets listed in file (by default asset-list.txt)"]
+    name = CLOUD_BLASTER,
+    mixinStandardHelpOptions = true,
+    version = ["1.0"],
+    description = ["Deletes assets listed in file (by default asset-list.txt)"]
 )
 class Deleter : Callable<Int> {
 

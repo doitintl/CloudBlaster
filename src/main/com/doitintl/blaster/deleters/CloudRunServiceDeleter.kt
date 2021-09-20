@@ -22,7 +22,7 @@ class CloudRunServiceDeleter : AbstractDeleter() {
         val credentials = GoogleCredentials.getApplicationDefault()
         val requestInitializer: HttpRequestInitializer = HttpCredentialsAdapter(credentials)
         val run = CloudRun.Builder(
-                GoogleNetHttpTransport.newTrustedTransport(), JacksonFactory(), requestInitializer
+            GoogleNetHttpTransport.newTrustedTransport(), JacksonFactory(), requestInitializer
         ).setApplicationName(Constants.CLOUD_BLASTER).build()
         val services = run.projects().Locations().services()
         val del = services.delete("projects/${p[PROJECT]!!}/locations/${p[LOCATION]!!}/services/${p[ID]!!}")

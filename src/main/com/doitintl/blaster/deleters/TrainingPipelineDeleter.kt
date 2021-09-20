@@ -21,8 +21,8 @@ class TrainingPipelineDeleter : AbstractDeleter() {
 
         //At this stage, the only location is us-central1
         val pipelineServiceSettings: PipelineServiceSettings = PipelineServiceSettings.newBuilder()
-                .setEndpoint("${p[LOCATION]}-aiplatform.googleapis.com:443")
-                .build()
+            .setEndpoint("${p[LOCATION]}-aiplatform.googleapis.com:443")
+            .build()
 
         PipelineServiceClient.create(pipelineServiceSettings).use { pipelineServiceClient ->
 
