@@ -1,10 +1,10 @@
 package com.doitintl.blaster.deleters
 
-import com.doitintl.blaster.Constants
-import com.doitintl.blaster.Constants.ID
-import com.doitintl.blaster.Constants.LOCATION
-import com.doitintl.blaster.Constants.PROJECT
 import com.doitintl.blaster.deleter.AbstractDeleter
+import com.doitintl.blaster.shared.Constants
+import com.doitintl.blaster.shared.Constants.ID
+import com.doitintl.blaster.shared.Constants.LOCATION
+import com.doitintl.blaster.shared.Constants.PROJECT
 import com.google.api.client.googleapis.javanet.GoogleNetHttpTransport
 import com.google.api.client.http.HttpRequestInitializer
 import com.google.api.client.json.jackson2.JacksonFactory
@@ -22,7 +22,7 @@ class CloudRunServiceDeleter : AbstractDeleter() {
         val credentials = GoogleCredentials.getApplicationDefault()
         val requestInitializer: HttpRequestInitializer = HttpCredentialsAdapter(credentials)
         val run = CloudRun.Builder(
-            GoogleNetHttpTransport.newTrustedTransport(), JacksonFactory(), requestInitializer
+                GoogleNetHttpTransport.newTrustedTransport(), JacksonFactory(), requestInitializer
         ).setApplicationName(Constants.CLOUD_BLASTER).build()
         val services = run.projects().Locations().services()
         val del = services.delete("projects/${p[PROJECT]!!}/locations/${p[LOCATION]!!}/services/${p[ID]!!}")

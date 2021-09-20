@@ -59,8 +59,8 @@ abstract class AbstractDeleter : AssetDeleter {
     }
 
     private fun groupNames(regex: Regex): List<String> {
-        assert(GROUP_NAMES_IN_REGEX.matches(regex.pattern))
-        val matchResults = GROUP_NAMES_IN_REGEX.findAll(regex.pattern)
+        val matchResults = GROUP_NAMES_IN_REGEX.findAll(regex.pattern).toList()
+        assert(matchResults.isNotEmpty()) { "$regex. lacks the group names" }
         return matchResults.map { it.groups[1]!!.value }.toList().distinct()
     }
 

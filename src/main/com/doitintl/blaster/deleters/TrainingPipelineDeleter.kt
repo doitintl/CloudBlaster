@@ -1,9 +1,9 @@
 package com.doitintl.blaster.deleters
 
-import com.doitintl.blaster.Constants.ID
-import com.doitintl.blaster.Constants.LOCATION
-import com.doitintl.blaster.Constants.PROJECT
 import com.doitintl.blaster.deleter.AbstractDeleter
+import com.doitintl.blaster.shared.Constants.ID
+import com.doitintl.blaster.shared.Constants.LOCATION
+import com.doitintl.blaster.shared.Constants.PROJECT
 import com.google.cloud.aiplatform.v1.PipelineServiceClient
 import com.google.cloud.aiplatform.v1.PipelineServiceSettings
 import com.google.cloud.aiplatform.v1.TrainingPipelineName
@@ -21,8 +21,8 @@ class TrainingPipelineDeleter : AbstractDeleter() {
 
         //At this stage, the only location is us-central1
         val pipelineServiceSettings: PipelineServiceSettings = PipelineServiceSettings.newBuilder()
-            .setEndpoint("${p[LOCATION]}-aiplatform.googleapis.com:443")
-            .build()
+                .setEndpoint("${p[LOCATION]}-aiplatform.googleapis.com:443")
+                .build()
 
         PipelineServiceClient.create(pipelineServiceSettings).use { pipelineServiceClient ->
 

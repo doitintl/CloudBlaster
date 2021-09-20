@@ -1,51 +1,42 @@
-package com.doitintl.blaster.test.tests
+package com.doitintl.blaster.test
 
-
-import com.doitintl.blaster.Constants.ASSET_LIST_FILE
-import com.doitintl.blaster.Constants.LIST_FILTER_YAML
 import com.doitintl.blaster.lister.LIST_THESE
 import com.doitintl.blaster.lister.REGEX
-import com.doitintl.blaster.test.randomString
-import com.doitintl.blaster.test.runCommand
-import org.junit.jupiter.api.Test
+import com.doitintl.blaster.shared.Constants
+import com.doitintl.blaster.shared.noComment
+import com.doitintl.blaster.shared.randomString
 import org.yaml.snakeyaml.DumperOptions
 import org.yaml.snakeyaml.Yaml
-import java.io.File
 import java.io.FileInputStream
-import java.io.FileReader
 import java.io.FileWriter
-import java.lang.Thread.sleep
 import java.util.*
 import com.doitintl.blaster.deleter.main as deleter
 import com.doitintl.blaster.lister.main as lister
 
-class BucketTest {
+abstract class TestBase(val project: String, private val sfx: String = randomString(8)) {
+    abstract fun createAssets(sfx: String, project: String): List<String>
+    abstract fun assetTypeIds(): List<String>
 
-    private fun assetTypeIds(): List<String> = listOf("storage.googleapis.com/Bucket")
-
-    private fun createAssets(sfx: String, project: String): List<String> {
-        fun makeBucket(project: String, location: String, bucketName: String) {
-            runCommand("gsutil mb -p $project -l $location gs://$bucketName")
+    init {
+        try {
+            assert(false)
+            println("Must enable assertions")
+            System.exit(1)
+        } catch (ae: AssertionError) {
+            //ok
         }
-
-        val multiregionAsset = "blastertest-multiregion-$sfx"
-        val regionAsset = "blastertest-region-$sfx"
-
-        makeBucket(project, "us", multiregionAsset)
-        makeBucket(project, "us-central1", regionAsset)
-        return listOf(multiregionAsset, regionAsset)
     }
 
+    fun createListDeleteTest(project: String) {
 
-    @Test
-    fun createListDeleteTest() {
-        val sfx = randomString(8)
-        println("Suffix $sfx")
-        val project = System.getProperty("PROJECT_ID") ?: "joshua-playground2"
 
         val assets = creationPhase(sfx, project)
         val (tempAssetToDeleteFile, tempFilterFile) = listResultsWithFilter(sfx, project, assets)
-        deletionPhase(tempAssetToDeleteFile, tempFilterFile, project, sfx, assets)
+        deletionPhase(tempAssetToDeleteFile, tempFilterFile, assets)
+    }
+
+    fun assetName(type: String): String {
+        return "blastertest-$type-$sfx"
     }
 
     private fun creationPhase(sfx: String, project: String): List<String> {
@@ -53,64 +44,61 @@ class BucketTest {
 
         val conditionNotAll = { allAssets: String, assets_: List<String> -> !assets_.all { asset -> allAssets.contains(asset) } }
 
-        waitOnUnfilteredOutput(project, sfx, conditionNotAll, assets)
+        waitOnUnfilteredOutput(conditionNotAll, assets)
         return assets
     }
 
-    private fun deletionPhase(tempAssetToDeleteFile: String, tempFilterFile: String, project: String, sfx: String, assets: List<String>) {
+
+    private fun deletionPhase(tempAssetToDeleteFile: String, tempFilterFile: String, assets: List<String>) {
         deleter(arrayOf("-d", tempAssetToDeleteFile, "-f", tempFilterFile))
         val conditionSome = { allAssets: String, assets_: List<String> -> !assets_.none { asset -> allAssets.contains(asset) } }
-        waitOnUnfilteredOutput(project, sfx, conditionSome, assets)
+        waitOnUnfilteredOutput(conditionSome, assets)
     }
 
 
     private fun listResultsWithFilter(sfx: String, project: String, expected: List<String>): Pair<String, String> {
         val tempFilterFilePath = newFilterYaml(sfx)
-        val tempAssetsToDeleteFile = createTempFile("$ASSET_LIST_FILE-$sfx", ".txt")
+        val tempAssetsToDeleteFile = createTempFile("${Constants.ASSET_LIST_FILE}-$sfx", ".txt")
         tempAssetsToDeleteFile.deleteOnExit()
         lister(arrayOf("-p", project, "-o", tempAssetsToDeleteFile.absolutePath, "-f", tempFilterFilePath))
-        val output = FileReader(tempAssetsToDeleteFile).readText()
-
+        val outputRaw = tempAssetsToDeleteFile.readText()
+        val output = noComment(outputRaw)
         assert(expected.all { output.contains(it) }) { "expected $expected \nbut output $output" }
-        var lines = output.split("\n")
-        if (lines[lines.lastIndex].trim() == "") {//remove last, empty line
-            lines = lines.subList(0, lines.lastIndex)
-        }
-        assert(lines.size == expected.size, { "expected $expected\noutput $output" })
+        var lines = output.split("\n").filter { it.isNotBlank() }
+
+        //can have an extra line when a disk is generated alongside its instnace
+        assert(lines.size == expected.size || lines.size == expected.size + 1) { "expected $expected\noutput $output" }
         return Pair(tempAssetsToDeleteFile.absolutePath, tempFilterFilePath)
     }
 
 
     private fun waitOnUnfilteredOutput(
-            project: String,
-            sfx: String,
+
             waitCondition: (String, List<String>) -> Boolean,
             expected: List<String>,
     ) {
         val DECISEC: Long = 100
-        val ONE_MIN_IN_DECISEC = 10//plus time for the actual calls
+        val DECISEC_IN_MIN = 10
+        val minutes = 3//plus time for the code to run, so more time than that
+        val loopLimit = minutes * DECISEC_IN_MIN
         val outputTempFile = createTempFile("all-assets$sfx", ".txt")
         outputTempFile.deleteOnExit()
         var counter = 0
         do {
             lister(arrayOf("-p", project, "-o", outputTempFile.absolutePath, "-n"))
-            val allAssets = File(outputTempFile.absolutePath).readText()
+            val allAssets = outputTempFile.readText()
 
-            sleep(DECISEC)
+            Thread.sleep(DECISEC)
             print(". ")
-        } while (counter++ < ONE_MIN_IN_DECISEC && waitCondition(allAssets, expected))
+        } while (counter++ < loopLimit && waitCondition(allAssets, expected))
         println()
-
-        val allAssets = File(outputTempFile.absolutePath).readText()
-
-        assert(!waitCondition(allAssets, expected))//assert that we didn't timeout
+        assert(counter <= loopLimit, { "Timed out" })
     }
 
 
     private fun newFilterYaml(sfx: String): String {
-
         var counter = 0
-        FileInputStream(LIST_FILTER_YAML).use { `in` ->
+        FileInputStream(Constants.LIST_FILTER_YAML).use { `in` ->
             for (o in Yaml().loadAll(`in`)) {
 
                 val filtersFromYaml = o as Map<String, Map<String, Any>>//The inner Map is Boolean|String
@@ -137,11 +125,12 @@ class BucketTest {
         throw  IllegalStateException("Should not get here")
     }
 
+
     private fun writeTempFilterYaml(
             sfx: String,
             filtersFromYamlOut: TreeMap<String, Map<String, Any>>
     ): String {
-        val baseFilename = LIST_FILTER_YAML.split(".")[0]
+        val baseFilename = Constants.LIST_FILTER_YAML.split(".")[0]
         val tempFilterYaml = createTempFile("$baseFilename-$sfx", ".yaml")
         tempFilterYaml.deleteOnExit()
         writeYaml(tempFilterYaml.absolutePath, filtersFromYamlOut)
@@ -159,9 +148,4 @@ class BucketTest {
         }
     }
 
-}
-
-fun main(vararg args: String) {
-    BucketTest().createListDeleteTest()
-    println("DONE")
 }

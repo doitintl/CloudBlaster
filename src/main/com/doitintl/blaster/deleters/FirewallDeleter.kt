@@ -1,7 +1,7 @@
 package com.doitintl.blaster.deleters
 
-import com.doitintl.blaster.Constants.ID
-import com.doitintl.blaster.Constants.PROJECT
+import com.doitintl.blaster.shared.Constants.ID
+import com.doitintl.blaster.shared.Constants.PROJECT
 
 class FirewallDeleter : GCEAbstractDeleter() {
 
