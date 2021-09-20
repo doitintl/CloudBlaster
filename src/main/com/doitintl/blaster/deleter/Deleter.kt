@@ -26,7 +26,8 @@ class Deleter : Callable<Int> {
     private var filterFile: String = LIST_FILTER_YAML
 
     override fun call(): Int {
-        val lines = File(assetsToDeleteFile).readLines()
+        val allLines = File(assetsToDeleteFile).readLines()
+        val lines = allLines.filter { l -> !l.trim().startsWith("#") }
         var counter = 0
         runBlocking {
             lines.forEach { line ->

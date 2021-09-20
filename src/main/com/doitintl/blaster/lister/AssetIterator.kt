@@ -9,32 +9,33 @@ class AssetIterator {
 
     fun listAssets(projectId: String, callback: Callback<String>, noFilter: Boolean, filterFile: String) {
 
-        val client = AssetServiceClient.create()
-        val contentType = ContentType.CONTENT_TYPE_UNSPECIFIED
-        val assetTypeMap = AssetTypeMap(filterFile)
-        var apiIdentifiers: List<String> = assetTypeMap.identifiers()
-        if (apiIdentifiers.isEmpty()) {
-            throw IllegalStateException("No asset types in config file3")
-        }
-        if (noFilter) {
-            apiIdentifiers = emptyList()
+        AssetServiceClient.create().use { client ->
 
-        }
+            val contentType = ContentType.CONTENT_TYPE_UNSPECIFIED
+            val assetTypeMap = AssetTypeMap(filterFile)
+            var apiIdentifiers: List<String> = assetTypeMap.identifiers()
+            if (apiIdentifiers.isEmpty()) {
+                throw IllegalStateException("No asset types in config file3")
+            }
+            if (noFilter) {
+                apiIdentifiers = emptyList()
 
-        var request = ListAssetsRequest.newBuilder()
-            .setParent(ProjectName.of(projectId).toString())
-            .addAllAssetTypes(apiIdentifiers)
-            .setContentType(contentType)
-            .build()
+            }
 
-        var response = client.listAssets(request)
-        iterateListingResponse(response, callback, noFilter, assetTypeMap)
-        while (response.nextPageToken.isNotEmpty()) {
-            request = request.toBuilder().setPageToken(response.nextPageToken).build()
-            response = client.listAssets(request)
+            var request = ListAssetsRequest.newBuilder()
+                    .setParent(ProjectName.of(projectId).toString())
+                    .addAllAssetTypes(apiIdentifiers)
+                    .setContentType(contentType)
+                    .build()
+
+            var response = client.listAssets(request)
             iterateListingResponse(response, callback, noFilter, assetTypeMap)
+            while (response.nextPageToken.isNotEmpty()) {
+                request = request.toBuilder().setPageToken(response.nextPageToken).build()
+                response = client.listAssets(request)
+                iterateListingResponse(response, callback, noFilter, assetTypeMap)
+            }
         }
-
     }
 
     private fun iterateListingResponse(

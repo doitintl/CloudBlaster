@@ -13,15 +13,12 @@ import com.google.auth.http.HttpCredentialsAdapter
 import com.google.auth.oauth2.GoogleCredentials
 
 class CloudRunServiceDeleter : AbstractDeleter() {
-    //todo test on regional buckets
 
     override val pathPatterns: Array<String>
         get() = arrayOf("//run.googleapis.com/projects/{PROJECT}/locations/{LOCATION}/services/{ID}")
 
 
     override fun doDelete(p: Map<String, String>) {
-
-
         val credentials = GoogleCredentials.getApplicationDefault()
         val requestInitializer: HttpRequestInitializer = HttpCredentialsAdapter(credentials)
         val run = CloudRun.Builder(
@@ -30,9 +27,5 @@ class CloudRunServiceDeleter : AbstractDeleter() {
         val services = run.projects().Locations().services()
         val del = services.delete("projects/${p[PROJECT]!!}/locations/${p[LOCATION]!!}/services/${p[ID]!!}")
         val result = del.execute()
-
-
     }
-
-
 }

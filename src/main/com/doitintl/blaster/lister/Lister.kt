@@ -29,10 +29,8 @@ class Lister : Callable<Any> {
 
 
     override fun call(): Int {
-        if (noFilter) {
-            println("Outputting all assets, even for types where deletion is not supported, to file $outputFile ")
-        }
-        FileWritingCallback(outputFile).use { callback ->
+
+        FileWritingCallback(outputFile, noFilter).use { callback ->
             AssetIterator().listAssets(project, callback, noFilter, filterFile)
             return 0
         }
@@ -41,8 +39,18 @@ class Lister : Callable<Any> {
 
 }
 
-internal class FileWritingCallback(filename: String) : Callback<String> {
+internal class FileWritingCallback(filename: String, noFilter: Boolean) : Callback<String> {
     private val fw: FileWriter = FileWriter(filename)
+
+    init {
+        val s = if (noFilter) {
+            "All assets of all types, even if not eligible for deletion"
+        } else {
+            "Assets of types supported for deletion, after filtering. Review and edit before passing this to the deleter"
+        }
+
+        fw.write("# $s\n")
+    }
 
     override fun call(s: String) {
         fw.write("$s\n")

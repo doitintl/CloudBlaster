@@ -2,8 +2,6 @@ package com.doitintl.blaster.deleter
 
 import java.util.*
 
-
-//todo Maybe use Kotlin Regex rather than Java Pattern, throughout.
 private val UPPERCASE_IN_CURLIES = Regex(""".*(\{[A-Z]+\}).*""")
 private val GROUP_NAMES_IN_REGEX = Regex("""\?<([a-zA-Z][a-zA-Z0-9]*)>""")
 
