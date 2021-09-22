@@ -73,8 +73,9 @@ that you do not want to delete.
 * Command line flags: Run `./deleter.sh -h`
   
 ## Features
-* I focused on the common important asset types that are set up and torn down in typical development and QA.  This includes 
-    * Google Compute Engine instances, disks, and firewalls
+* I focused on the common important asset types that are set up and torn down in typical development and QA. 
+This includes: 
+    * Google Compute Engine instances, disks, firewalls, and addresses
     * Google Cloud PubSub topics and Subscriptions 
     * Google Kubernetes Engine regional and zonal clusters
     * Google Cloud Operations log metrics
@@ -95,9 +96,7 @@ that you do not want to delete.
 * More asset types.
 * Track asset dependencies, so that if you want to delete asset A, but it is undeletable until 
 asset B is gone, you delete B first, then A. 
-* Runtime verification by user along the lines of "Are you sure". Still, we have to trust the user. 
-A sloppy user will bypass such checks, and a careful user already has the opportunity 
-to edit  `asset-list.txt`.
+
 
 # Other projects and approaches
 - [Safe Scrub](https://github.come/doitintl/SafeScrub) was an earlier bash-only project that does the same thing. 

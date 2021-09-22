@@ -6,8 +6,10 @@ import com.doitintl.blaster.test.TestBase
 
 class PubSubTest(project: String) : TestBase(project) {
 
-    override fun assetTypeIds(): List<String> = listOf("pubsub.googleapis.com/Subscription",
-            "pubsub.googleapis.com/Topic")
+    override fun assetTypeIds(): List<String> = listOf(
+        "pubsub.googleapis.com/Subscription",
+        "pubsub.googleapis.com/Topic"
+    )
 
     override fun createAssets(sfx: String, project: String): List<String> {
 

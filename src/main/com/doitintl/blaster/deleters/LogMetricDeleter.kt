@@ -1,15 +1,11 @@
 package com.doitintl.blaster.deleters
 
 import com.doitintl.blaster.deleter.BaseDeleter
-import com.doitintl.blaster.shared.Constants.CLOUD_BLASTER
 import com.doitintl.blaster.shared.Constants.ID
 import com.doitintl.blaster.shared.Constants.PROJECT
-import com.google.api.client.googleapis.javanet.GoogleNetHttpTransport
-import com.google.api.client.http.HttpRequestInitializer
-import com.google.api.client.json.jackson2.JacksonFactory
-import com.google.api.services.logging.v2.Logging
-import com.google.auth.http.HttpCredentialsAdapter
-import com.google.auth.oauth2.GoogleCredentials
+
+import com.google.cloud.logging.v2.MetricsClient
+import com.google.logging.v2.LogMetricName
 
 
 class LogMetricDeleter : BaseDeleter() {
@@ -18,14 +14,10 @@ class LogMetricDeleter : BaseDeleter() {
         get() = arrayOf("//logging.googleapis.com/projects/{PROJECT}/metrics/{ID}")
 
     override fun doDelete(p: Map<String, String>) {
-        val credentials = GoogleCredentials.getApplicationDefault()
-        val requestInitializer: HttpRequestInitializer = HttpCredentialsAdapter(credentials)
-        val logging = Logging.Builder(
-            GoogleNetHttpTransport.newTrustedTransport(), JacksonFactory(), requestInitializer
-        ).setApplicationName(CLOUD_BLASTER).build()
-        val metrics = logging.Projects().metrics()
-        val del = metrics.delete("projects/${p[PROJECT]!!}/metrics/${p[ID]!!} ")
-        val result = del.execute()
+        MetricsClient.create().use { metricsClient ->
+            val metricName = LogMetricName.of(p[PROJECT], p[ID])
+            metricsClient.deleteLogMetric(metricName)
+        }
 
     }
 }

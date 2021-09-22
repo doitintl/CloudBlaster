@@ -23,8 +23,7 @@ class CloudFunctionDeleter : BaseDeleter() {
         ).setApplicationName(CLOUD_BLASTER).build()
         val function = funcs.projects().Locations().functions()
         val idTriplet = "projects/${p[PROJECT]}/locations/${p[LOCATION]}/functions/${p[ID]}"
-        val del = function.delete(idTriplet)
-        val result = del.execute()
+        val result = function.delete(idTriplet).execute()
 
     }
 }

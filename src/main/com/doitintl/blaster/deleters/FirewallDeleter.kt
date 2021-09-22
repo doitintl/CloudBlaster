@@ -11,9 +11,9 @@ class FirewallDeleter : GCEBaseDeleter() {
 
 
     override fun doDelete(p: Map<String, String>) {
-        val computeService = getComputeService()
-        val request = computeService.firewalls().delete(p[PROJECT], p[ID])
-        val operation = request.execute()
-        waitOnGlobalOperation(p[PROJECT]!!, operation)
+        val project = p[PROJECT]!!
+        val id = p[ID]
+        val operation = getComputeService().firewalls().delete(project, id).execute()
+        waitOnGlobalOperation(project, operation)
     }
 }

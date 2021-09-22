@@ -6,7 +6,7 @@ import com.doitintl.blaster.test.TestBase
 
 class BucketTest(project: String) : TestBase(project) {
 
-    override fun assetTypeIds(): List<String> = listOf("storage.googleapis.com/Bucket")
+    override fun assetTypeIds() = listOf("storage.googleapis.com/Bucket")//same value twice
 
     override fun createAssets(sfx: String, project: String): List<String> {
         fun makeBucket(project: String, location: String, bucketName: String) {

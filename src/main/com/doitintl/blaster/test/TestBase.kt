@@ -17,7 +17,15 @@ import com.doitintl.blaster.deleter.main as deleter
 import com.doitintl.blaster.lister.main as lister
 
 abstract class TestBase(val project: String, private val sfx: String = randomString(8)) {
+    /**
+     * Create the assets that you are going to test.
+     * @return a list of local names (e.g., instance name, bucket name; not the full ID with path)
+     */
     abstract fun createAssets(sfx: String, project: String): List<String>
+
+    /**
+     * @return list of asset types tested by this test, chosen from list-filter.yaml
+     */
     abstract fun assetTypeIds(): List<String>
 
     init {
@@ -68,8 +76,16 @@ abstract class TestBase(val project: String, private val sfx: String = randomStr
 
     private fun deletionPhase(tempAssetToDeleteFile: String, tempFilterFile: String, assets: List<String>) {
         deleter(arrayOf("-d", tempAssetToDeleteFile, "-f", tempFilterFile))
-        val some = { fullListing: String, delThese: List<String> -> !delThese.none { asset -> fullListing.contains(asset) } }
+        val some =
+            { fullListing: String, delThese: List<String> -> !delThese.none { asset -> fullListing.contains(asset) } }
         waitOnUnfilteredOutput(some, assets)
+        val allAssets = File(tempAssetToDeleteFile).readText()
+        assert(
+            !allAssets.contains(sfx)
+        ) {
+            "Found suffix $sfx in unfiltered output:" + allAssets.split("\n").filter { l -> l.contains(sfx) }
+                .joinToString("\n")
+        }
     }
 
 
@@ -92,8 +108,8 @@ abstract class TestBase(val project: String, private val sfx: String = randomStr
 
     private fun waitOnUnfilteredOutput(
 
-            waitCondition: (String, List<String>) -> Boolean,
-            expected: List<String>,
+        waitCondition: (String, List<String>) -> Boolean,
+        expected: List<String>,
     ) {
         val DECISEC: Long = 100
         val DECISEC_IN_MIN = 10
@@ -110,6 +126,8 @@ abstract class TestBase(val project: String, private val sfx: String = randomStr
             print(". ")
         } while (counter++ < loopLimit && waitCondition(allAssets, expected))
         println()
+
+
         assert(counter <= loopLimit) { "Timed out" }
     }
 
@@ -123,11 +141,11 @@ abstract class TestBase(val project: String, private val sfx: String = randomStr
                 val filtersFromYamlOut = TreeMap<String, Map<String, Any>>()
                 for (assetTypeId: String in filtersFromYaml.keys) {
                     val value: Map<String, Any> =
-                            if (assetTypeIds().contains(assetTypeId)) {
-                                mapOf(REGEX to ".*$sfx.*", LIST_THESE to true)
-                            } else {
-                                mapOf(REGEX to ".*", LIST_THESE to false)
-                            }
+                        if (assetTypeIds().contains(assetTypeId)) {
+                            mapOf(REGEX to ".*$sfx.*", LIST_THESE to true)
+                        } else {
+                            mapOf(REGEX to ".*", LIST_THESE to false)
+                        }
                     filtersFromYamlOut[assetTypeId] = value
 
                 }
@@ -145,8 +163,8 @@ abstract class TestBase(val project: String, private val sfx: String = randomStr
 
 
     private fun writeTempFilterYaml(
-            sfx: String,
-            filtersFromYamlOut: TreeMap<String, Map<String, Any>>
+        sfx: String,
+        filtersFromYamlOut: TreeMap<String, Map<String, Any>>
     ): String {
         val baseFilename = Constants.LIST_FILTER_YAML.split(".")[0]
         val tempFilterYaml = createTempFile("$baseFilename-$sfx", ".yaml")

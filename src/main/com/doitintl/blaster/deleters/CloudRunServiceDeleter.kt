@@ -25,7 +25,6 @@ class CloudRunServiceDeleter : BaseDeleter() {
             GoogleNetHttpTransport.newTrustedTransport(), JacksonFactory(), requestInitializer
         ).setApplicationName(Constants.CLOUD_BLASTER).build()
         val services = run.projects().Locations().services()
-        val del = services.delete("projects/${p[PROJECT]!!}/locations/${p[LOCATION]!!}/services/${p[ID]!!}")
-        val result = del.execute()
+        val result = services.delete("projects/${p[PROJECT]}/locations/${p[LOCATION]}/services/${p[ID]}").execute()
     }
 }

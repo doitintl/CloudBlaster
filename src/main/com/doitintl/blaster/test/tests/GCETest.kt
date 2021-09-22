@@ -8,6 +8,9 @@ import com.doitintl.blaster.shared.randomString
 import com.doitintl.blaster.test.TestBase
 import com.google.api.services.compute.model.*
 import com.google.api.services.compute.model.Firewall.Allowed
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.runBlocking
 
 
 class GCETest(project: String) : TestBase(project) {
@@ -15,7 +18,8 @@ class GCETest(project: String) : TestBase(project) {
     override fun assetTypeIds(): List<String> = listOf(
         "compute.googleapis.com/Firewall",
         "compute.googleapis.com/Disk",
-        "compute.googleapis.com/Instance"
+        "compute.googleapis.com/Instance",
+        "compute.googleapis.com/Address",
     )
 
     override fun createAssets(sfx: String, project: String): List<String> {
@@ -23,18 +27,39 @@ class GCETest(project: String) : TestBase(project) {
         val diskName = assetName("disk")
         val instanceName = assetName("instance")
         val firewallName = assetName("firewall")
-        createInstance(project, instanceName)
-        createDisk(project, diskName)
-        createFirewall(project, firewallName)
-        return listOf(firewallName, diskName, instanceName)
+        val addressName = assetName("address")
+        val creations = listOf(
+            { createInstance(project, instanceName) },
+            { createDisk(project, diskName) },
+            { createFirewall(project, firewallName) },
+            { createAddress(project, addressName) })
+
+        runBlocking {
+            creations.forEach { creation ->
+                launch(Dispatchers.IO) {
+                    creation()
+                }
+            }
+        }
+
+        return listOf(firewallName, diskName, instanceName, addressName)
+    }
+
+    private fun createAddress(project: String, addressName: String) {
+
+        val address = Address().setName(addressName)
+
+        val operation = getComputeService().addresses().insert(project, addressName, address).execute()
+
+        waitOnGlobalOperation(project, operation)
+
     }
 
     private fun createFirewall(project: String, fwName: String) {
 
         val fw = Firewall().setName(fwName)
         fw.allowed = listOf(Allowed().setIPProtocol("icmp"))
-        val compute = getComputeService()
-        val operation = compute.firewalls().insert(project, fw).execute()
+        val operation = getComputeService().firewalls().insert(project, fw).execute()
 
         waitOnGlobalOperation(project, operation)
 
@@ -66,8 +91,7 @@ class GCETest(project: String) : TestBase(project) {
         ).setNetworkInterfaces(listOf(ifc)).setDisks(listOf(disk))
 
 
-        val compute = getComputeService()
-        val operation = compute.instances().insert(project, location, instance).execute()
+        val operation = getComputeService().instances().insert(project, location, instance).execute()
 
         waitOnZoneOperation(project, location, operation)
     }
@@ -76,8 +100,7 @@ class GCETest(project: String) : TestBase(project) {
         val location = "us-central1-c"
 
         val disk = Disk().setName(diskName).setZone(String.format("projects/$project/zones/$location"))
-        val compute = getComputeService()
-        val operation = compute.disks().insert(project, location, disk).execute()
+        val operation = getComputeService().disks().insert(project, location, disk).execute()
         waitOnZoneOperation(project, location, operation)
     }
 }

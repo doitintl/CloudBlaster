@@ -49,7 +49,8 @@ abstract class BaseDeleter : AssetTypeDeleter {
             val matchResult = regex.find(path)
             if (matchResult != null) {
                 for (k in keys) {
-                    params[k] = matchResult.groups[k]!!.value
+                    val matchGroup = matchResult.groups[k]!!
+                    params[k] = matchGroup.value
                 }
                 break
             }
@@ -61,7 +62,7 @@ abstract class BaseDeleter : AssetTypeDeleter {
     private fun groupNames(regex: Regex): List<String> {
         val matchResults = GROUP_NAMES_IN_REGEX.findAll(regex.pattern).toList()
         assert(matchResults.isNotEmpty()) { "$regex. lacks the group names" }
-        return matchResults.map { it.groups[1]!!.value }.toList().distinct()
+        return matchResults.map { val grp = it.groups[1]!!; grp.value }.toList().distinct()
     }
 
     override fun pathRegexes(): List<Regex> {

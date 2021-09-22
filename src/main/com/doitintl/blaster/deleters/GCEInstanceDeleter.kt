@@ -12,8 +12,11 @@ class GCEInstanceDeleter : GCEBaseDeleter() {
 
 
     override fun doDelete(p: Map<String, String>) {
-        val operation = getComputeService().instances().delete(p[PROJECT]!!, p[LOCATION]!!, p[ID]!!).execute()
-        waitOnZoneOperation(p[PROJECT]!!, p[LOCATION]!!, operation)
+        val project = p[PROJECT]!!
+        val location = p[LOCATION]!!
+        val id = p[ID]
+        val operation = getComputeService().instances().delete(project, location, id).execute()
+        waitOnZoneOperation(project, location, operation)
     }
 
 

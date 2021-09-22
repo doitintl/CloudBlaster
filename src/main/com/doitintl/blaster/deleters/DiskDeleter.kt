@@ -12,9 +12,10 @@ class DiskDeleter : GCEBaseDeleter() {
 
 
     override fun doDelete(p: Map<String, String>) {
-        val computeService = getComputeService()
-        val request = computeService.disks().delete(p[PROJECT]!!, p[LOCATION]!!, p[ID]!!)
-        val operation = request.execute()
-        waitOnZoneOperation(p[PROJECT]!!, p[LOCATION]!!, operation)
+        val project = p[PROJECT]!!
+        val location = p[LOCATION]!!
+        val id = p[ID]
+        val operation = getComputeService().disks().delete(project, location, id).execute()
+        waitOnZoneOperation(project, location, operation)
     }
 }

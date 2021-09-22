@@ -23,10 +23,10 @@ class AssetIterator {
             }
 
             var request = ListAssetsRequest.newBuilder()
-                    .setParent(ProjectName.of(projectId).toString())
-                    .addAllAssetTypes(apiIdentifiers)
-                    .setContentType(contentType)
-                    .build()
+                .setParent(ProjectName.of(projectId).toString())
+                .addAllAssetTypes(apiIdentifiers)
+                .setContentType(contentType)
+                .build()
 
             var response = client.listAssets(request)
             iterateListingResponse(response, callback, noFilter, assetTypeMap)
@@ -39,25 +39,25 @@ class AssetIterator {
     }
 
     private fun iterateListingResponse(
-            response: AssetServiceClient.ListAssetsPagedResponse,
-            callback: Callback<String>,
-            noFilter: Boolean,
-            assetTypeMap: AssetTypeMap
+        response: AssetServiceClient.ListAssetsPagedResponse,
+        callback: Callback<String>,
+        noFilter: Boolean,
+        assetTypeMap: AssetTypeMap
     ) {
         for (asset in response.iterateAll()) {
             val matched: Boolean =
-                    if (noFilter) {//Just printing ALL assets
-                        callback.call(asset.name)
-                        true
-                    } else {
-                        val parts = asset.name.split("/").toTypedArray()
-                        val id = parts[parts.size - 1]
-                        val assetTypeIdentifier = asset.assetType
-                        val (filterRegex, isWhitelist) = assetTypeMap.getFilterRegex(assetTypeIdentifier)
+                if (noFilter) {//Just printing ALL assets
+                    callback.call(asset.name)
+                    true
+                } else {
+                    val parts = asset.name.split("/").toTypedArray()
+                    val id = parts[parts.size - 1]
+                    val assetTypeIdentifier = asset.assetType
+                    val (filterRegex, isWhitelist) = assetTypeMap.getFilterRegex(assetTypeIdentifier)
 
-                        val match = filterRegex.matches(id)
-                        match == isWhitelist
-                    }
+                    val match = filterRegex.matches(id)
+                    match == isWhitelist
+                }
             if (matched) {
                 callback.call(asset.name)
             }

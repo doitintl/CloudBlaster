@@ -20,7 +20,6 @@ class AssetTypeMap(private val filterFile: String) {
         for (assetType in assetTypeMap.values) {
             val deleter = assetType.deleterClass.getConstructor().newInstance()
             for (regex in deleter.pathRegexes()) {
-
                 if (regex.matches(line.trim())) {
                     if (ret != null) {
                         throw RuntimeException("Only one pattern should match each path: ${ret.javaClass.name} and ${assetType.deleterClass.name} both found for pattern $regex")
@@ -67,7 +66,7 @@ class AssetTypeMap(private val filterFile: String) {
                 if (count > 1) {
                     throw java.lang.IllegalArgumentException("Should have only one root-level map in the $filterFile")
                 }
-                val filtersFromYaml = o as Map<String, Map<String, Any>>//The inner Map is Boolean|String
+                val filtersFromYaml = o as Map<String, Map<String, Any>>//The  Any is Boolean|String
                 for (assetTypeId in filtersFromYaml.keys) {
                     val filter = filtersFromYaml[assetTypeId]!!
                     val sz = filter.size
@@ -82,8 +81,8 @@ class AssetTypeMap(private val filterFile: String) {
                             if (filter.keys.toSet() != setOf(REGEX, LIST_THESE)) {
                                 throw IllegalArgumentException(error)
                             } else {
-                                val listThese = filter[LIST_THESE]!! as Boolean
-                                val regexS = (filter[REGEX]!! as String).trim()
+                                val listThese = filter[LIST_THESE] as Boolean
+                                val regexS = (filter[REGEX] as String).trim()
 
                                 if (regexS.isEmpty()) {
                                     throw IllegalArgumentException("$assetTypeId has blank $REGEX. Either omit $REGEX and $LIST_THESE or give a value")

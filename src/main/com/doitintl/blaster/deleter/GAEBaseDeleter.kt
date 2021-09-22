@@ -16,10 +16,9 @@ abstract class GAEBaseDeleter : BaseDeleter() {
         fun getAppEngine(): Appengine {
             val credentials = GoogleCredentials.getApplicationDefault()
             val requestInitializer: HttpRequestInitializer = HttpCredentialsAdapter(credentials)
-            val engine = Appengine.Builder(
-                    GoogleNetHttpTransport.newTrustedTransport(), JacksonFactory(), requestInitializer
+            return Appengine.Builder(
+                GoogleNetHttpTransport.newTrustedTransport(), JacksonFactory(), requestInitializer
             ).setApplicationName(Constants.CLOUD_BLASTER).build()
-            return engine
         }
 
         fun waitOnOperation(project: String, operation: Operation) {

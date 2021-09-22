@@ -9,10 +9,10 @@ import java.io.FileWriter
 import java.util.concurrent.Callable
 
 @CommandLine.Command(
-        name = CLOUD_BLASTER,
-        mixinStandardHelpOptions = true,
-        version = ["1.0"],
-        description = ["Lists assets in a GCP project."]
+    name = CLOUD_BLASTER,
+    mixinStandardHelpOptions = true,
+    version = ["1.0"],
+    description = ["Lists assets in a GCP project."]
 )
 class Lister : Callable<Any> {
     @CommandLine.Option(names = ["-p", "--project"], required = true)

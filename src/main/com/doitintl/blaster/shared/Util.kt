@@ -19,15 +19,15 @@ fun randomString(length: Int = 6): String {
     return ('a'..'z').map { it }.shuffled().subList(0, length).joinToString("")
 }
 
-fun runCommand(command: String, workingDir_: File? = null): String {
-    val workingDir = workingDir_ ?: File(System.getProperty("user.dir"))
+fun runCommand(command: String, workingDirectory: File? = null): String {
+    val workingDir = workingDirectory ?: File(System.getProperty("user.dir"))
 
     val parts = command.split("\\s".toRegex())
     val proc = ProcessBuilder(*parts.toTypedArray())
-            .directory(workingDir)
-            .redirectOutput(ProcessBuilder.Redirect.PIPE)
-            .redirectError(ProcessBuilder.Redirect.PIPE)
-            .start()
+        .directory(workingDir)
+        .redirectOutput(ProcessBuilder.Redirect.PIPE)
+        .redirectError(ProcessBuilder.Redirect.PIPE)
+        .start()
 
     proc.waitFor(60, TimeUnit.MINUTES)
     val ret = proc.inputStream.bufferedReader().readText()
