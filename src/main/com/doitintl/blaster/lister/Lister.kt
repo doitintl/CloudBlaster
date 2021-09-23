@@ -1,6 +1,6 @@
 package com.doitintl.blaster.lister
 
-import com.doitintl.blaster.shared.Constants.ALL_ASSETS_ALL_TYPES
+import com.doitintl.blaster.shared.Constants.ALL_ASSETS_ALL_TYPES_FULL_COMMENT
 import com.doitintl.blaster.shared.Constants.ASSET_LIST_FILE
 import com.doitintl.blaster.shared.Constants.CLOUD_BLASTER
 import com.doitintl.blaster.shared.Constants.LIST_FILTER_YAML
@@ -31,7 +31,7 @@ class Lister : Callable<Any> {
 
     override fun call(): Int {
         val outputFile = outputFileName()
-        FileWritingCallback(outputFile, noFilter).use { callback ->
+        FileWritingCallback(project, outputFile, noFilter).use { callback ->
             AssetIterator().listAssets(project, callback, noFilter, filterFile)
             return 0
         }
@@ -53,14 +53,14 @@ class Lister : Callable<Any> {
     }
 }
 
-internal class FileWritingCallback(filename: String, noFilter: Boolean) : Callback<String> {
+internal class FileWritingCallback(project: String, filename: String, noFilter: Boolean) : Callback<String> {
     private val fw: FileWriter = FileWriter(filename)
 
     init {
         val s = if (noFilter) {
-            ALL_ASSETS_ALL_TYPES
+            "Project $project: "+ ALL_ASSETS_ALL_TYPES_FULL_COMMENT
         } else {
-            "Assets after filtering. Review, edit, then add the comment indicating readiness to delete, before passing this to the deleter"
+            "Assets after filtering in project $project. Review, edit, then add the comment indicating readiness to delete, before passing this to the deleter"
         }
 
         fw.write("# $s\n")

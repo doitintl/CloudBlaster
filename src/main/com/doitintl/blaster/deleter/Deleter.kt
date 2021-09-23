@@ -2,6 +2,7 @@ package com.doitintl.blaster.deleter
 
 import com.doitintl.blaster.lister.AssetTypeMap
 import com.doitintl.blaster.shared.Constants.ALL_ASSETS_ALL_TYPES
+import com.doitintl.blaster.shared.Constants.ALL_ASSETS_ALL_TYPES_FULL_COMMENT
 import com.doitintl.blaster.shared.Constants.ASSET_LIST_FILE
 import com.doitintl.blaster.shared.Constants.CLOUD_BLASTER
 import com.doitintl.blaster.shared.Constants.COMMENT_READY_TO_DELETE
@@ -35,7 +36,7 @@ class Deleter : Callable<Int> {
             throw IllegalArgumentException("Nothing to delete")
         }
         if (allLines.any { l -> l.contains(ALL_ASSETS_ALL_TYPES) }) {
-            throw  IllegalArgumentException("Cannot process a listing of $ALL_ASSETS_ALL_TYPES; see supported types in filter file")
+            throw  IllegalArgumentException("Cannot process a listing of all assets of all types; see supported types in filter file")
         }
         val readyToGo = COMMENT_READY_TO_DELETE.substring(2, COMMENT_READY_TO_DELETE.length)
         val commentsStr = comments(allLines).joinToString("\n")
