@@ -56,7 +56,7 @@ fun main(vararg args: String) {
             println("Done with ${failures.size} failures: ${failures.joinToString(",")}")
             exitProcess(1)
         } else {
-            println("Done. Success in all tests")
+            println("Done. Success in all ${successes.size} tests")
         }
 
 }
