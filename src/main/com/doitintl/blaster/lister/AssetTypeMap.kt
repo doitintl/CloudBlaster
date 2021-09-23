@@ -71,7 +71,8 @@ class AssetTypeMap(private val filterFile: String) {
                 }
                 val filtersFromYaml = o as Map<String, Map<String, Any>>//The  Any is Boolean|String
                 for (assetTypeId in filtersFromYaml.keys) {
-                    val filter = filtersFromYaml[assetTypeId]!!
+                    val filter = filtersFromYaml[assetTypeId]?:mapOf()
+
                     val sz = filter.size
                     val error =
                         "$assetTypeId has keys ${filter.keys.toList()} but should have either none or \"$REGEX\" and \"$LIST_THESE\""

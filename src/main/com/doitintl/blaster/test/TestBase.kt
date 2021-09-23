@@ -51,12 +51,9 @@ abstract class TestBase(val project: String, private val sfx: String = randomStr
             val assets = creationPhase(sfx, project)
             val (tempAssetToDeleteFile, tempFilterFile) = listAssetsWithFilter(sfx, project, assets)
             val content = tempAssetToDeleteFile.readText()
-
+            //Put COMMENT_READY_TO_DELETE at end, and in upper case, to test a slightly unusual but supported case
             FileWriter(tempAssetToDeleteFile).use { fw ->
-                fw.write(
-                    COMMENT_READY_TO_DELETE +
-                            "\n" +
-                            content
+                fw.write( content+"\n"+COMMENT_READY_TO_DELETE.toUpperCase()
                 )
             }
 

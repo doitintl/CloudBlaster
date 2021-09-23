@@ -15,9 +15,7 @@ class LogMetricDeleter : BaseDeleter() {
 
     override fun doDelete(p: Map<String, String>) {
         MetricsClient.create().use { metricsClient ->
-            val metricName = LogMetricName.of(p[PROJECT], p[ID])
-            metricsClient.deleteLogMetric(metricName)
+            metricsClient.deleteLogMetric(LogMetricName.of(p[PROJECT], p[ID]))
         }
-
     }
 }

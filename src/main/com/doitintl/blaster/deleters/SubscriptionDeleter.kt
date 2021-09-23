@@ -11,13 +11,9 @@ class SubscriptionDeleter : BaseDeleter() {
     override val pathPatterns: Array<String>
         get() = arrayOf("//pubsub.googleapis.com/projects/{PROJECT}/subscriptions/{ID}")
 
-
     override fun doDelete(p: Map<String, String>) {
-        SubscriptionAdminClient.create()
-
-            .use { subscriptionAdminClient ->
-                val subscriptionName = ProjectSubscriptionName.of(p[PROJECT], p[ID])
-                subscriptionAdminClient.deleteSubscription(subscriptionName)
+        SubscriptionAdminClient.create() .use { subAdminClient ->
+                subAdminClient.deleteSubscription(ProjectSubscriptionName.of(p[PROJECT], p[ID]))
             }
     }
 }

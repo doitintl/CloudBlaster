@@ -11,13 +11,7 @@ class GAEServiceDeleter : GAEBaseDeleter() {
 
 
     override fun doDelete(p: Map<String, String>) {
-        val project = p[PROJECT]!!
-        val id = p[ID]
-        val operation = getAppEngine().apps().services().delete(project, id).execute()
-
-        waitOnOperation(project, operation)
-
+        val operation = getAppEngine().apps().services().delete(p[PROJECT]!!, p[ID]).execute()
+        waitOnOperation(p[PROJECT]!!, operation)
     }
-
-
 }

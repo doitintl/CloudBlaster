@@ -12,10 +12,7 @@ class AddressDeleter : GCEBaseDeleter() {
 
 
     override fun doDelete(p: Map<String, String>) {
-        val project = p[PROJECT]!!
-        val location = p[LOCATION]!!
-        val id = p[ID]!!
-        val operation = getComputeService().addresses().delete(project, location, id).execute()
-        waitOnRegionalOperation(project, location, operation)
+        val operation = getComputeService().addresses().delete(p[PROJECT]!!, p[LOCATION]!!, p[ID]!!).execute()
+        waitOnRegionalOperation(p[PROJECT]!!, p[LOCATION]!!, operation)
     }
 }

@@ -9,7 +9,7 @@ import java.io.FileWriter
 import kotlin.system.measureTimeMillis
 
 
-class GAETest(project: String) : TestBase(project) {
+class GAEServiceTest(project: String) : TestBase(project) {
     override fun assetTypeIds(): List<String> = listOf("appengine.googleapis.com/Service")
 
     override fun createAssets(sfx: String, project: String): List<String> {

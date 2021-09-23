@@ -7,6 +7,7 @@ import com.doitintl.blaster.shared.Constants.CLOUD_BLASTER
 import com.doitintl.blaster.shared.Constants.COMMENT_READY_TO_DELETE
 import com.doitintl.blaster.shared.Constants.LIST_FILTER_YAML
 import com.doitintl.blaster.shared.noComment
+import com.doitintl.blaster.shared.comments
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
@@ -29,16 +30,16 @@ class Deleter : Callable<Int> {
     private var filterFile: String = LIST_FILTER_YAML
 
     override fun call(): Int {
-        val allLines = File(assetsToDeleteFile).readLines()
+        val  allLines = File(assetsToDeleteFile).readLines()
         if (noComment(allLines).isEmpty()) {
             throw IllegalArgumentException("Nothing to delete")
         }
         if (allLines.any { l -> l.contains(ALL_ASSETS_ALL_TYPES) }) {
             throw  IllegalArgumentException("Cannot process a listing of $ALL_ASSETS_ALL_TYPES; see supported types in filter file")
         }
-
         val readyToGo = COMMENT_READY_TO_DELETE.substring(2, COMMENT_READY_TO_DELETE.length)
-        if (!allLines[0].toLowerCase().contains(readyToGo.toLowerCase())) {
+        val commentsStr = comments(allLines).joinToString("\n")
+        if (!commentsStr.toLowerCase().contains(readyToGo.toLowerCase())) {
             throw   IllegalArgumentException("Must add \"$readyToGo\" comment to top of $assetsToDeleteFile to enable deletion.")
         }
 
@@ -59,6 +60,8 @@ class Deleter : Callable<Int> {
         println("Deleter done: $counter assets")
         return 0
     }
+
+
 
     private fun deleteAsset(line: String) {
         if (line.isBlank()) {

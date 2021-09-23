@@ -13,8 +13,7 @@ class TopicDeleter : BaseDeleter() {
 
     override fun doDelete(p: Map<String, String>) {
         TopicAdminClient.create().use {
-            val topicName = TopicName.of(p[PROJECT], p[ID])
-            it.deleteTopic(topicName)
+            it.deleteTopic(TopicName.of(p[PROJECT], p[ID]))
         }
     }
 }

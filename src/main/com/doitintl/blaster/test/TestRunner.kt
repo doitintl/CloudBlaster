@@ -4,11 +4,10 @@ import com.doitintl.blaster.test.tests.*
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
+import java.lang.System.currentTimeMillis
 
 import kotlin.reflect.KClass
 import kotlin.system.exitProcess
-import kotlin.system.measureTimeMillis
-
 
 
 private fun runAsync(
@@ -34,7 +33,7 @@ private fun runAsync(
 }
 
 fun main(vararg args: String) {
-    val elapsed = measureTimeMillis {
+    val start=currentTimeMillis()
         if (args.isEmpty()) {
             println("Must provide project id as first arg")
             exitProcess(1)
@@ -42,23 +41,22 @@ fun main(vararg args: String) {
         val project = args[0]
         println("Project $project")
         val classes: List<KClass<out TestBase>> = listOf(
-            LogMetricTest::class,//todo Maybe takes too long before the Lister finds the metric
             GKETest::class,
-                  CloudRunTest::class,
-            GAETest::class,
-          BucketTest::class,
-           PubSubTest::class,
+            CloudRunTest::class,
+            GAEServiceTest::class,
+            BucketTest::class,
+            PubSubTest::class,
             GCETest::class,
         )
 
         val (successes, failures) = runAsync(classes, project)
-
+        val elapsedTimeSec= (currentTimeMillis()-start)/1000
+         println("Elapsed $elapsedTimeSec s")
         if (failures.isNotEmpty()) {
             println("Done with ${failures.size} failures: ${failures.joinToString(",")}")
             exitProcess(1)
         } else {
             println("Done. Success in all tests")
         }
-    }
-    println("Elapsed ${elapsed / 1000} s")
+
 }

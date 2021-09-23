@@ -57,6 +57,7 @@ class AssetIterator {
                     val (filterRegex, isWhitelist) = assetTypeMap.getFilterRegex(assetTypeIdentifier)
 
                     val match = filterRegex.matches(id)
+                    // Filter can be either whitelist (listThese true) or blacklist,
                     match == isWhitelist
                 }
             if (matched) {
