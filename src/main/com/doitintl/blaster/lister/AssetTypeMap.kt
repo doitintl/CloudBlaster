@@ -1,6 +1,7 @@
 package com.doitintl.blaster.lister
 
 import com.doitintl.blaster.deleter.AssetTypeDeleter
+import com.doitintl.blaster.lister.AssetTypeMap.Companion.ASSET_TYPES_FILE
 import com.doitintl.blaster.shared.IllegalCodePathException
 import com.doitintl.blaster.shared.IllegalConfigException
 import org.yaml.snakeyaml.Yaml
@@ -71,7 +72,7 @@ class AssetTypeMap(private val filterFile: String) {
                 }
                 val filtersFromYaml = o as Map<String, Map<String, Any>>//The  Any is Boolean|String
                 for (assetTypeId in filtersFromYaml.keys) {
-                    val filter = filtersFromYaml[assetTypeId]?:mapOf()
+                    val filter = filtersFromYaml[assetTypeId] ?: mapOf()
 
                     val sz = filter.size
                     val error =
@@ -165,7 +166,7 @@ class AssetTypeMap(private val filterFile: String) {
     }
 
     companion object {
-        private const val ASSET_TYPES_FILE = "asset-types.properties"
+        const val ASSET_TYPES_FILE = "asset-types.properties"
     }
 }
 
@@ -205,8 +206,17 @@ private class AssetType(
         }
 
         val deleterClassName = deleterClassName(assetTypeId, deleterClassName_)
-        val deleterCls = Class.forName(deleterClassName) as Class<AssetTypeDeleter>
-        this.deleterClass = deleterCls.kotlin
+        try {
+            val deleterCls = Class.forName(deleterClassName) as Class<AssetTypeDeleter>
+            this.deleterClass = deleterCls.kotlin
+
+        } catch (e: ClassNotFoundException) {
+            System.err.println(
+                """Cannot find class $deleterClassName for asset type $assetTypeId. 
+    The deleter class should be specified  in $ASSET_TYPES_FILE, or else the default is used, based on the last component of the asset type name."""
+            )
+            throw e
+        }
     }
 
 

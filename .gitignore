@@ -1,9 +1,6 @@
 .idea/
 target/
 *.iml
-/asset-list.txt
 .DS_Store
-/assets-del.txt
 list-filter-*.yaml
-assets-to-delete-*
-asset-list-*
+*asset-list*

@@ -12,9 +12,9 @@ class SubscriptionDeleter : BaseDeleter() {
         get() = arrayOf("//pubsub.googleapis.com/projects/{PROJECT}/subscriptions/{ID}")
 
     override fun doDelete(p: Map<String, String>) {
-        SubscriptionAdminClient.create() .use { subAdminClient ->
-                subAdminClient.deleteSubscription(ProjectSubscriptionName.of(p[PROJECT], p[ID]))
-            }
+        SubscriptionAdminClient.create().use { subAdminClient ->
+            subAdminClient.deleteSubscription(ProjectSubscriptionName.of(p[PROJECT], p[ID]))
+        }
     }
 }
 

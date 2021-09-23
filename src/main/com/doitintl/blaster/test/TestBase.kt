@@ -39,7 +39,7 @@ abstract class TestBase(val project: String, private val sfx: String = randomStr
         println("Suffix $sfx for ${this::class.simpleName}")
         try {
             assert(false)
-            println("Must enable assertions")
+            System.err.println("Must enable assertions")
             exitProcess(1)
         } catch (ae: AssertionError) {
             // Asseertions are enabled, so we can continue
@@ -47,22 +47,23 @@ abstract class TestBase(val project: String, private val sfx: String = randomStr
     }
 
     fun test(): Boolean {
-       return try {
+        return try {
             val assets = creationPhase(sfx, project)
             val (tempAssetToDeleteFile, tempFilterFile) = listAssetsWithFilter(sfx, project, assets)
             val content = tempAssetToDeleteFile.readText()
             //Put COMMENT_READY_TO_DELETE at end, and in upper case, to test a slightly unusual but supported case
             FileWriter(tempAssetToDeleteFile).use { fw ->
-                fw.write( content+"\n"+COMMENT_READY_TO_DELETE.toUpperCase()
+                fw.write(
+                    content + "\n" + COMMENT_READY_TO_DELETE.toUpperCase()
                 )
             }
 
             deletionPhase(tempAssetToDeleteFile, tempFilterFile, assets)
             println("Success ${this::class.simpleName}")
-           true
+            true
         } catch (th: Throwable) {
-            println("Error in ${this::class.simpleName}: ${th.stackTraceToString()}")
-              false
+            System.err.println("Error in ${this::class.simpleName}: ${th.stackTraceToString()}")
+            false
         }
     }
 
@@ -177,10 +178,10 @@ abstract class TestBase(val project: String, private val sfx: String = randomStr
      * Deletion, however, does not block, so the waitTimeMillis is partially
      * a wait for deletion to complete.
      */
-      open fun waitTimeMillis(): Long{
-          val twoMin = 1000L * 60 * 10
-          return twoMin
-      }
+    open fun waitTimeMillis(): Long {
+        val twoMin = 1000L * 60 * 10
+        return twoMin
+    }
 
 
     private fun newFilterYaml(sfx: String): String {
@@ -210,7 +211,7 @@ abstract class TestBase(val project: String, private val sfx: String = randomStr
                 return writeTempFilterYaml(sfx, filtersFromYamlOut)
             }
         }
-throw        IllegalCodePathException("Should not get here")
+        throw        IllegalCodePathException("Should not get here")
     }
 
     private fun verifyAssetTypeIds() {

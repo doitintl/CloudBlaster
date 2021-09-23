@@ -6,8 +6,8 @@ import com.doitintl.blaster.shared.Constants.ASSET_LIST_FILE
 import com.doitintl.blaster.shared.Constants.CLOUD_BLASTER
 import com.doitintl.blaster.shared.Constants.COMMENT_READY_TO_DELETE
 import com.doitintl.blaster.shared.Constants.LIST_FILTER_YAML
-import com.doitintl.blaster.shared.noComment
 import com.doitintl.blaster.shared.comments
+import com.doitintl.blaster.shared.noComment
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
@@ -30,7 +30,7 @@ class Deleter : Callable<Int> {
     private var filterFile: String = LIST_FILTER_YAML
 
     override fun call(): Int {
-        val  allLines = File(assetsToDeleteFile).readLines()
+        val allLines = File(assetsToDeleteFile).readLines()
         if (noComment(allLines).isEmpty()) {
             throw IllegalArgumentException("Nothing to delete")
         }
@@ -60,7 +60,6 @@ class Deleter : Callable<Int> {
         println("Deleter done: $counter assets")
         return 0
     }
-
 
 
     private fun deleteAsset(line: String) {

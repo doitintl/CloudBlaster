@@ -58,7 +58,7 @@ class GKETest(project: String) : TestBase(project) {
     }
 
 
-    override fun waitTimeMillis(): Long{
+    override fun waitTimeMillis(): Long {
         val fourMin = 1000L * 60 * 10
         return fourMin
     }

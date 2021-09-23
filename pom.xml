@@ -68,7 +68,11 @@
             <artifactId>google-api-client-jackson2</artifactId>
             <version>1.32.1</version>
         </dependency>
-
+        <dependency>
+            <groupId>com.google.apis</groupId>
+            <artifactId>google-api-services-sqladmin</artifactId>
+            <version>v1-rev20210913-1.32.1</version>
+        </dependency>
         <dependency>
             <groupId>com.google.apis</groupId>
             <artifactId>google-api-services-container</artifactId>

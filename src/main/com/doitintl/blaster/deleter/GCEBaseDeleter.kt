@@ -60,7 +60,7 @@ abstract class GCEBaseDeleter : BaseDeleter() {
         fun waitOnGlobalOperation(project: String, operation: Operation) {
             val currentTime = currentTimeMillis()
             val twoMin = 1000 * 60 * 2
-            val target = currentTime + twoMin;
+            val target = currentTime + twoMin
             while (currentTimeMillis() < target) {
                 val currentOperation: Operation = getComputeService()
                     .globalOperations().get(project, operation.name).execute()

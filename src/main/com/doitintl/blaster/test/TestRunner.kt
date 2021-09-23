@@ -33,30 +33,30 @@ private fun runAsync(
 }
 
 fun main(vararg args: String) {
-    val start=currentTimeMillis()
-        if (args.isEmpty()) {
-            println("Must provide project id as first arg")
-            exitProcess(1)
-        }
-        val project = args[0]
-        println("Project $project")
-        val classes: List<KClass<out TestBase>> = listOf(
-            GKETest::class,
-            CloudRunTest::class,
-            GAEServiceTest::class,
-            BucketTest::class,
-            PubSubTest::class,
-            GCETest::class,
-        )
+    val start = currentTimeMillis()
+    if (args.isEmpty()) {
+        System.err.println("Must provide project id as first arg")
+        exitProcess(1)
+    }
+    val project = args[0]
+    println("Project $project")
+    val classes: List<KClass<out TestBase>> = listOf(
+        GKETest::class,
+        CloudRunTest::class,
+        GAEServiceTest::class,
+        BucketTest::class,
+        PubSubTest::class,
+        GCETest::class,
+    )
 
-        val (successes, failures) = runAsync(classes, project)
-        val elapsedTimeSec= (currentTimeMillis()-start)/1000
-         println("Elapsed $elapsedTimeSec s")
-        if (failures.isNotEmpty()) {
-            println("Done with ${failures.size} failures: ${failures.joinToString(",")}")
-            exitProcess(1)
-        } else {
-            println("Done. Success in all ${successes.size} tests")
-        }
+    val (successes, failures) = runAsync(classes, project)
+    val elapsedTimeSec = (currentTimeMillis() - start) / 1000
+    println("Elapsed $elapsedTimeSec s")
+    if (failures.isNotEmpty()) {
+        System.err.println("Done with ${failures.size} failures: ${failures.joinToString(",")}")
+        exitProcess(1)
+    } else {
+        println("Done. Success in all ${successes.size} tests")
+    }
 
 }

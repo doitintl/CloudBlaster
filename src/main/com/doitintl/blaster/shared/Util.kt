@@ -3,14 +3,17 @@ package com.doitintl.blaster.shared
 import java.io.File
 import java.util.concurrent.TimeUnit
 
-fun isComment(l:String): Boolean {return   l.trim().startsWith("#") }
+fun isComment(l: String): Boolean {
+    return l.trim().startsWith("#")
+}
 
 fun comments(allLines: List<String>): List<String> {
-    return allLines.filter{isComment(it)}
+    return allLines.filter { isComment(it) }
 
 }
+
 fun noComment(allLines: List<String>): List<String> {
-    return allLines.filter {!isComment(it)}
+    return allLines.filter { !isComment(it) }
 }
 
 fun noComment(content: String): String {

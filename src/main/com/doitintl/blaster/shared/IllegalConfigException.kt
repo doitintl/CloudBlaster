@@ -1,3 +1,3 @@
 package com.doitintl.blaster.shared
 
-class IllegalConfigException(msg : String):Exception(msg)
+class IllegalConfigException(msg: String) : Exception(msg)

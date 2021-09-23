@@ -56,10 +56,12 @@ You can add filters for each asset type to specify assets that you don't or do w
 (See the top of that file for detailed instructions.)
 * Run `./lister.sh -p <GCP_PROJECT>` 
    * (In `lister.sh`, Maven builds if needed, then executes `java com.doitintl.blaster.lister.Lister` .) 
-   * The Lister outputs `asset-list.txt` (configurable)
+   * The Lister outputs `asset-list.txt` (configurable with the `-o` flag).
    * Note:
        * If instead you   want to print  a list of *all* GCP assets, whether or not of a type
-       supported by Cloud Blaster, add the `-n` flag.
+       supported by Cloud Blaster, add the `-n` flag. The default output file  
+       for this is `all-types-assets-list.txt`,
+       though you can set this value with the `-o` flag.
 * Command line flags: Run `./lister.sh -h`  
 
 ### Deleting listed assets
@@ -87,6 +89,7 @@ This includes:
     * Google Cloud Operations log metrics
     * Google Cloud Functions
     * Cloud Run services
+    * Cloud SQL instances
     * Google App Engine services and versions
     * Google Cloud Storage buckets
     
