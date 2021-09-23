@@ -1,11 +1,14 @@
 package com.doitintl.blaster.lister
 
 import com.doitintl.blaster.deleter.AssetTypeDeleter
+import com.doitintl.blaster.shared.IllegalCodePathException
+import com.doitintl.blaster.shared.IllegalConfigException
 import org.yaml.snakeyaml.Yaml
 import java.io.FileInputStream
 import java.io.FileReader
 import java.util.*
 import java.util.stream.Collectors
+import kotlin.reflect.KClass
 
 val assetTypeRegex: Regex = Regex("""[a-z]+\.googleapis\.com/[a-zA-Z]+""")
 const val REGEX = "regex"
@@ -18,11 +21,11 @@ class AssetTypeMap(private val filterFile: String) {
     fun deleterClass(line: String): AssetTypeDeleter {
         var ret: AssetTypeDeleter? = null
         for (assetType in assetTypeMap.values) {
-            val deleter = assetType.deleterClass.getConstructor().newInstance()
+            val deleter = assetType.deleterClass.constructors.first().call()
             for (regex in deleter.pathRegexes()) {
                 if (regex.matches(line.trim())) {
                     if (ret != null) {
-                        throw RuntimeException("Only one pattern should match each path: ${ret.javaClass.name} and ${assetType.deleterClass.name} both found for pattern $regex")
+                        throw IllegalConfigException("Only one pattern should match each path: ${ret.javaClass.name} and ${assetType.deleterClass.simpleName} both found for pattern $regex")
                     }
                     ret = deleter
                 }
@@ -64,7 +67,7 @@ class AssetTypeMap(private val filterFile: String) {
 
                 count++
                 if (count > 1) {
-                    throw java.lang.IllegalArgumentException("Should have only one root-level map in the $filterFile")
+                    throw  IllegalConfigException("Should have only one root-level map in the $filterFile")
                 }
                 val filtersFromYaml = o as Map<String, Map<String, Any>>//The  Any is Boolean|String
                 for (assetTypeId in filtersFromYaml.keys) {
@@ -79,7 +82,7 @@ class AssetTypeMap(private val filterFile: String) {
                         }
                         2 -> {
                             if (filter.keys.toSet() != setOf(REGEX, LIST_THESE)) {
-                                throw IllegalArgumentException(error)
+                                throw IllegalConfigException(error)
                             } else {
                                 val listThese = filter[LIST_THESE] as Boolean
                                 val regexS = (filter[REGEX] as String).trim()
@@ -135,7 +138,7 @@ class AssetTypeMap(private val filterFile: String) {
                     return filtersFromYaml.keys.toList()
                 }
             }
-            throw IllegalStateException("Should not reach here")
+            throw IllegalCodePathException("Should not reach here")
         }
 
 
@@ -176,7 +179,7 @@ private class AssetType(
     var regexIsWhitelist: Boolean = false
         private set
 
-    lateinit var deleterClass: Class<AssetTypeDeleter>
+    lateinit var deleterClass: KClass<AssetTypeDeleter>
         private set
 
 
@@ -201,7 +204,8 @@ private class AssetType(
         }
 
         val deleterClassName = deleterClassName(assetTypeId, deleterClassName_)
-        this.deleterClass = Class.forName(deleterClassName) as Class<AssetTypeDeleter>
+        val deleterCls = Class.forName(deleterClassName) as Class<AssetTypeDeleter>
+        this.deleterClass = deleterCls.kotlin
     }
 
 

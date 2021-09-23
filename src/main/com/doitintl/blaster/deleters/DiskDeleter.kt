@@ -16,6 +16,6 @@ class DiskDeleter : GCEBaseDeleter() {
         val location = p[LOCATION]!!
         val id = p[ID]
         val operation = getComputeService().disks().delete(project, location, id).execute()
-        waitOnZoneOperation(project, location, operation)
+        waitOnZonalOperation(project, location, operation)
     }
 }

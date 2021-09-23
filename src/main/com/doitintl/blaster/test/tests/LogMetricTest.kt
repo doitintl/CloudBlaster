@@ -7,7 +7,7 @@ import com.google.logging.v2.LogMetric
 import com.google.logging.v2.ProjectName
 
 class LogMetricTest(project: String) : TestBase(project) {
-
+    //todo Apparently metrics are listed only after  a long time, so this test is not worth having
     override fun assetTypeIds(): List<String> = listOf(
         "logging.googleapis.com/LogMetric"
     )//same value twice
@@ -16,8 +16,8 @@ class LogMetricTest(project: String) : TestBase(project) {
         val metricName = assetName("logmetric")
         MetricsClient.create().use { metricsClient ->
             val parent = ProjectName.of(project)
-            val metric = LogMetric.newBuilder().setName(metricName).build()
-            val created = metricsClient.createLogMetric(parent, metric)
+            val metric = LogMetric.newBuilder().setName(metricName).setFilter("dummy").build()
+            val created:LogMetric = metricsClient.createLogMetric(parent, metric)
         }
 
 

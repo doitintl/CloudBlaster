@@ -18,7 +18,7 @@ class Lister : Callable<Any> {
     @CommandLine.Option(names = ["-p", "--project"], required = true)
     private lateinit var project: String
 
-    @CommandLine.Option(names = ["-o", "--output"])
+    @CommandLine.Option(names = ["-o", "--output-file"])
     private var outputFile: String = ASSET_LIST_FILE
 
     @CommandLine.Option(names = ["-f", "--filter-file"])
@@ -30,14 +30,11 @@ class Lister : Callable<Any> {
 
 
     override fun call(): Int {
-
         FileWritingCallback(outputFile, noFilter).use { callback ->
             AssetIterator().listAssets(project, callback, noFilter, filterFile)
             return 0
         }
     }
-
-
 }
 
 internal class FileWritingCallback(filename: String, noFilter: Boolean) : Callback<String> {
@@ -60,15 +57,13 @@ internal class FileWritingCallback(filename: String, noFilter: Boolean) : Callba
     override fun close() {
         fw.close()
     }
-
-
 }
 
 
 fun main(args: Array<String>) {
     val exitCode = CommandLine(Lister()).execute(*args)
     if (exitCode != 0) {
-        throw RuntimeException("" + exitCode)
+        throw RuntimeException(exitCode.toString())
     }
 
 }

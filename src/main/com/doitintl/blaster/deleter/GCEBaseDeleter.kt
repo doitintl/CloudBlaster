@@ -6,10 +6,13 @@ import com.google.api.client.googleapis.javanet.GoogleNetHttpTransport
 import com.google.api.client.json.jackson2.JacksonFactory
 import com.google.api.services.compute.Compute
 import com.google.api.services.compute.model.Operation
+import java.lang.System.currentTimeMillis
 
 
 abstract class GCEBaseDeleter : BaseDeleter() {
+
     companion object {
+        private const val HALF_SEC: Long = 500
 
         fun getComputeService(): Compute {
             val httpTransport = GoogleNetHttpTransport.newTrustedTransport()
@@ -24,8 +27,11 @@ abstract class GCEBaseDeleter : BaseDeleter() {
         }
 
 
-        fun waitOnZoneOperation(project: String, location: String, operation: Operation) {
-            while (true) {
+        fun waitOnZonalOperation(project: String, location: String, operation: Operation) {
+            val currentTime = currentTimeMillis()
+            val twoMin = 1000 * 60 * 2
+            val target = currentTime + twoMin
+            while (currentTimeMillis() < target) {
                 val currentOperation: Operation = getComputeService()
                     .zoneOperations()
                     .get(project, location, operation.name)
@@ -33,29 +39,35 @@ abstract class GCEBaseDeleter : BaseDeleter() {
                 if (currentOperation.status == "DONE") {
                     return
                 }
-                Thread.sleep(500)
+                Thread.sleep(HALF_SEC)
             }
         }
 
-        fun waitOnRegionOperation(project: String, location: String, operation: Operation) {
-            while (true) {
+        fun waitOnRegionalOperation(project: String, location: String, operation: Operation) {
+            val currentTime = currentTimeMillis()
+            val twoMin = 1000 * 60 * 2
+            val target = currentTime + twoMin
+            while (currentTimeMillis() < target) {
                 val currentOperation: Operation = getComputeService()
                     .regionOperations().get(project, location, operation.name).execute()
                 if (currentOperation.status == "DONE") {
                     return
                 }
-                Thread.sleep(500)
+                Thread.sleep(HALF_SEC)
             }
         }
 
         fun waitOnGlobalOperation(project: String, operation: Operation) {
-            while (true) {
+            val currentTime = currentTimeMillis()
+            val twoMin = 1000 * 60 * 2
+            val target = currentTime + twoMin;
+            while (currentTimeMillis() < target) {
                 val currentOperation: Operation = getComputeService()
                     .globalOperations().get(project, operation.name).execute()
                 if (currentOperation.status == "DONE") {
                     return
                 }
-                Thread.sleep(500)
+                Thread.sleep(HALF_SEC)
             }
         }
     }

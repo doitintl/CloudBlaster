@@ -3,7 +3,8 @@ package com.doitintl.blaster.test.tests
 
 import com.doitintl.blaster.deleter.GCEBaseDeleter.Companion.getComputeService
 import com.doitintl.blaster.deleter.GCEBaseDeleter.Companion.waitOnGlobalOperation
-import com.doitintl.blaster.deleter.GCEBaseDeleter.Companion.waitOnZoneOperation
+import com.doitintl.blaster.deleter.GCEBaseDeleter.Companion.waitOnRegionalOperation
+import com.doitintl.blaster.deleter.GCEBaseDeleter.Companion.waitOnZonalOperation
 import com.doitintl.blaster.shared.randomString
 import com.doitintl.blaster.test.TestBase
 import com.google.api.services.compute.model.*
@@ -32,35 +33,38 @@ class GCETest(project: String) : TestBase(project) {
             { createInstance(project, instanceName) },
             { createDisk(project, diskName) },
             { createFirewall(project, firewallName) },
-            { createAddress(project, addressName) })
+            { createAddress(project, addressName) }
+        )
 
         runBlocking {
             creations.forEach { creation ->
                 launch(Dispatchers.IO) {
-                    creation()
+                    try {
+                        creation()
+                    } catch (th: Throwable) {
+                        th.printStackTrace()
+                        // Just continue, so that all resources can be cleaned up -- by the test itself!
+                    }
                 }
             }
         }
 
-        return listOf(firewallName, diskName, instanceName, addressName)
+
+        return listOf(firewallName, addressName, diskName, instanceName)
     }
 
     private fun createAddress(project: String, addressName: String) {
 
+        val location = "us-central1"
         val address = Address().setName(addressName)
-
-        val operation = getComputeService().addresses().insert(project, addressName, address).execute()
-
-        waitOnGlobalOperation(project, operation)
+        val operation = getComputeService().addresses().insert(project, location, address).execute()
+        waitOnRegionalOperation(project, location, operation)
 
     }
 
     private fun createFirewall(project: String, fwName: String) {
-
-        val fw = Firewall().setName(fwName)
-        fw.allowed = listOf(Allowed().setIPProtocol("icmp"))
+        val fw = Firewall().setName(fwName).setAllowed(listOf(Allowed().setIPProtocol("icmp")))
         val operation = getComputeService().firewalls().insert(project, fw).execute()
-
         waitOnGlobalOperation(project, operation)
 
     }
@@ -68,9 +72,7 @@ class GCETest(project: String) : TestBase(project) {
 
     private fun createInstance(project: String, instanceName: String) {
         val location = "us-central1-c"
-
         val config = AccessConfig().setType("ONE_TO_ONE_NAT").setName("External NAT")
-
         val ifc = NetworkInterface().setNetwork(
             "https://www.googleapis.com/compute/v1/projects/$project/global/networks/default"
         ).setAccessConfigs(listOf(config))
@@ -90,18 +92,15 @@ class GCETest(project: String) : TestBase(project) {
             "https://www.googleapis.com/compute/v1/projects/$project/zones/$location/machineTypes/e2-standard-2",
         ).setNetworkInterfaces(listOf(ifc)).setDisks(listOf(disk))
 
-
         val operation = getComputeService().instances().insert(project, location, instance).execute()
-
-        waitOnZoneOperation(project, location, operation)
+        waitOnZonalOperation(project, location, operation)
     }
 
     private fun createDisk(project: String, diskName: String) {
         val location = "us-central1-c"
-
         val disk = Disk().setName(diskName).setZone(String.format("projects/$project/zones/$location"))
         val operation = getComputeService().disks().insert(project, location, disk).execute()
-        waitOnZoneOperation(project, location, operation)
+        waitOnZonalOperation(project, location, operation)
     }
 }
 

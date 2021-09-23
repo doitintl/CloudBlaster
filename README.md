@@ -3,7 +3,7 @@
 Cloud Blaster helps you delete the unwanted assets in your Google Cloud Platform project, 
 leaving it clean of confusing clutter and saving you money.
 
-# Compared to Safe Scrub
+## Compared to Safe Scrub
 
 [Safe Scrub](https://github.come/doitintl/SafeScrub) is  another project that does the same thing. 
 See [the blog post](https://blog.doit-intl.com/safe-scrub-clean-up-your-google-cloud-projects-f90f18aca311)
@@ -58,6 +58,7 @@ building the `asset-list.txt` file.
        * If instead you   want to print  a list of *all* GCP assets, whether or not of a type
        supported by Cloud Blaster, add the `-n` flag.
 * Command line flags: Run `./lister.sh -h`  
+
 ### Deleting listed assets
 * Review `asset-list.txt` (or the other file you plan to use) and remove lines for any assets 
 that you do not want to delete.
@@ -71,8 +72,9 @@ that you do not want to delete.
   will just get an exception.
   * For speed, deletion is executed concurrently.
 * Command line flags: Run `./deleter.sh -h`
-  
+
 ## Features
+### Supported asset types
 * I focused on the common important asset types that are set up and torn down in typical development and QA. 
 This includes: 
     * Google Compute Engine instances, disks, firewalls, and addresses
@@ -87,16 +89,33 @@ This includes:
     
      For the most up-to-date list of supported asset types, see `list-filter.yaml`
     
-* If you want more asset types or new features, please either
-    * Submit an issue at GitHub.
-    * Or add support for the asset type and submit a pull request. 
-        * To do this, see the  comment in `asset-types.properties`.
 
-# Future features
+### Future features
 * More asset types.
 * Track asset dependencies, so that if you want to delete asset A, but it is undeletable until 
 asset B is gone, you delete B first, then A. 
 
+### Adding features   
+* If you want more asset types or new features, please either
+    * Submit an issue at GitHub.
+    * Or add support for the asset type and submit a pull request. 
+        * For instructions see the comment in `asset-types.properties`.
+
+### Testing
+* Run `tester.sh <PROJECT_ID>`
+* This is an integration test rather than a unit test, which is why it is not in a
+suite, driven by a framework by JUnit or TestNG, that would be run on every build.
+* The test creates an asset of each of (almost all) the supported types, confirms that it 
+exists, then runs the deleter, then confirms that the asset does not exist.
+* It does this for each asset type in parallel (grouping together some asset types like all GCE asset types), 
+since cloud operations can take several minutes each.
+* Since it works with real cloud assets and blocks on each creation/deletion operation, it is not robust. Permissions errors, slow response
+from the cloud, etc., can cause failure. 
+* The Deleter as normally run is more robust because
+the GCP Asset Service only sees assets some time after they are created, generally within seconds
+but for some asset types, a few minutes. In normal usage, this is not a problem, but the test
+only waits a short time and if it does not see the asset, it will fail. 
+     
 
 # Other projects and approaches
 - [Safe Scrub](https://github.come/doitintl/SafeScrub) was an earlier bash-only project that does the same thing. 

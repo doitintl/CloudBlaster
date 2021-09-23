@@ -1,35 +1,64 @@
 package com.doitintl.blaster.test
 
 import com.doitintl.blaster.test.tests.*
-import kotlin.system.exitProcess
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.runBlocking
 
+import kotlin.reflect.KClass
+import kotlin.system.exitProcess
+import kotlin.system.measureTimeMillis
+
+
+
+private fun runAsync(
+    classes: List<KClass<out TestBase>>, project: String
+): Pair<MutableList<String>, MutableList<String>> {
+    val successes = mutableListOf<String>()
+    val failures = mutableListOf<String>()
+    runBlocking {
+        classes.forEach { `class` ->
+            launch(Dispatchers.IO) {
+                val t: TestBase = `class`.constructors.first().call(project)
+                val result = t.test()
+                if (result) {
+                    successes.add(`class`.simpleName!!)
+                } else {
+                    failures.add(`class`.simpleName!!)
+                }
+            }
+        }
+    }
+    return Pair(successes, failures)
+
+}
 
 fun main(vararg args: String) {
-    if (args.isEmpty()) {
-        println("Must provide project id")
-        exitProcess(1)
+    val elapsed = measureTimeMillis {
+        if (args.isEmpty()) {
+            println("Must provide project id as first arg")
+            exitProcess(1)
+        }
+        val project = args[0]
+        println("Project $project")
+        val classes: List<KClass<out TestBase>> = listOf(
+            LogMetricTest::class,//todo Maybe takes too long before the Lister finds the metric
+            GKETest::class,
+                  CloudRunTest::class,
+            GAETest::class,
+          BucketTest::class,
+           PubSubTest::class,
+            GCETest::class,
+        )
+
+        val (successes, failures) = runAsync(classes, project)
+
+        if (failures.isNotEmpty()) {
+            println("Done with ${failures.size} failures: ${failures.joinToString(",")}")
+            exitProcess(1)
+        } else {
+            println("Done. Success in all tests")
+        }
     }
-    val project = args[0]
-    println("Project $project")
-    val results = ArrayList<String>()
-    val cls1 = GCETest::class
-
-    val t: TestBase = cls1.constructors.first().call(project)
-    results.add(t.test())
-//todo do this for all test classes, then parallelize
-
-    //results.add(GCETest(project).test())
-    results.add(BucketTest(project).test())
-    results.add(PubSubTest(project).test())
-    results.add(CloudRunTest(project).test())
-    results.add(GAETest(project).test())
-    results.add(LogMetricTest(project).test())
-    results.add(TrainingPipelineTest(project).test())
-    if (!results.all { it.isBlank() }) {
-        println(results.joinToString("\n"))
-        exitProcess(1)
-    } else {
-        println("Success in test")
-
-    }
+    println("Elapsed ${elapsed / 1000} s")
 }

@@ -8,14 +8,14 @@ import java.io.File
 class CloudRunTest(project: String) : TestBase(project) {
 
     override fun assetTypeIds(): List<String> = listOf(
-        "appengine.googleapis.com/Service"
+        "run.googleapis.com/Service"
     )//same value twice
 
     override fun createAssets(sfx: String, project: String): List<String> {
         val cloudRunService = assetName("cloudrunsvc")
         val dir = File("./test-input/cloud-run")
         assert((dir).isDirectory) { "$dir is not directory" }
-        runCommand("./deploy.sh", dir)
+        runCommand("./deploy.sh $project $cloudRunService", dir)
         return listOf(cloudRunService)
     }
 

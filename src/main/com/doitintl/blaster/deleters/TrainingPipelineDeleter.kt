@@ -11,7 +11,7 @@ import java.util.concurrent.TimeUnit
 
 
 class TrainingPipelineDeleter : BaseDeleter() {
-
+    //todo test
     override val pathPatterns: Array<String>
         get() = arrayOf("//aiplatform.googleapis.com/projects/{PROJECT}/locations/{LOCATION}/trainingPipelines/{ID}")
 
@@ -22,7 +22,7 @@ class TrainingPipelineDeleter : BaseDeleter() {
             .build()
 
         PipelineServiceClient.create(pipelineServiceSettings).use { pipelineServiceClient ->
-            val trainingPipelineName = TrainingPipelineName.of(p[PROJECT], p[LOCATION], p[ID])
+            val trainingPipelineName = TrainingPipelineName.of(p[PROJECT]!!, p[LOCATION], p[ID])
             val future = pipelineServiceClient.deleteTrainingPipelineAsync(trainingPipelineName)
             val result = future.get(300, TimeUnit.SECONDS)
         }

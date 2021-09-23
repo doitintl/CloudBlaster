@@ -1,15 +1,16 @@
 #!/bin/bash
 REGION=us-east1
-IMAGE=helloworld-cloudrun
 
-export PROJECT=$
-
+PROJECT=$1
 if [[ -z "$PROJECT" ]]; then
-  echo "Must provide project"
+  echo "Must provide project as first param"
   exit 1
 fi
-# Submit build
-gcloud builds submit --tag gcr.io/$PROJECT/$IMAGE
 
-# Could run with --platform gke (or kubernetes)
-gcloud run deploy helloworld-service --image gcr.io/$PROJECT/$IMAGE --platform managed --region=$REGION --allow-unauthenticated
+SERVICE=$2
+if [[ -z "$SERVICE" ]]; then
+  echo "Must provide service as second param"
+  exit 1
+fi
+
+gcloud run deploy $SERVICE --image gcr.io/cloudrun/hello --platform managed --region=$REGION --allow-unauthenticated --project $PROJECT

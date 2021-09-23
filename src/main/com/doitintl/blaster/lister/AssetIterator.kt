@@ -1,5 +1,6 @@
 package com.doitintl.blaster.lister
 
+import com.doitintl.blaster.shared.IllegalConfigException
 import com.google.cloud.asset.v1.AssetServiceClient
 import com.google.cloud.asset.v1.ContentType
 import com.google.cloud.asset.v1.ListAssetsRequest
@@ -15,7 +16,7 @@ class AssetIterator {
             val assetTypeMap = AssetTypeMap(filterFile)
             var apiIdentifiers: List<String> = assetTypeMap.identifiers()
             if (apiIdentifiers.isEmpty()) {
-                throw IllegalStateException("No asset types in config file3")
+                throw IllegalConfigException("No asset types in config file")
             }
             if (noFilter) {
                 apiIdentifiers = emptyList()

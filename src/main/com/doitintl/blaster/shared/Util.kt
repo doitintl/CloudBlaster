@@ -16,25 +16,31 @@ fun noComment(content: String): String {
 
 
 fun randomString(length: Int = 6): String {
-    return ('a'..'z').map { it }.shuffled().subList(0, length).joinToString("")
+    fun rand(chars: String, len: Int): String {
+        return chars.toList().map { it }.shuffled().subList(0, len).joinToString("")
+    }
+
+    val vowels = "aeiouy".toList().joinToString("")
+    val consonants = ('a'..'z').toList().filter { !vowels.contains(it) }.joinToString("")
+    val randVowels = rand(vowels, length / 2)
+    val randCons = rand(consonants, length / 2)
+    return randVowels.zip(randCons) { a, b -> "$a$b" }.joinToString("")
+
+
 }
 
-fun runCommand(command: String, workingDirectory: File? = null): String {
+fun runCommand(command: String, workingDirectory: File? = null) {
     val workingDir = workingDirectory ?: File(System.getProperty("user.dir"))
 
     val parts = command.split("\\s".toRegex())
     val proc = ProcessBuilder(*parts.toTypedArray())
-        .directory(workingDir)
-        .redirectOutput(ProcessBuilder.Redirect.PIPE)
-        .redirectError(ProcessBuilder.Redirect.PIPE)
+        .directory(workingDir).inheritIO()
         .start()
 
     proc.waitFor(60, TimeUnit.MINUTES)
-    val ret = proc.inputStream.bufferedReader().readText()
     val exit = proc.exitValue()
     if (exit != 0) {
         throw RuntimeException(exit.toString())
     }
-    return ret
 
 }

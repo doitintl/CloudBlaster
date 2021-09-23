@@ -31,15 +31,15 @@ class Deleter : Callable<Int> {
     override fun call(): Int {
         val allLines = File(assetsToDeleteFile).readLines()
         if (noComment(allLines).isEmpty()) {
-            throw IllegalStateException("Nothing to delete")
+            throw IllegalArgumentException("Nothing to delete")
         }
         if (allLines.any { l -> l.contains(ALL_ASSETS_ALL_TYPES) }) {
-            throw  IllegalStateException("Cannot process a listing of $ALL_ASSETS_ALL_TYPES; see supported types in filter file")
+            throw  IllegalArgumentException("Cannot process a listing of $ALL_ASSETS_ALL_TYPES; see supported types in filter file")
         }
 
-        val readyToGo = COMMENT_READY_TO_DELETE.substring(2, COMMENT_READY_TO_DELETE.length - 2)
-        if (!allLines[0].contains(readyToGo)) {
-            throw   IllegalStateException("Must add \"$readyToGo\" comment to top of $assetsToDeleteFile to enable deletion.")
+        val readyToGo = COMMENT_READY_TO_DELETE.substring(2, COMMENT_READY_TO_DELETE.length)
+        if (!allLines[0].toLowerCase().contains(readyToGo.toLowerCase())) {
+            throw   IllegalArgumentException("Must add \"$readyToGo\" comment to top of $assetsToDeleteFile to enable deletion.")
         }
 
         val lines = noComment(allLines)
@@ -82,6 +82,6 @@ class Deleter : Callable<Int> {
 fun main(args: Array<String>) {
     val exitCode = CommandLine(Deleter()).execute(*args)
     if (exitCode != 0) {
-        throw RuntimeException("" + exitCode)
+        throw RuntimeException(exitCode.toString())
     }
 }
