@@ -6,6 +6,9 @@ private val UPPERCASE_IN_CURLIES = Regex(""".*(\{[A-Z]+\}).*""")
 private val GROUP_NAMES_IN_REGEX = Regex("""\?<([a-zA-Z][a-zA-Z0-9]*)>""")
 
 abstract class BaseDeleter : AssetTypeDeleter {
+    companion object {
+        val SLEEP_IN_LOOPS_MS: Long = 500 //Sleep this long  in loops while waiting for deletion to end
+    }
 
     override fun delete(line: String) {
         doDelete(paramsFromPath(line))

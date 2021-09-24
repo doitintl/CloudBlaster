@@ -12,7 +12,7 @@ import java.lang.System.currentTimeMillis
 abstract class GCEBaseDeleter : BaseDeleter() {
 
     companion object {
-        private const val HALF_SEC: Long = 500
+
 
         fun getComputeService(): Compute {
             val httpTransport = GoogleNetHttpTransport.newTrustedTransport()
@@ -27,7 +27,11 @@ abstract class GCEBaseDeleter : BaseDeleter() {
         }
 
 
-        fun waitOnZonalOperation(project: String, location: String, operation: Operation) {
+        fun waitOnZonalOperation(
+            project: String,
+            location: String,
+            operation: com.google.api.services.container.model.Operation
+        ) {
             val currentTime = currentTimeMillis()
             val twoMin = 1000 * 60 * 2
             val target = currentTime + twoMin
@@ -39,7 +43,7 @@ abstract class GCEBaseDeleter : BaseDeleter() {
                 if (currentOperation.status == "DONE") {
                     return
                 }
-                Thread.sleep(HALF_SEC)
+                Thread.sleep(SLEEP_IN_LOOPS_MS)
             }
         }
 
@@ -53,7 +57,7 @@ abstract class GCEBaseDeleter : BaseDeleter() {
                 if (currentOperation.status == "DONE") {
                     return
                 }
-                Thread.sleep(HALF_SEC)
+                Thread.sleep(SLEEP_IN_LOOPS_MS)
             }
         }
 
@@ -67,7 +71,7 @@ abstract class GCEBaseDeleter : BaseDeleter() {
                 if (currentOperation.status == "DONE") {
                     return
                 }
-                Thread.sleep(HALF_SEC)
+                Thread.sleep(SLEEP_IN_LOOPS_MS)
             }
         }
     }

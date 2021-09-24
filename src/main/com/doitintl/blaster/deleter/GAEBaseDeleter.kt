@@ -37,7 +37,7 @@ abstract class GAEBaseDeleter : BaseDeleter() {
                 if (currentOp.done != null && currentOp.done) {
                     return
                 }
-                Thread.sleep(500)
+                Thread.sleep(SLEEP_IN_LOOPS_MS)
             }
             println()
             if (currentTimeMillis() > target) {
