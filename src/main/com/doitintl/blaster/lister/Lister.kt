@@ -4,6 +4,7 @@ import com.doitintl.blaster.shared.Constants.ALL_ASSETS_ALL_TYPES_FULL_COMMENT
 import com.doitintl.blaster.shared.Constants.ASSET_LIST_FILE
 import com.doitintl.blaster.shared.Constants.CLOUD_BLASTER
 import com.doitintl.blaster.shared.Constants.LIST_FILTER_YAML
+import com.doitintl.blaster.shared.currentTimeISO
 import picocli.CommandLine
 import java.io.FileWriter
 import java.util.concurrent.Callable
@@ -58,9 +59,9 @@ internal class FileWritingCallback(project: String, filename: String, noFilter: 
 
     init {
         val s = if (noFilter) {
-            "Project $project: "+ ALL_ASSETS_ALL_TYPES_FULL_COMMENT
+            "$project at ${currentTimeISO()}; $ALL_ASSETS_ALL_TYPES_FULL_COMMENT"
         } else {
-            "Assets after filtering in project $project. Review, edit, then add the comment indicating readiness to delete, before passing this to the deleter"
+            "$project at ${currentTimeISO()}; Assets after filtering. Review, edit, then add the comment indicating readiness to delete, before passing this to the Deleter"
         }
 
         fw.write("# $s\n")

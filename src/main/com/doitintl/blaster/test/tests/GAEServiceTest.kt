@@ -2,6 +2,9 @@ package com.doitintl.blaster.test.tests
 
 
 import com.doitintl.blaster.deleters.GAEServiceDeleter
+import com.doitintl.blaster.shared.Constants.ID
+import com.doitintl.blaster.shared.Constants.PROJECT
+import com.doitintl.blaster.shared.Constants.SERVICE
 import com.doitintl.blaster.shared.runCommand
 import com.doitintl.blaster.test.TestBase
 import java.io.File
@@ -18,8 +21,11 @@ class GAEServiceTest(project: String) : TestBase(project) {
         assert(dir.isDirectory) { "$dir is not directory" }
 
         val template = File(dir, "app.yaml.template").readText()
-        val appYamlContent = template.replace("SERVICE", name)
-        FileWriter(File(dir, "app.yaml")).use { fw ->
+
+        val appYamlContent = template.replace(SERVICE.toUpperCase(), name)
+        val outputFile = File(dir, "app.yaml")
+        outputFile.deleteOnExit()
+        FileWriter(outputFile).use { fw ->
             fw.write(appYamlContent)
         }
 
@@ -28,7 +34,7 @@ class GAEServiceTest(project: String) : TestBase(project) {
         }
         println("Deployed App Engine Service in ${timeInMillis / 1000} s")
         val pattern = GAEServiceDeleter().pathPatterns[0]
-        val gaeSvcPath = pattern.replace("{PROJECT}", project).replace("{ID}", name)
+        val gaeSvcPath = pattern.replace("{${PROJECT.toUpperCase()}}", project).replace("{${ID.toUpperCase()}}", name)
         return listOf(gaeSvcPath)
     }
 

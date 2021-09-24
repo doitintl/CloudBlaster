@@ -1,6 +1,9 @@
 package com.doitintl.blaster.shared
 
 import java.io.File
+import java.text.DateFormat
+import java.text.SimpleDateFormat
+import java.util.*
 import java.util.concurrent.TimeUnit
 
 fun isComment(l: String): Boolean {
@@ -51,4 +54,10 @@ fun runCommand(command: String, workingDirectory: File? = null) {
         throw RuntimeException(exit.toString())
     }
 
+}
+
+fun currentTimeISO(): String? {
+    val df: DateFormat = SimpleDateFormat("yyyy-MM-dd'T'HH:mm'Z'")
+    df.timeZone = TimeZone.getTimeZone("UTC")
+    return df.format(Date())
 }
