@@ -158,8 +158,8 @@ abstract class TestBase(val project: String, private val sfx: String = randomStr
         var counter = 0
         do {
             val allAssets = listAllAssetsUnfiltered()
-            if (counter % 4 == 0 && counter > 0) {
-                println("Waiting in ${this::class.simpleName}: $counter")
+            if (counter % 10 == 0 && counter > 0) {
+                println("Waiting in ${this::class.simpleName}: Loop $counter")
             }
             counter++
             Thread.sleep(1000)//Must wait to avoid exceeding Asset Service quota
