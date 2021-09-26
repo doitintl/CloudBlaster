@@ -3,14 +3,6 @@
 Cloud Blaster helps you delete the unwanted assets in your Google Cloud Platform project, 
 leaving it clean of confusing clutter and saving you money.
 
-The advantages of Cloud Blaster:
-* It supports more complexity, since it is in Kotlin rather than bash. This makes it easier to add new asset types
- and make other changes. Safe Scrub is at the limit of the complexity that can be accomodted in Bash.
- 
-Cloud Blaster has its own safety features, listed below. It also supports some of the most common asset types (see below),
-with the possibility of easily adding more (see below).
- 
-
 ## Use case
 * It is intended for development and QA projects, where you want to start fresh at the end of the day or 
 before a new test run.
@@ -140,3 +132,9 @@ only waits a short time and if it does not see the asset, it will fail.
       * GCE routes, instance templates, networks, routers, and load balancers, along with a variety of subassets within LBs
       * GAE firewall rules
       * PubSub snapshots
+      
+      
+ The advantages of Cloud Blaster:
+  * It supports more complexity, since it is in Kotlin rather than bash. This makes it easier to add new asset types
+       and make other changes. Safe Scrub is at the limit of the complexity that can be accomodted in Bash.
+       
