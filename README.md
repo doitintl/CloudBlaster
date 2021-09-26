@@ -3,18 +3,6 @@
 Cloud Blaster helps you delete the unwanted assets in your Google Cloud Platform project, 
 leaving it clean of confusing clutter and saving you money.
 
-## Compared to Safe Scrub
-
-[Safe Scrub](https://github.com/doitintl/SafeScrub) is another project that does the same thing. 
-See [the blog post](https://blog.doit-intl.com/safe-scrub-clean-up-your-google-cloud-projects-f90f18aca311?source=friends_link&sk=bce56e27b568c8209f3da94eac17099f)
-for an explanation of Safe Scrub.
-
-The advantages of Safe Scrub over Cloud Blaster:
-* Safe Scrub does not delete anything. It just outputs a Bash script with a simple list of `delete` statements. 
-You then review it and run it.
-* Safe Scrub is in pure Bash. You may have more confidence as you see the code that it is running, without a compilation step. 
-* Safe Scrub supports more asset types (for now).
-
 The advantages of Cloud Blaster:
 * It supports more complexity, since it is in Kotlin rather than bash. This makes it easier to add new asset types
  and make other changes. Safe Scrub is at the limit of the complexity that can be accomodted in Bash.
@@ -112,7 +100,7 @@ asset B is gone, you delete B first, then A.
          * Implement a subclass of `BaseDeleter` alongside
           [the others](https://github.com/doitintl/CloudBlaster/tree/master/src/main/com/doitintl/blaster/deleters),
           which you can use as examples.
-
+                                                     c, 
 ### Testing
 * Run `tester.sh <PROJECT_ID>`
 * This is an integration test rather than a unit test, which is why it is not in a
@@ -132,8 +120,22 @@ In normal usage, this is not a problem, since you don't clean up immediately, bu
 only waits a short time and if it does not see the asset, it will fail. 
      
 
-# Other projects and approaches
+## Other projects and approaches
 - [Safe Scrub](https://github.com/doitintl/SafeScrub) was an earlier bash-only project that does the same thing. 
 - [Travis CI GCloud Cleanup](https://github.com/travis-ci/gcloud-cleanup) and [Bazooka](https://github.com/enxebre/bazooka) also delete GCE assets.
 - [Cloud Nuke](https://blog.gruntwork.io/cloud-nuke-how-we-reduced-our-aws-bill-by-85-f3aced4e5876) does this for AWS.
  
+ ### Compared to Safe Scrub
+ 
+ [Safe Scrub](https://github.com/doitintl/SafeScrub) is another project that does the same thing. 
+ See [the blog post](https://blog.doit-intl.com/safe-scrub-clean-up-your-google-cloud-projects-f90f18aca311?source=friends_link&sk=bce56e27b568c8209f3da94eac17099f)
+ for an explanation of Safe Scrub.
+ 
+ The advantages of Safe Scrub over Cloud Blaster:
+ * Safe Scrub does not delete anything. It just outputs a Bash script with a simple list of `delete` statements. 
+ You then review it and run it.
+ * Safe Scrub is in pure Bash. You may have more confidence as you see the code that it is running, without a compilation step. 
+ * Safe Scrub supports more asset types (for now). It supports these asset types that are not supported by Cloud Blaster:
+      * GCE routes, instance templates, networks, routers, and load balancers, along with a variety of subassets within LBs
+      * GAE firewall rules
+      * PubSub snapshots
