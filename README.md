@@ -27,9 +27,9 @@ building the `asset-list.txt` file.
 ## Instructions
 
 ### Prerequisites
-* Install Maven. We use it here to run the project, building it if needed, with a single command. You could also build the jars
-and run them separately.
-* If you wants to run the tests, install and initialize `gcloud`
+* Install Maven. We use it here to run the project, building it if needed, with a single command. 
+(You could also build the jars and run them separately.)
+* Install and initialize `gcloud`. This tool provides authentication, though  it is used to give commands only in the tests. 
 
 ### Listing the assets
 * Edit `list-filter.yaml` (or another file whose name you will specify on the command line of Lister and Deleter.)
