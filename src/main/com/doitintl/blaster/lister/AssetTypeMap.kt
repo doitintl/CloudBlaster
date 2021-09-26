@@ -33,9 +33,10 @@ class AssetTypeMap(private val filterFile: String) {
             }
         }
 
-        assert(ret != null) { "Did not match any path-pattern $line" }
-
-        return ret!!
+        if (ret == null) {
+            throw IllegalConfigException("Did not the path-pattern of any asset type $line")
+        }
+        return ret
     }
 
     fun identifiers(): List<String> {

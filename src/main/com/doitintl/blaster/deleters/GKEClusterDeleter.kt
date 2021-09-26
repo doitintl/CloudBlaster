@@ -11,6 +11,7 @@ import com.google.api.services.container.Container
 import com.google.api.services.container.model.Operation
 import com.google.auth.http.HttpCredentialsAdapter
 import com.google.auth.oauth2.GoogleCredentials
+import java.lang.System.currentTimeMillis
 
 class GKEClusterDeleter : BaseDeleter() {
     override val pathPatterns: Array<String>
@@ -39,11 +40,11 @@ class GKEClusterDeleter : BaseDeleter() {
                 .build()
         }
 
-        private fun waitOnZonalOperation(project: String, location: String, operation: Operation) {
-            val currentTime = System.currentTimeMillis()
+        fun waitOnZonalOperation(project: String, location: String, operation: Operation) {
+            val start = currentTimeMillis()
             val fourMin = 1000 * 60 * 4
-            val target = currentTime + fourMin
-            while (System.currentTimeMillis() < target) {
+            val timeout = start + fourMin
+            while (currentTimeMillis() < timeout) {
                 val currentOperation = getContainerService().projects().zones().operations()
                     .get(project, location, operation.name)
                     .execute()

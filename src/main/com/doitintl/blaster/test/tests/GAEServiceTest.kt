@@ -2,8 +2,6 @@ package com.doitintl.blaster.test.tests
 
 
 import com.doitintl.blaster.deleters.GAEServiceDeleter
-import com.doitintl.blaster.shared.Constants.ID
-import com.doitintl.blaster.shared.Constants.PROJECT
 import com.doitintl.blaster.shared.Constants.SERVICE
 import com.doitintl.blaster.shared.runCommand
 import com.doitintl.blaster.test.TestBase
@@ -13,6 +11,7 @@ import kotlin.system.measureTimeMillis
 
 
 class GAEServiceTest(project: String) : TestBase(project) {
+
     override fun assetTypeIds(): List<String> = listOf("appengine.googleapis.com/Service")
 
     override fun createAssets(sfx: String, project: String): List<String> {
@@ -34,13 +33,15 @@ class GAEServiceTest(project: String) : TestBase(project) {
         }
         println("Deployed App Engine Service in ${timeInMillis / 1000} s")
         val pattern = GAEServiceDeleter().pathPatterns[0]
-        val gaeSvcPath = pattern.replace("{${PROJECT.toUpperCase()}}", project).replace("{${ID.toUpperCase()}}", name)
+        val gaeSvcPath = pathForAsset(pattern, project, name)
         return listOf(gaeSvcPath)
     }
 
-    override fun secondaryAssetsExpected(): Boolean {
+
+    override fun identifierIsFullPath(): Boolean {
         return true
     }
+
 
 }
 

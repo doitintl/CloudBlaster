@@ -15,7 +15,7 @@ class GCEInstanceDeleter : GCEBaseDeleter() {
         val project = p[PROJECT]!!
         val location = p[LOCATION]!!
         val id = p[ID]
-        val operation = getComputeService().instances().delete(project, location, id).execute()
+        val operation = getComputeService().instances().delete(project, location, id).execute()!!
         waitOnZonalOperation(project, location, operation)
     }
 

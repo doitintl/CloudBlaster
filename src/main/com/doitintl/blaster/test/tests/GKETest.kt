@@ -1,7 +1,7 @@
 package com.doitintl.blaster.test.tests
 
 
-import com.doitintl.blaster.deleter.GCEBaseDeleter.Companion.waitOnZonalOperation
+import com.doitintl.blaster.deleters.GKEClusterDeleter
 import com.doitintl.blaster.shared.Constants
 import com.doitintl.blaster.test.TestBase
 import com.google.api.client.googleapis.javanet.GoogleNetHttpTransport
@@ -32,15 +32,22 @@ class GKETest(project: String) : TestBase(project) {
         val cluster = Cluster().setName(name).setInitialNodeCount(1)
         val createClusterReq = CreateClusterRequest().setParent(path).setCluster(cluster)
         val op =
-            getContainerService().projects().zones().clusters().create(project, location, createClusterReq).execute()
-        waitOnZonalOperation(project, location, op!!)
-        return listOf(name)
+            getContainerService().projects().zones().clusters().create(project, location, createClusterReq).execute()!!
+        GKEClusterDeleter.waitOnZonalOperation(project, location, op)
+        val pattern = GKEClusterDeleter().pathPatterns.filter { it.contains("zones") }.first()
+        val clusterPath = pathForAsset(pattern, project, name, location)
+
+        return listOf(clusterPath)
+    }
+
+    override fun identifierIsFullPath(): Boolean {
+        return true
     }
 
 
     override fun waitTimeMillis(): Long {
-        val fourMin = 1000L * 60 * 10
-        return fourMin
+        val tenMin = 10 * 60 * 1000L
+        return tenMin
     }
 }
 

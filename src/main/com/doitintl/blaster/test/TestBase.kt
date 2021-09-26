@@ -4,7 +4,10 @@ import com.doitintl.blaster.lister.LIST_THESE
 import com.doitintl.blaster.lister.REGEX
 import com.doitintl.blaster.shared.*
 import com.doitintl.blaster.shared.Constants.COMMENT_READY_TO_DELETE
+import com.doitintl.blaster.shared.Constants.ID
 import com.doitintl.blaster.shared.Constants.LIST_FILTER_YAML
+import com.doitintl.blaster.shared.Constants.LOCATION
+import com.doitintl.blaster.shared.Constants.PROJECT
 import org.yaml.snakeyaml.DumperOptions
 import org.yaml.snakeyaml.Yaml
 import java.io.File
@@ -74,9 +77,16 @@ abstract class TestBase(val project: String, private val sfx: String = randomStr
     private fun creationPhase(sfx: String, project: String): List<String> {
         val assets = createAssets(sfx, project)
         validateAssetIdentifiers(assets)
-        val notAll = { allAssets: String, assets_: List<String> -> !assets_.all { asset -> allAssets.contains(asset) } }
+        val notAll = { allAssets: String, assets_: List<String> ->
+            !assets_.all { asset ->
+                fullListingContainsAsset(
+                    allAssets,
+                    asset
+                )
+            }
+        }
 
-        waitOnUnfilteredOutput(notAll, assets)
+        waitOnUnfilteredOutput(notAll, "creation", assets)
         return assets
     }
 
@@ -85,7 +95,7 @@ abstract class TestBase(val project: String, private val sfx: String = randomStr
         assert(assets.none { it.toLowerCase() != it }) { "Should not have uppercase in $assets" }
         val predicate: (String) -> Boolean = { a -> a.contains("/") }
 
-        if (this.secondaryAssetsExpected()) {
+        if (this.identifierIsFullPath()) {
             assert(assets.all(predicate)) { "Use full path when secondary assets expected: $assets" }
         } else {
             assert(assets.none(predicate)) { "Use local path when secondary assets not expected: $assets" }
@@ -103,15 +113,35 @@ abstract class TestBase(val project: String, private val sfx: String = randomStr
             )
         )
         val some =
-            { fullListStr: String, delThese: List<String> -> !delThese.none { asset -> fullListStr.contains(asset) } }
-        waitOnUnfilteredOutput(some, assets)
+            { fullListStr: String, delThese: List<String> ->
+                !delThese.none { asset ->
+                    fullListingContainsAsset(
+                        fullListStr,
+                        asset
+                    )
+                }
+            }
+        waitOnUnfilteredOutput(some, "deletion", assets)
 
         val allAssets = listAllAssetsUnfiltered()
-        if (!this.secondaryAssetsExpected()) {
+        if (!this.identifierIsFullPath()) {
             assert(!allAssets.contains(sfx)) {
                 val linesWithSfx = allAssets.split("\n").filter { it.contains(sfx) }.joinToString("\n")
                 "Found suffix $sfx in unfiltered output:\n$linesWithSfx"
             }
+        }
+    }
+
+    /**
+     * If we are using full paths, check that the exact path is listed. Otherwise, just
+     * look for the string.
+     */
+    private fun fullListingContainsAsset(fullList: String, asset: String): Boolean {
+        return if (!identifierIsFullPath()) {
+            fullList.contains(asset)
+        } else {
+            val lines = fullList.split("\n")
+            lines.any { line -> asset == line }
         }
     }
 
@@ -148,24 +178,23 @@ abstract class TestBase(val project: String, private val sfx: String = randomStr
 
 
     private fun waitOnUnfilteredOutput(
-        waitCondition: (String, List<String>) -> Boolean,
-        expected: List<String>,
+        waitCondition: (String, List<String>) -> Boolean, phase: String, expected: List<String>,
     ) {
 
-        val currentTime = currentTimeMillis()
-        val target = currentTime + waitTimeMillis()
+        val start = currentTimeMillis()
+        val timeout = start + waitTimeMillis()
 
-        var counter = 0
-        do {
+
+        while (true) {
             val allAssets = listAllAssetsUnfiltered()
-            if (counter % 10 == 0 && counter > 0) {
-                println("Waiting in ${this::class.simpleName}: Loop $counter")
+            println("Waiting for $phase in ${this::class.simpleName}: ${(currentTimeMillis() - start) / 1000}s passed")
+            if (currentTimeMillis() > timeout || !waitCondition(allAssets, expected)) {
+                break
             }
-            counter++
-            Thread.sleep(1000)//Must wait to avoid exceeding Asset Service quota
-        } while (currentTimeMillis() < target && waitCondition(allAssets, expected))
+            Thread.sleep(2000)//Must wait to avoid exceeding Asset Service quota
+        }
 
-        if (currentTimeMillis() > target) {
+        if (currentTimeMillis() >= timeout) {
             throw TimeoutException("Timed out")
         }
     }
@@ -179,7 +208,7 @@ abstract class TestBase(val project: String, private val sfx: String = randomStr
      * a wait for deletion to complete.
      */
     open fun waitTimeMillis(): Long {
-        val twoMin = 1000L * 60 * 10
+        val twoMin = 2 * 60 * 1000L
         return twoMin
     }
 
@@ -232,8 +261,21 @@ abstract class TestBase(val project: String, private val sfx: String = randomStr
         }
     }
 
-    //todo If secondary assets are expected, as in GAE, then garbage will be left after the test (containers for GAE)
-    open fun secondaryAssetsExpected(): Boolean {
+
+    // todo use fullpath as identifier for ALL asset types, not just where we have to.
+    //  This will require developing the code to do that consistenly and easily.
+    //
+    // todo We use identifierIsFullPath == true where secondary assets are expected (e.g., GAE Service, GKE Cluster),
+    // and then garbage may be left after the test (containers in the case GAE). Clean this garbage up.
+    // (The garbage is not special to Cloud Blaster or this test -- it will always happen when
+    // generating such assets.)
+
+    /**
+     * Use full path as identifier if secondary assets are expected (e.g., GAE Service which generates containers),
+     * because in these cases,the asset name by itself is not enough to identify the asset
+     */
+
+    open fun identifierIsFullPath(): Boolean {
         return false
     }
 
@@ -258,5 +300,19 @@ abstract class TestBase(val project: String, private val sfx: String = randomStr
         FileWriter(filePath).use { fw ->
             yaml.dump(newYaml, fw)
         }
+    }
+
+
+    fun pathForAsset(pattern: String, project: String, name: String, location: String? = null): String {
+
+        val replaced = pattern.replace("{${PROJECT.toUpperCase()}}", project).replace("{${ID.toUpperCase()}}", name)
+        val ret = if (location == null) {
+            replaced
+        } else {
+            replaced.replace("{${LOCATION.toUpperCase()}}", location)
+        }
+        assert(ret != pattern)
+        assert(!ret.contains("{"))
+        return ret
     }
 }

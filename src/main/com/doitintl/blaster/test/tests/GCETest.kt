@@ -99,7 +99,7 @@ class GCETest(project: String) : TestBase(project) {
     private fun createDisk(project: String, diskName: String) {
         val location = "us-central1-c"
         val disk = Disk().setName(diskName).setZone(String.format("projects/$project/zones/$location"))
-        val operation = getComputeService().disks().insert(project, location, disk).execute()
+        val operation = getComputeService().disks().insert(project, location, disk).execute()!!
         waitOnZonalOperation(project, location, operation)
     }
 }

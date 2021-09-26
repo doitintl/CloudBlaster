@@ -35,7 +35,7 @@ private fun runAsync(
 fun main(vararg args: String) {
     val start = currentTimeMillis()
     if (args.isEmpty()) {
-        System.err.println("Must provide project id as first arg")
+        System.err.println("Must provide project as first arg")
         exitProcess(1)
     }
     val project = args[0]
@@ -51,12 +51,12 @@ fun main(vararg args: String) {
 
     val (successes, failures) = runAsync(classes, project)
     val elapsedTimeSec = (currentTimeMillis() - start) / 1000
-    println("Elapsed $elapsedTimeSec s")
+    println("TestRunner total time  $elapsedTimeSec s")
     if (failures.isNotEmpty()) {
         System.err.println("Done with ${failures.size} failures: ${failures.joinToString(",")}")
         exitProcess(1)
     } else {
-        println("Done. Success in all ${successes.size} tests")
+        println("TestRunner Done. Success in all ${successes.size} tests")
     }
 
 }

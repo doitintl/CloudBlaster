@@ -25,10 +25,11 @@ abstract class GAEBaseDeleter : BaseDeleter() {
 
         fun waitOnOperation(project: String, operation: Operation) {
             val engine = getAppEngine()
-            val currentTime = currentTimeMillis()
+            val start = currentTimeMillis()
             val threeMin = 1000 * 60 * 3
-            val target = currentTime + threeMin
-            while (currentTimeMillis() < target) {
+            val timeout = start + threeMin
+
+            while (currentTimeMillis() < timeout) {
                 //operation.name Takes the form apps/myproject/operations/1d7adb9f-79d8-48ed-849f-2454ce417d6f
                 val pathParts = operation.name.split("/")
                 val id = pathParts[pathParts.size - 1]
@@ -40,7 +41,7 @@ abstract class GAEBaseDeleter : BaseDeleter() {
                 Thread.sleep(SLEEP_IN_LOOPS_MS)
             }
             println()
-            if (currentTimeMillis() > target) {
+            if (currentTimeMillis() >= timeout) {
                 throw TimeoutException("Timed out")
             }
         }

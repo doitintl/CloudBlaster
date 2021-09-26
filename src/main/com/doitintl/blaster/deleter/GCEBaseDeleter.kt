@@ -12,7 +12,7 @@ import java.lang.System.currentTimeMillis
 abstract class GCEBaseDeleter : BaseDeleter() {
 
     companion object {
-
+        private const val twoMin = 1000 * 60 * 2
 
         fun getComputeService(): Compute {
             val httpTransport = GoogleNetHttpTransport.newTrustedTransport()
@@ -30,12 +30,12 @@ abstract class GCEBaseDeleter : BaseDeleter() {
         fun waitOnZonalOperation(
             project: String,
             location: String,
-            operation: com.google.api.services.container.model.Operation
+            operation: Operation
         ) {
-            val currentTime = currentTimeMillis()
-            val twoMin = 1000 * 60 * 2
-            val target = currentTime + twoMin
-            while (currentTimeMillis() < target) {
+            val start = currentTimeMillis()
+
+            val timeout = start + twoMin
+            while (currentTimeMillis() < timeout) {
                 val currentOperation: Operation = getComputeService()
                     .zoneOperations()
                     .get(project, location, operation.name)
@@ -48,10 +48,9 @@ abstract class GCEBaseDeleter : BaseDeleter() {
         }
 
         fun waitOnRegionalOperation(project: String, location: String, operation: Operation) {
-            val currentTime = currentTimeMillis()
-            val twoMin = 1000 * 60 * 2
-            val target = currentTime + twoMin
-            while (currentTimeMillis() < target) {
+            val start = currentTimeMillis()
+            val timeout = start + twoMin
+            while (currentTimeMillis() < timeout) {
                 val currentOperation: Operation = getComputeService()
                     .regionOperations().get(project, location, operation.name).execute()
                 if (currentOperation.status == "DONE") {
@@ -62,10 +61,10 @@ abstract class GCEBaseDeleter : BaseDeleter() {
         }
 
         fun waitOnGlobalOperation(project: String, operation: Operation) {
-            val currentTime = currentTimeMillis()
-            val twoMin = 1000 * 60 * 2
-            val target = currentTime + twoMin
-            while (currentTimeMillis() < target) {
+            val start = currentTimeMillis()
+
+            val timeout = start + twoMin
+            while (currentTimeMillis() < timeout) {
                 val currentOperation: Operation = getComputeService()
                     .globalOperations().get(project, operation.name).execute()
                 if (currentOperation.status == "DONE") {
