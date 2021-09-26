@@ -89,7 +89,7 @@ asset B is gone, you delete B first, then A.
          * For instructions see the comment in `asset-types.properties`. 
          * Uncomment the asset type in `asset-types.properties` and specify the deleter class here if needed. 
          Instructions at the top of that file.
-         * Add the asset type to `list-filter.properties`. Optionally add a default filter as in the `Firewall` example there.
+         * Add the asset type to `list-filter.yaml`. Optionally add a default filter as in the `Firewall` example there.
          * Implement a subclass of `BaseDeleter` alongside
           [the others](https://github.com/doitintl/CloudBlaster/tree/master/src/main/com/doitintl/blaster/deleters),
           which you can use as examples.
