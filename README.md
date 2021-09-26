@@ -5,18 +5,18 @@ leaving it clean of confusing clutter and saving you money.
 
 ## Compared to Safe Scrub
 
-[Safe Scrub](https://github.com/doitintl/SafeScrub) is  another project that does the same thing. 
+[Safe Scrub](https://github.com/doitintl/SafeScrub) is another project that does the same thing. 
 See [the blog post](https://blog.doit-intl.com/safe-scrub-clean-up-your-google-cloud-projects-f90f18aca311?source=friends_link&sk=bce56e27b568c8209f3da94eac17099f)
 for an explanation of Safe Scrub.
 
 The advantages of Safe Scrub over Cloud Blaster:
-* Safe Scrub  does not delete anything. It just outputs a Bash script with a simple list of `delete` statements. 
+* Safe Scrub does not delete anything. It just outputs a Bash script with a simple list of `delete` statements. 
 You then review it and run it.
-* Safe Scrub  is in pure Bash. You may have more confidence as you see the code that it is running, without a compilation step. 
+* Safe Scrub is in pure Bash. You may have more confidence as you see the code that it is running, without a compilation step. 
 * Safe Scrub supports more asset types (for now).
 
 The advantages of Cloud Blaster:
-* It supports more complexity, since it is in Kotlin rather than bash. This makes it easier to  add new asset types
+* It supports more complexity, since it is in Kotlin rather than bash. This makes it easier to add new asset types
  and make other changes. Safe Scrub is at the limit of the complexity that can be accomodted in Bash.
  
 Cloud Blaster has its own safety features, listed below. It also supports some of the most common asset types (see below),
@@ -34,11 +34,11 @@ between components before deleting anything.
 To keep it safe, Cloud Blaster has these features.
 1. The first step, the Lister, does *not* delete assets; rather, it just lists assets into
  a file, `asset-list.txt`, hat you review.
-1. The Lister requires you to explicitly state a project. It does not implicitly use your `gcloud`  default project.
+1. The Lister requires you to explicitly state a project. It does not implicitly use your `gcloud` default project.
 1. The Lister can be filtered (see `list-filter.yaml` file) so that specified assets are skipped when 
 building the `asset-list.txt` file.
 1. After running the Lister, you review the list of assets for deletion
-       * Manually edit it.
+      * Manually edit it.
        * Add a comment line `# Ready to delete` to the top 
        * If you like danger, write a script to add this comment between steps.
        * Then run the Deleter. 
@@ -58,11 +58,11 @@ You can add filters for each asset type to specify assets that you don't or do w
    * (In `lister.sh`, Maven builds if needed, then executes `java com.doitintl.blaster.lister.Lister` .) 
    * The Lister outputs `asset-list.txt` (configurable with the `-o` flag).
    * Note:
-       * If instead you   want to print  a list of *all* GCP assets, whether or not of a type
+       * If instead you want to print a list of *all* GCP assets, whether or not of a type
        supported by Cloud Blaster, add the `-n` flag. The default output file  
        for this is `all-types-assets-list.txt`,
        though you can set this value with the `-o` flag.
-* Command line flags: Run `./lister.sh -h`  
+* Command line flags: Run `./lister.sh -h` 
 
 ### Deleting listed assets
 * Review `asset-list.txt` (or the other file you plan to use) and remove lines for any assets 
@@ -106,7 +106,8 @@ asset B is gone, you delete B first, then A.
     * Submit an issue at GitHub.
     * Or add support for the asset type and submit a pull request. 
          * For instructions see the comment in `asset-types.properties`. 
-         * Uncomment the asset type in `asset-types.properties` and specify the deleter class here if needed. Instructions at the top of that file.
+         * Uncomment the asset type in `asset-types.properties` and specify the deleter class here if needed. 
+         Instructions at the top of that file.
          * Add the asset type to `list-filter.properties`. Optionally add a default filter as in the `Firewall` example there.
          * Implement a subclass of `BaseDeleter` alongside
           [the others](https://github.com/doitintl/CloudBlaster/tree/master/src/main/com/doitintl/blaster/deleters),
@@ -120,14 +121,14 @@ JUnit/TestNG suite that would be run on every CI build.
 GAE Services, GCS regional and multiregional Buckets, CloudRun Services, and PubSub Topics and Subscriptions.
 * The test creates an asset of each type, confirms that it 
 exists, then runs the deleter, then confirms that the asset does not exist.
-* Since  cloud operations can take several minutes each, it tests ach asset type in parallel
+* Since cloud operations can take several minutes each, it tests ach asset type in parallel
 (grouping together some asset types like all GCE asset types)  
 * Since it works with real cloud assets and blocks on each creation/deletion operation,
 it is not robust. Permissions errors, slow response from the cloud, etc., can cause test failure. 
-* The Deleter as normally run is more robust because
+* The Lister/Deleter are normally run is more robust than the Test because
 the GCP Asset Service only sees assets some time after they are created. 
-Generally this is within seconds but for some asset types, much longer. In normal usage, this is not a problem, 
-since you don't clean up immediately, but the test
+Generally this is within seconds, but for some asset types, much longer. 
+In normal usage, this is not a problem, since you don't clean up immediately, but the test
 only waits a short time and if it does not see the asset, it will fail. 
      
 

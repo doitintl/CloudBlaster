@@ -35,12 +35,12 @@ class Deleter : Callable<Int> {
             throw IllegalArgumentException("Nothing to delete")
         }
         if (allLines.any { l -> l.contains(ALL_ASSETS_ALL_TYPES) }) {
-            throw  IllegalArgumentException("Cannot process a listing of all assets of all types; see supported types in filter file")
+            throw IllegalArgumentException("Cannot process a listing of all assets of all types; see supported types in filter file")
         }
         val readyToGo = COMMENT_READY_TO_DELETE.substring(2, COMMENT_READY_TO_DELETE.length)
         val commentsStr = comments(allLines).joinToString("\n")
         if (!commentsStr.toLowerCase().contains(readyToGo.toLowerCase())) {
-            throw   IllegalArgumentException("Must add \"$readyToGo\" comment to top of $assetsToDeleteFile to enable deletion.")
+            throw IllegalArgumentException("Must add \"$readyToGo\" comment to top of $assetsToDeleteFile to enable deletion.")
         }
 
         val lines = noComment(allLines)

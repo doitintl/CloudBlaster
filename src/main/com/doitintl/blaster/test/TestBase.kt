@@ -187,10 +187,10 @@ abstract class TestBase(val project: String, private val sfx: String = randomStr
 
         while (true) {
             val allAssets = listAllAssetsUnfiltered()
-            if (currentTimeMillis() > timeout || !waitCondition(allAssets, expected)) {
+            if (!waitCondition(allAssets, expected) || currentTimeMillis() > timeout) {
                 break
             }
-            Thread.sleep(2000)//Must wait to avoid exceeding Asset Service quota
+            Thread.sleep(2000) // To avoid exceeding Asset Service quota
             println("Waiting for $phase in ${this::class.simpleName}: ${(currentTimeMillis() - start) / 1000}s passed")
         }
 
@@ -217,7 +217,6 @@ abstract class TestBase(val project: String, private val sfx: String = randomStr
         var counter = 0
         FileInputStream(LIST_FILTER_YAML).use { `in` ->
             for (o in Yaml().loadAll(`in`)) {
-
                 val filtersFromYaml = o as Map<String, Map<String, Any>>//The inner Map is Boolean|String
                 val filtersFromYamlOut = TreeMap<String, Map<String, Any>>()
                 for (assetTypeId: String in filtersFromYaml.keys) {
@@ -240,7 +239,7 @@ abstract class TestBase(val project: String, private val sfx: String = randomStr
                 return writeTempFilterYaml(sfx, filtersFromYamlOut)
             }
         }
-        throw        IllegalCodePathException("Should not get here")
+        throw IllegalCodePathException("Should not get here")
     }
 
     private fun verifyAssetTypeIds() {
@@ -249,7 +248,7 @@ abstract class TestBase(val project: String, private val sfx: String = randomStr
         FileInputStream(LIST_FILTER_YAML).use { `in` ->
 
             for (o in Yaml().loadAll(`in`)) {
-                val filtersFromYaml = o as Map<String, Map<String, Any>>//The  Any is Boolean|String
+                val filtersFromYaml = o as Map<String, Map<String, Any>>//The Any is Boolean|String
                 for (assetTypeId in filtersFromYaml.keys) {
                     knownIds.add(assetTypeId)
                 }

@@ -15,7 +15,7 @@
 #
 # 2. The same thing but with
 #            listThese: true
-#    is used for a whitelist: that only names foo and foobar and other full-string-matching names  will be listed.
+#    is used for a whitelist: that only names foo and foobar and other full-string-matching names will be listed.
 #
 #
 compute.googleapis.com/Firewall:

@@ -69,9 +69,9 @@ class AssetTypeMap(private val filterFile: String) {
 
                 count++
                 if (count > 1) {
-                    throw  IllegalConfigException("Should have only one root-level map in the $filterFile")
+                    throw IllegalConfigException("Should have only one root-level map in the $filterFile")
                 }
-                val filtersFromYaml = o as Map<String, Map<String, Any>>//The  Any is Boolean|String
+                val filtersFromYaml = o as Map<String, Map<String, Any>>//The Any is Boolean|String
                 for (assetTypeId in filtersFromYaml.keys) {
                     val filter = filtersFromYaml[assetTypeId] ?: mapOf()
 
@@ -113,7 +113,7 @@ class AssetTypeMap(private val filterFile: String) {
             for ((k, v) in props.entries) {
                 val assetTypeId = k as String
                 if (!assetTypeRegex.matches(assetTypeId)) {
-                    throw  IllegalArgumentException("Unsupported asset type id $assetTypeId")
+                    throw IllegalArgumentException("Unsupported asset type id $assetTypeId")
                 }
 
                 val optionalDeleterClassName = v as String
@@ -214,7 +214,7 @@ private class AssetType(
         } catch (e: ClassNotFoundException) {
             System.err.println(
                 """Cannot find class $deleterClassName for asset type $assetTypeId. 
-    The deleter class should be specified  in $ASSET_TYPES_FILE, or else the default is used, based on the last component of the asset type name."""
+    The deleter class should be specified in $ASSET_TYPES_FILE, or else the default is used, based on the last component of the asset type name."""
             )
             throw e
         }
