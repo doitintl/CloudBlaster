@@ -14,7 +14,7 @@ assets so it later can delete just what was created.
 ## Safety First 
 To keep it safe, Cloud Blaster has these features.
 1. The first step, the Lister, does *not* delete assets; rather, it just lists assets into
- a file, `asset-list.txt`, hat you review.
+ a file, `asset-list.txt`, that you review.
 1. The Lister requires you to explicitly state a project. It does not implicitly use your `gcloud` default project.
 1. The Lister can be filtered (see `list-filter.yaml` file) so that specified assets are skipped when 
 building the `asset-list.txt` file.
