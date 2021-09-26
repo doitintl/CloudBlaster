@@ -12,11 +12,12 @@ with the possibility of easily adding more (see below).
  
 
 ## Use case
-* The use case for Cloud Blaster is the same as for Safe Scrub.
 * It is intended for development and QA projects, where you want to start fresh at the end of the day or 
 before a new test run.
-* It is less likely to be useful for production projects, where you should determine the potential dependencies 
-between components before deleting anything.
+* It is less likely to be useful for production projects, 
+where you should use Terraform or other Infrastructure as Code. This will track all
+assets so it later can delete just what was created.
+* The use case for Cloud Blaster is the same as for Safe Scrub. (See below in this README.)
 
 ## Safety First 
 To keep it safe, Cloud Blaster has these features.
