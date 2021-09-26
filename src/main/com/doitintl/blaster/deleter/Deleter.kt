@@ -2,7 +2,6 @@ package com.doitintl.blaster.deleter
 
 import com.doitintl.blaster.lister.AssetTypeMap
 import com.doitintl.blaster.shared.Constants.ALL_ASSETS_ALL_TYPES
-import com.doitintl.blaster.shared.Constants.ALL_ASSETS_ALL_TYPES_FULL_COMMENT
 import com.doitintl.blaster.shared.Constants.ASSET_LIST_FILE
 import com.doitintl.blaster.shared.Constants.CLOUD_BLASTER
 import com.doitintl.blaster.shared.Constants.COMMENT_READY_TO_DELETE

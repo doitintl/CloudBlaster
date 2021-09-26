@@ -34,7 +34,7 @@ class GKETest(project: String) : TestBase(project) {
         val op =
             getContainerService().projects().zones().clusters().create(project, location, createClusterReq).execute()!!
         GKEClusterDeleter.waitOnZonalOperation(project, location, op)
-        val pattern = GKEClusterDeleter().pathPatterns.filter { it.contains("zones") }.first()
+        val pattern = GKEClusterDeleter().pathPatterns.first { it.contains("zones") }
         val clusterPath = pathForAsset(pattern, project, name, location)
 
         return listOf(clusterPath)

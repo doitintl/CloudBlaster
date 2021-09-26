@@ -187,11 +187,11 @@ abstract class TestBase(val project: String, private val sfx: String = randomStr
 
         while (true) {
             val allAssets = listAllAssetsUnfiltered()
-            println("Waiting for $phase in ${this::class.simpleName}: ${(currentTimeMillis() - start) / 1000}s passed")
             if (currentTimeMillis() > timeout || !waitCondition(allAssets, expected)) {
                 break
             }
             Thread.sleep(2000)//Must wait to avoid exceeding Asset Service quota
+            println("Waiting for $phase in ${this::class.simpleName}: ${(currentTimeMillis() - start) / 1000}s passed")
         }
 
         if (currentTimeMillis() >= timeout) {

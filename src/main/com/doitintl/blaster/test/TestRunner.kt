@@ -51,7 +51,7 @@ fun main(vararg args: String) {
 
     val (successes, failures) = runAsync(classes, project)
     val elapsedTimeSec = (currentTimeMillis() - start) / 1000
-    println("TestRunner total time  $elapsedTimeSec s")
+    println("TestRunner total time: ${elapsedTimeSec}s")
     if (failures.isNotEmpty()) {
         System.err.println("Done with ${failures.size} failures: ${failures.joinToString(",")}")
         exitProcess(1)

@@ -20,13 +20,12 @@ class SQLInstanceDeleter : BaseDeleter() {
     }
 
     private fun createSqlAdminService(): SQLAdmin {
-        val httpTransport = GoogleNetHttpTransport.newTrustedTransport()
         var cred = GoogleCredential.getApplicationDefault()
         if (cred.createScopedRequired()) {
             cred = cred.createScoped(listOf("https://www.googleapis.com/auth/cloud-platform"))
         }
 
-        return SQLAdmin.Builder(httpTransport, JacksonFactory.getDefaultInstance(), cred).
-        setApplicationName(CLOUD_BLASTER).build()
+        return SQLAdmin.Builder(GoogleNetHttpTransport.newTrustedTransport(), JacksonFactory.getDefaultInstance(), cred)
+            .setApplicationName(CLOUD_BLASTER).build()
     }
 }
