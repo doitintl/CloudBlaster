@@ -184,7 +184,7 @@ abstract class TestBase(val project: String, private val sfx: String = randomStr
     ) {
 
         val start = currentTimeMillis()
-        val timeout = start + waitTimeMillis()
+        val timeout = start + timeOutForCreateOrDelete()
 
 
         while (true) {
@@ -209,7 +209,7 @@ abstract class TestBase(val project: String, private val sfx: String = randomStr
      * Deletion, however, does not block, so the waitTimeMillis is partially
      * a wait for deletion to complete.
      */
-    open fun waitTimeMillis(): Long {
+    open fun timeOutForCreateOrDelete(): Long {
         val twoMin = 2 * 60 * 1000L
         return twoMin
     }

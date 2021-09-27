@@ -45,7 +45,7 @@ class GKETest(project: String) : TestBase(project) {
     }
 
 
-    override fun waitTimeMillis(): Long {
+    override fun timeOutForCreateOrDelete(): Long {
         val tenMin = 10 * 60 * 1000L
         return tenMin
     }
