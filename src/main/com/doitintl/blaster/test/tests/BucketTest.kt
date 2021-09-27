@@ -19,6 +19,7 @@ class BucketTest(project: String) : TestBase(project) {
         val regionAsset = assetName("bucket-region")
         makeBucket(project, "us", multiregionAsset)
         makeBucket(project, "us-central1", regionAsset)
+
         return listOf(multiregionAsset, regionAsset)
     }
 

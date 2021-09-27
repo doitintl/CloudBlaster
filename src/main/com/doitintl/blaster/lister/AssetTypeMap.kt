@@ -75,13 +75,12 @@ class AssetTypeMap(private val filterFile: String) {
                 for (assetTypeId in filtersFromYaml.keys) {
                     val filter = filtersFromYaml[assetTypeId] ?: mapOf()
 
-                    val sz = filter.size
                     val error =
                         "$assetTypeId has keys ${filter.keys.toList()} but should have either none or \"$REGEX\" and \"$LIST_THESE\""
-                    val at = assetTypeMap_inout[assetTypeId] ?: error("$assetTypeId not found")
-                    when (sz) {
+                    val assetType = assetTypeMap_inout[assetTypeId] ?: error("$assetTypeId not found")
+                    when (filter.size) {//either empty, or else we have REGEX and LIST_THESE as keys
                         0 -> {
-                            at.setFilterRegex(".*", true)
+                            assetType.setFilterRegex(".*", true)
                         }
                         2 -> {
                             if (filter.keys.toSet() != setOf(REGEX, LIST_THESE)) {
@@ -93,11 +92,10 @@ class AssetTypeMap(private val filterFile: String) {
                                 if (regexS.isEmpty()) {
                                     throw IllegalArgumentException("$assetTypeId has blank $REGEX. Either omit $REGEX and $LIST_THESE or give a value")
                                 }
-                                at.setFilterRegex(regexS, listThese)
+                                assetType.setFilterRegex(regexS, listThese)
                             }
                         }
                         else -> throw IllegalArgumentException(error)
-
                     }
                 }
             }

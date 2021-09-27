@@ -1,6 +1,6 @@
 package com.doitintl.blaster.deleter
 
-import com.doitintl.blaster.shared.Constants
+import com.doitintl.blaster.shared.Constants.CLOUD_BLASTER
 import com.doitintl.blaster.shared.TimeoutException
 import com.google.api.client.googleapis.javanet.GoogleNetHttpTransport
 import com.google.api.client.http.HttpRequestInitializer
@@ -20,7 +20,7 @@ abstract class GAEBaseDeleter : BaseDeleter() {
             val requestInitializer: HttpRequestInitializer = HttpCredentialsAdapter(credentials)
             return Appengine.Builder(
                 GoogleNetHttpTransport.newTrustedTransport(), JacksonFactory(), requestInitializer
-            ).setApplicationName(Constants.CLOUD_BLASTER).build()
+            ).setApplicationName(CLOUD_BLASTER).build()
         }
 
         fun waitOnOperation(project: String, operation: Operation) {

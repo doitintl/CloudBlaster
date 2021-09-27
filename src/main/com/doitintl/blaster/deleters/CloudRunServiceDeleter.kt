@@ -1,7 +1,7 @@
 package com.doitintl.blaster.deleters
 
 import com.doitintl.blaster.deleter.BaseDeleter
-import com.doitintl.blaster.shared.Constants
+import com.doitintl.blaster.shared.Constants.CLOUD_BLASTER
 import com.doitintl.blaster.shared.Constants.ID
 import com.doitintl.blaster.shared.Constants.LOCATION
 import com.doitintl.blaster.shared.Constants.PROJECT
@@ -23,7 +23,7 @@ class CloudRunServiceDeleter : BaseDeleter() {
         val requestInitializer: HttpRequestInitializer = HttpCredentialsAdapter(credentials)
         val run = CloudRun.Builder(
             GoogleNetHttpTransport.newTrustedTransport(), JacksonFactory(), requestInitializer
-        ).setApplicationName(Constants.CLOUD_BLASTER).build()
+        ).setApplicationName(CLOUD_BLASTER).build()
         val services = run.projects().Locations().services()
         val result = services.delete("projects/${p[PROJECT]}/locations/${p[LOCATION]}/services/${p[ID]}").execute()
     }

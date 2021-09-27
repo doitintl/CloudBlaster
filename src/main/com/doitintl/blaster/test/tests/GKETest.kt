@@ -2,7 +2,7 @@ package com.doitintl.blaster.test.tests
 
 
 import com.doitintl.blaster.deleters.GKEClusterDeleter
-import com.doitintl.blaster.shared.Constants
+import com.doitintl.blaster.shared.Constants.CLOUD_BLASTER
 import com.doitintl.blaster.test.TestBase
 import com.google.api.client.googleapis.javanet.GoogleNetHttpTransport
 import com.google.api.client.json.jackson2.JacksonFactory
@@ -21,7 +21,7 @@ class GKETest(project: String) : TestBase(project) {
         val requestInitializer = HttpCredentialsAdapter(GoogleCredentials.getApplicationDefault())
         return Container.Builder(
             GoogleNetHttpTransport.newTrustedTransport(), JacksonFactory(), requestInitializer
-        ).setApplicationName(Constants.CLOUD_BLASTER).build()
+        ).setApplicationName(CLOUD_BLASTER).build()
     }
 
     override fun createAssets(sfx: String, project: String): List<String> {

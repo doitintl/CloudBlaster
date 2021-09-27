@@ -2,19 +2,21 @@ package com.doitintl.blaster.test
 
 import com.doitintl.blaster.lister.LIST_THESE
 import com.doitintl.blaster.lister.REGEX
-import com.doitintl.blaster.shared.*
+import com.doitintl.blaster.shared.Constants.ASSET_LIST_FILE
 import com.doitintl.blaster.shared.Constants.COMMENT_READY_TO_DELETE
 import com.doitintl.blaster.shared.Constants.ID
 import com.doitintl.blaster.shared.Constants.LIST_FILTER_YAML
 import com.doitintl.blaster.shared.Constants.LOCATION
 import com.doitintl.blaster.shared.Constants.PROJECT
-import org.yaml.snakeyaml.DumperOptions
+import com.doitintl.blaster.shared.TimeoutException
+import com.doitintl.blaster.shared.noComment
+import com.doitintl.blaster.shared.randomString
+import com.doitintl.blaster.shared.writeTempFilterYaml
 import org.yaml.snakeyaml.Yaml
 import java.io.File
 import java.io.FileInputStream
 import java.io.FileWriter
 import java.lang.System.currentTimeMillis
-import java.util.*
 import kotlin.system.exitProcess
 import com.doitintl.blaster.deleter.main as deleter
 import com.doitintl.blaster.lister.main as lister
@@ -154,8 +156,8 @@ abstract class TestBase(val project: String, private val sfx: String = randomStr
 
 
     private fun listAssetsWithFilter(sfx: String, project: String, expected: List<String>): Pair<File, File> {
-        val tempFilterFilePath = newFilterYaml(sfx)
-        val tempAssetsToDeleteFile = createTempFile("${Constants.ASSET_LIST_FILE}-$sfx", ".txt")
+        val tempFilterFilePath = writeTempFilterYaml(assetTypeIds(), sfx, ::makeFilter)
+        val tempAssetsToDeleteFile = createTempFile("$ASSET_LIST_FILE-$sfx", ".txt")
         tempAssetsToDeleteFile.deleteOnExit()
         lister(
             arrayOf(
@@ -164,7 +166,7 @@ abstract class TestBase(val project: String, private val sfx: String = randomStr
                 "--output-file",
                 tempAssetsToDeleteFile.absolutePath,
                 "--filter-file",
-                tempFilterFilePath
+                tempFilterFilePath.absolutePath
             )
         )
         val outputRaw = tempAssetsToDeleteFile.readText()
@@ -173,7 +175,7 @@ abstract class TestBase(val project: String, private val sfx: String = randomStr
         val filteredLines = output.split("\n").filter { it.isNotBlank() }
 
         assert(expected.size == filteredLines.size) { "expected $expected\noutput $output" }
-        return Pair(tempAssetsToDeleteFile, File(tempFilterFilePath))
+        return Pair(tempAssetsToDeleteFile, tempFilterFilePath)
     }
 
 
@@ -213,33 +215,18 @@ abstract class TestBase(val project: String, private val sfx: String = randomStr
     }
 
 
-    private fun newFilterYaml(sfx: String): String {
-        var counter = 0
-        FileInputStream(LIST_FILTER_YAML).use { `in` ->
-            for (o in Yaml().loadAll(`in`)) {
-                val filtersFromYaml = o as Map<String, Map<String, Any>>//The inner Map is Boolean|String
-                val filtersFromYamlOut = TreeMap<String, Map<String, Any>>()
-                for (assetTypeId: String in filtersFromYaml.keys) {
-                    verifyAssetTypeIds()
-                    val value: Map<String, Any> =
-                        if (assetTypeIds().contains(assetTypeId)) {
-                            mapOf(REGEX to ".*$sfx.*", LIST_THESE to true)
-                        } else {
-                            mapOf(REGEX to ".*", LIST_THESE to false)
-                        }
-                    filtersFromYamlOut[assetTypeId] = value
+    private fun makeFilter(
+        assetTypeId: String?,
+        assetTypeIds: List<String>?,
+        sfx: String?
+    ): Map<String, Any> {
 
-                }
-
-                counter++
-                if (counter > 1) {
-                    throw IllegalConfigException("Only 1 object allowed in root of list-filter.yaml")
-                }
-
-                return writeTempFilterYaml(sfx, filtersFromYamlOut)
-            }
+        assert(sfx != null)
+        return if (assetTypeIds!!.contains(assetTypeId!!)) {
+            mapOf(REGEX to ".*$sfx.*", LIST_THESE to true)
+        } else {
+            mapOf(REGEX to ".*", LIST_THESE to false)
         }
-        throw IllegalCodePathException("Should not get here")
     }
 
     private fun verifyAssetTypeIds() {
@@ -261,10 +248,9 @@ abstract class TestBase(val project: String, private val sfx: String = randomStr
     }
 
 
-    // todo use fullpath as identifier for ALL asset types, not just where we have to.
-    //  This will require developing the code to do that consistenly and easily.
-    //
-    // todo We use identifierIsFullPath == true where secondary assets are expected (e.g., GAE Service, GKE Cluster),
+    // todo Use fullpath as identifier for ALL asset types, not just where we have to.
+    // This will require developing the code to do that consistenly and easily.
+    // We use identifierIsFullPath == true where secondary assets are expected (e.g., GAE Service, GKE Cluster),
     // and then garbage may be left after the test (containers in the case GAE). Clean this garbage up.
     // (The garbage is not special to Cloud Blaster or this test -- it will always happen when
     // generating such assets.)
@@ -276,29 +262,6 @@ abstract class TestBase(val project: String, private val sfx: String = randomStr
 
     open fun identifierIsFullPath(): Boolean {
         return false
-    }
-
-
-    private fun writeTempFilterYaml(
-        sfx: String,
-        filtersFromYamlOut: TreeMap<String, Map<String, Any>>
-    ): String {
-        val baseFilename = LIST_FILTER_YAML.split(".")[0]
-        val tempFilterYaml = createTempFile("$baseFilename-$sfx", ".yaml")
-        tempFilterYaml.deleteOnExit()
-        writeYaml(tempFilterYaml.absolutePath, filtersFromYamlOut)
-        return tempFilterYaml.absolutePath
-    }
-
-    private fun writeYaml(filePath: String, newYaml: Map<String, Map<String, Any>>) {
-        val dumperOptions = DumperOptions()
-        dumperOptions.isPrettyFlow = true
-        dumperOptions.defaultFlowStyle = DumperOptions.FlowStyle.BLOCK
-        dumperOptions.defaultScalarStyle = DumperOptions.ScalarStyle.DOUBLE_QUOTED
-        val yaml = Yaml(dumperOptions)
-        FileWriter(filePath).use { fw ->
-            yaml.dump(newYaml, fw)
-        }
     }
 
 
@@ -314,4 +277,6 @@ abstract class TestBase(val project: String, private val sfx: String = randomStr
         assert(!ret.contains("{"))
         return ret
     }
+
+
 }

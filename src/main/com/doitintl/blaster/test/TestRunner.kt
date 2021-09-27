@@ -1,13 +1,17 @@
 package com.doitintl.blaster.test
 
+import com.doitintl.blaster.lister.LIST_THESE
+import com.doitintl.blaster.lister.REGEX
+import com.doitintl.blaster.shared.Constants.ASSET_LIST_FILE
+import com.doitintl.blaster.shared.writeTempFilterYaml
 import com.doitintl.blaster.test.tests.*
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import java.lang.System.currentTimeMillis
-
 import kotlin.reflect.KClass
 import kotlin.system.exitProcess
+import com.doitintl.blaster.lister.main as lister
 
 
 private fun runAsync(
@@ -54,9 +58,37 @@ fun main(vararg args: String) {
     println("TestRunner total time: ${elapsedTimeSec}s")
     if (failures.isNotEmpty()) {
         System.err.println("Done with ${failures.size} failures: ${failures.joinToString(",")}")
+        messageForCleanup(project)
         exitProcess(1)
     } else {
         println("TestRunner Done. Success in all ${successes.size} tests")
     }
 
+}
+
+
+fun messageForCleanup(project: String) {
+    val unfiltered =
+        { _: String?, _: List<String>?, _: String? ->
+            mapOf(REGEX to ".*", LIST_THESE to true)
+        }
+
+    val tempFilterFilePath = writeTempFilterYaml(null, null, unfiltered)
+    val tempAssetsToDeleteFile = createTempFile(ASSET_LIST_FILE, ".txt")
+    tempAssetsToDeleteFile.deleteOnExit()
+
+    lister(
+        arrayOf(
+            "--project",
+            project,
+            "--output-file",
+            tempAssetsToDeleteFile.absolutePath,
+            "--filter-file",
+            tempFilterFilePath.absolutePath
+        )
+    )
+    val found = tempAssetsToDeleteFile.readText()
+    val lines = found.split("\n")
+    val linesS = lines.subList(1, lines.lastIndex).joinToString("\n")
+    System.err.println("\nTest failed: Check project $project for undeleted test assets. Assets found were:\n\n$linesS")
 }
