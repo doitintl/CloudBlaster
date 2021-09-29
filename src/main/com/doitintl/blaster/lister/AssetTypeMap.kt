@@ -15,7 +15,7 @@ val assetTypeRegex: Regex = Regex("""[a-z]+\.googleapis\.com/[a-zA-Z]+""")
 const val REGEX = "regex"
 const val LIST_THESE = "listThese"
 
-class AssetTypeMap(private val filterFile: String) {
+class AssetTypeMap(private val filterFile: String? = null) {
 
     private val assetTypeMap: Map<String, AssetType>
 
@@ -55,47 +55,52 @@ class AssetTypeMap(private val filterFile: String) {
 
 
     private fun loadAssetTypesFromFile(): Map<String, AssetType> {
-        compareKeys()
+        checkKeysSameInBothFiles()
         val ret = loadAssetTypesFile()
         loadListFilterFile(ret) //inout
         return ret
     }
 
     private fun loadListFilterFile(assetTypeMap_inout: Map<String, AssetType>) {
+        if (filterFile == null) {
+            assetTypeMap_inout.values.forEach { assetType ->
+                assetType.setFilterRegex(".*", true)
+            }
+        } else {
+            FileInputStream(filterFile).use { `in` ->
+                var count = 0
+                for (o in Yaml().loadAll(`in`)) {
 
-        FileInputStream(filterFile).use { `in` ->
-            var count = 0
-            for (o in Yaml().loadAll(`in`)) {
+                    count++
+                    if (count > 1) {
+                        throw IllegalConfigException("Should have only one root-level map in the $filterFile")
+                    }
+                    val filtersFromYaml = o as Map<String, Map<String, Any>>//The Any is Boolean|String
+                    for (assetTypeId in filtersFromYaml.keys) {
+                        val filter = filtersFromYaml[assetTypeId] ?: mapOf()
 
-                count++
-                if (count > 1) {
-                    throw IllegalConfigException("Should have only one root-level map in the $filterFile")
-                }
-                val filtersFromYaml = o as Map<String, Map<String, Any>>//The Any is Boolean|String
-                for (assetTypeId in filtersFromYaml.keys) {
-                    val filter = filtersFromYaml[assetTypeId] ?: mapOf()
-
-                    val error =
-                        "$assetTypeId has keys ${filter.keys.toList()} but should have either none or \"$REGEX\" and \"$LIST_THESE\""
-                    val assetType = assetTypeMap_inout[assetTypeId] ?: error("$assetTypeId not found")
-                    when (filter.size) {//either empty, or else we have REGEX and LIST_THESE as keys
-                        0 -> {
-                            assetType.setFilterRegex(".*", true)
-                        }
-                        2 -> {
-                            if (filter.keys.toSet() != setOf(REGEX, LIST_THESE)) {
-                                throw IllegalConfigException(error)
-                            } else {
-                                val listThese = filter[LIST_THESE] as Boolean
-                                val regexS = (filter[REGEX] as String).trim()
-
-                                if (regexS.isEmpty()) {
-                                    throw IllegalArgumentException("$assetTypeId has blank $REGEX. Either omit $REGEX and $LIST_THESE or give a value")
-                                }
-                                assetType.setFilterRegex(regexS, listThese)
+                        val error =
+                            "$assetTypeId has keys ${filter.keys.toList()} but should have either none or \"$REGEX\" and \"$LIST_THESE\""
+                        val assetType = assetTypeMap_inout[assetTypeId] ?: error("$assetTypeId not found")
+                        when (filter.size) {//either empty, or else we have REGEX and LIST_THESE as keys
+                            0 -> {
+                                assetType.setFilterRegex(".*", true)
                             }
+                            2 -> {
+                                if (filter.keys.toSet() != setOf(REGEX, LIST_THESE)) {
+                                    throw IllegalConfigException(error)
+                                } else {
+                                    val listThese = filter[LIST_THESE] as Boolean
+                                    val regexS = (filter[REGEX] as String).trim()
+
+                                    if (regexS.isEmpty()) {
+                                        throw IllegalArgumentException("$assetTypeId has blank $REGEX. Either omit $REGEX and $LIST_THESE or give a value")
+                                    }
+                                    assetType.setFilterRegex(regexS, listThese)
+                                }
+                            }
+                            else -> throw IllegalArgumentException(error)
                         }
-                        else -> throw IllegalArgumentException(error)
                     }
                 }
             }
@@ -122,8 +127,11 @@ class AssetTypeMap(private val filterFile: String) {
     }
 
 
-    private fun compareKeys() {
-        fun loadAssetTypeIdsFromProps(fileName: String): List<String> {
+    private fun checkKeysSameInBothFiles() {
+        if (filterFile == null) {
+            return //nothing to compare
+        }
+        fun assetTypeConfigKeys(fileName: String): List<String> {
             FileReader(fileName).use { `in` ->
                 val props = Properties()
                 props.load(`in`)
@@ -131,7 +139,8 @@ class AssetTypeMap(private val filterFile: String) {
             }
         }
 
-        fun loadAssetTypeIdsFromYaml(fileName: String): List<String> {
+        fun filterKeys(fileName: String): List<String> {
+
             FileReader(fileName).use { `in` ->
                 for (o in Yaml().loadAll(`in`)) {
                     //only one object in root
@@ -140,12 +149,13 @@ class AssetTypeMap(private val filterFile: String) {
                 }
             }
             throw IllegalCodePathException("Should not reach here")
+
         }
 
 
         var errMessage = ""
-        val at = loadAssetTypeIdsFromProps(ASSET_TYPES_FILE)
-        val lf = loadAssetTypeIdsFromYaml(filterFile)
+        val at = assetTypeConfigKeys(ASSET_TYPES_FILE)
+        val lf = filterKeys(filterFile)
 
         val missingInFilter = at subtract lf
         if (missingInFilter.isNotEmpty()) {

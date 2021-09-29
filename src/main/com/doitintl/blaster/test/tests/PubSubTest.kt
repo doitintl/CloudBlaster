@@ -12,13 +12,11 @@ class PubSubTest(project: String) : TestBase(project) {
     )
 
     override fun createAssets(sfx: String, project: String): List<String> {
-
         val sub = assetName("sub")
         val topic = assetName("topic")
 
         runCommand("gcloud pubsub topics create $topic --project $project")
         println("Created $topic")
-
         runCommand("gcloud pubsub subscriptions create $sub --topic $topic --project $project")
         println("Created $sub")
         return listOf(sub, topic)

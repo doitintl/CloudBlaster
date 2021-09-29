@@ -35,6 +35,7 @@ abstract class GCEBaseDeleter : BaseDeleter() {
             val start = currentTimeMillis()
 
             val timeout = start + twoMin
+            var lastPrint = -1L
             while (currentTimeMillis() < timeout) {
                 val currentOperation: Operation = getComputeService()
                     .zoneOperations()
@@ -44,12 +45,17 @@ abstract class GCEBaseDeleter : BaseDeleter() {
                     return
                 }
                 Thread.sleep(SLEEP_IN_LOOPS_MS)
+                if (currentTimeMillis() - lastPrint > 15_000L) {
+                    println("Waiting on ${operation.operationType} for ${operation.targetLink}")
+                    lastPrint = currentTimeMillis()
+                }
             }
         }
 
         fun waitOnRegionalOperation(project: String, location: String, operation: Operation) {
             val start = currentTimeMillis()
             val timeout = start + twoMin
+            var lastPrint = -1L
             while (currentTimeMillis() < timeout) {
                 val currentOperation: Operation = getComputeService()
                     .regionOperations().get(project, location, operation.name).execute()
@@ -57,6 +63,10 @@ abstract class GCEBaseDeleter : BaseDeleter() {
                     return
                 }
                 Thread.sleep(SLEEP_IN_LOOPS_MS)
+                if (currentTimeMillis() - lastPrint > 15_000L) {
+                    println("Waiting on ${operation.operationType} for ${operation.targetLink}")
+                    lastPrint = currentTimeMillis()
+                }
             }
         }
 
@@ -64,6 +74,7 @@ abstract class GCEBaseDeleter : BaseDeleter() {
             val start = currentTimeMillis()
 
             val timeout = start + twoMin
+            var lastPrint = -1L
             while (currentTimeMillis() < timeout) {
                 val currentOperation: Operation = getComputeService()
                     .globalOperations().get(project, operation.name).execute()
@@ -71,6 +82,10 @@ abstract class GCEBaseDeleter : BaseDeleter() {
                     return
                 }
                 Thread.sleep(SLEEP_IN_LOOPS_MS)
+                if (currentTimeMillis() - lastPrint > 15_000L) {
+                    println("Waiting on ${operation.operationType} for ${operation.targetLink}")
+                    lastPrint = currentTimeMillis()
+                }
             }
         }
     }

@@ -5,7 +5,6 @@ import com.doitintl.blaster.shared.Constants.ALL_ASSETS_ALL_TYPES
 import com.doitintl.blaster.shared.Constants.ASSET_LIST_FILE
 import com.doitintl.blaster.shared.Constants.CLOUD_BLASTER
 import com.doitintl.blaster.shared.Constants.COMMENT_READY_TO_DELETE
-import com.doitintl.blaster.shared.Constants.LIST_FILTER_YAML
 import com.doitintl.blaster.shared.comments
 import com.doitintl.blaster.shared.noComment
 import kotlinx.coroutines.Dispatchers
@@ -26,11 +25,6 @@ class Deleter : Callable<Int> {
     @CommandLine.Option(names = ["-d", "--assets-to-delete-file"])
     private var assetsToDeleteFile: String = ASSET_LIST_FILE
 
-    /**
-     * todo: Does this filter have any value? Can we pass null to AssetTypeMap?
-     */
-    @CommandLine.Option(names = ["-f", "--filter-file"])
-    private var filterFile: String = LIST_FILTER_YAML
 
     override fun call(): Int {
         val allLines = File(assetsToDeleteFile).readLines()
@@ -69,7 +63,7 @@ class Deleter : Callable<Int> {
         if (line.isBlank()) {
             return
         }
-        val deleter = AssetTypeMap(filterFile).deleterClass(line)
+        val deleter = AssetTypeMap().deleterClass(line)
 
         try {
             deleter.delete(line)
@@ -79,8 +73,6 @@ class Deleter : Callable<Int> {
             e.printStackTrace()
         }
     }
-
-
 }
 
 

@@ -44,6 +44,7 @@ class GKEClusterDeleter : BaseDeleter() {
             val start = currentTimeMillis()
             val fourMin = 1000 * 60 * 4
             val timeout = start + fourMin
+            var lastPrint = -1L
             while (currentTimeMillis() < timeout) {
                 val currentOperation = getContainerService().projects().zones().operations()
                     .get(project, location, operation.name)
@@ -53,6 +54,10 @@ class GKEClusterDeleter : BaseDeleter() {
                     return
                 }
                 Thread.sleep(SLEEP_IN_LOOPS_MS)
+                if (currentTimeMillis() - lastPrint > 15_000L) {
+                    println("Waiting on ${operation.operationType}")
+                    lastPrint = currentTimeMillis()
+                }
             }
         }
     }

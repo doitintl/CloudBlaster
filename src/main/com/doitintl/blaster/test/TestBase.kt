@@ -36,7 +36,7 @@ abstract class TestBase(val project: String, private val sfx: String = randomStr
     abstract fun createAssets(sfx: String, project: String): List<String>
 
     /**
-     * @return list of asset types tested by this test, chosen from list-filter.yaml
+     * @return list of asset types tested by this test, chosen from list-filter.yaml or asset-types.properties
      */
     abstract fun assetTypeIds(): List<String>
 
@@ -53,18 +53,52 @@ abstract class TestBase(val project: String, private val sfx: String = randomStr
 
     fun test(): Boolean {
         return try {
+            validateAssetTypeIds()
             val assets = creationPhase(sfx, project)
-            val (tempAssetToDeleteFile, tempFilterFile) = listAssetsWithFilter(sfx, project, assets)
-            addDeletionEnablement(tempAssetToDeleteFile)
-
-            deletionPhase(tempAssetToDeleteFile, tempFilterFile, assets)
+            deletionPhase(assets)
             println("Success ${this::class.simpleName}")
             true
         } catch (th: Throwable) {
+            System.err.println("Failure in ${this::class.simpleName}: ${th.stackTraceToString()}")
             finalNonblockingCleanup()
 
-            System.err.println("Error in ${this::class.simpleName}: ${th.stackTraceToString()}")
             false
+        }
+    }
+
+    private fun deletionPhase(assets: List<String>) {
+        val (tempAssetToDeleteFile, tempFilterFile) = listAssetsWithFilter(sfx, project, assets)
+        addDeletionEnablement(tempAssetToDeleteFile)
+
+        deleter(
+            arrayOf(
+                "--assets-to-delete-file",
+                tempAssetToDeleteFile.absolutePath,
+
+                )
+        )
+        val some =
+            { fullListStr: String, delThese: List<String> ->
+                !delThese.none { asset ->
+                    fullListingContainsAsset(
+                        fullListStr,
+                        asset
+                    )
+                }
+            }
+
+        waitOnUnfilteredOutput(some, "deletion", assets)
+
+
+        // We assert that there are no assets with this sfx string in them.
+        // If we are using fullPath, then we could assert that that there are no assets with this full path in them.
+        // However, we already do that in waitOnUnfilteredOutput (line above) so it is not useful.
+        if (!identifierIsFullPath()) {
+            val allAssets = listAllAssetsUnfiltered()
+            assert(!allAssets.contains(sfx)) {
+                val foundLines = allAssets.split("\n").filter { it.contains(sfx) }.joinToString("\n")
+                "Found suffix $sfx in unfiltered output:\n$foundLines"
+            }
         }
     }
 
@@ -78,7 +112,7 @@ abstract class TestBase(val project: String, private val sfx: String = randomStr
         }
     }
 
-    fun finalNonblockingCleanup() {
+    private fun finalNonblockingCleanup() {
         System.err.println("finalNonblockingCleanup: $sfx")
         val (tempAssetToDeleteFile, tempFilterFile) = listAssetsWithFilter(sfx, project)
         addDeletionEnablement(tempAssetToDeleteFile)
@@ -87,9 +121,8 @@ abstract class TestBase(val project: String, private val sfx: String = randomStr
             arrayOf(
                 "--assets-to-delete-file",
                 tempAssetToDeleteFile.absolutePath,
-                "--filter-file",
-                tempFilterFile.absolutePath
-            )
+
+                )
         )
     }
 
@@ -99,7 +132,7 @@ abstract class TestBase(val project: String, private val sfx: String = randomStr
 
     private fun creationPhase(sfx: String, project: String): List<String> {
         val assets = createAssets(sfx, project)
-        validateAssetIdentifiers(assets)
+        assertAssetIdStructure(assets)
         val notAll = { allAssets: String, assets_: List<String> ->
             !assets_.all { asset ->
                 fullListingContainsAsset(
@@ -113,7 +146,12 @@ abstract class TestBase(val project: String, private val sfx: String = randomStr
         return assets
     }
 
-    private fun validateAssetIdentifiers(assets: List<String>) {
+    /**
+     * This is an internal assertion (not a check of external input), intended to handle the
+     * complexity of the fact that we use either  full-path or local-name.
+     * We check that the usage in fact matches the definition in the Deleter class.
+     */
+    private fun assertAssetIdStructure(assets: List<String>) {
         assert(assets.none { a -> a.contains("{") }) { "Should not have braces in $assets" }
         assert(assets.none { it.toLowerCase() != it }) { "Should not have uppercase in $assets" }
         val predicate: (String) -> Boolean = { a -> a.contains("/") }
@@ -125,35 +163,6 @@ abstract class TestBase(val project: String, private val sfx: String = randomStr
         }
     }
 
-
-    private fun deletionPhase(tempAssetToDeleteFile: File, tempFilterFile: File, assets: List<String>) {
-        deleter(
-            arrayOf(
-                "--assets-to-delete-file",
-                tempAssetToDeleteFile.absolutePath,
-                "--filter-file",
-                tempFilterFile.absolutePath
-            )
-        )
-        val some =
-            { fullListStr: String, delThese: List<String> ->
-                !delThese.none { asset ->
-                    fullListingContainsAsset(
-                        fullListStr,
-                        asset
-                    )
-                }
-            }
-        waitOnUnfilteredOutput(some, "deletion", assets)
-
-        val allAssets = listAllAssetsUnfiltered()
-        if (!this.identifierIsFullPath()) {
-            assert(!allAssets.contains(sfx)) {
-                val linesWithSfx = allAssets.split("\n").filter { it.contains(sfx) }.joinToString("\n")
-                "Found suffix $sfx in unfiltered output:\n$linesWithSfx"
-            }
-        }
-    }
 
     /**
      * If we are using full paths, check that the exact path is listed. Otherwise, just
@@ -177,6 +186,7 @@ abstract class TestBase(val project: String, private val sfx: String = randomStr
 
 
     private fun listAssetsWithFilter(sfx: String, project: String, expected: List<String>? = null): Pair<File, File> {
+
         val tempFilterFilePath = writeTempFilterYaml(assetTypeIds(), sfx, ::makeFilter)
         val tempAssetsToDeleteFile = createTempFile("$ASSET_LIST_FILE-$sfx", ".txt")
         tempAssetsToDeleteFile.deleteOnExit()
@@ -209,7 +219,6 @@ abstract class TestBase(val project: String, private val sfx: String = randomStr
 
         val start = currentTimeMillis()
         val timeout = start + timeOutForCreateOrDelete()
-
 
         while (true) {
             val allAssets = listAllAssetsUnfiltered()
@@ -253,7 +262,7 @@ abstract class TestBase(val project: String, private val sfx: String = randomStr
         }
     }
 
-    private fun verifyAssetTypeIds() {
+    private fun validateAssetTypeIds() {
 
         val knownIds = mutableListOf<String>()
         FileInputStream(LIST_FILTER_YAML).use { `in` ->

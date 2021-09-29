@@ -1,9 +1,6 @@
 package com.doitintl.blaster.test
 
-import com.doitintl.blaster.lister.LIST_THESE
-import com.doitintl.blaster.lister.REGEX
 import com.doitintl.blaster.shared.Constants.ASSET_LIST_FILE
-import com.doitintl.blaster.shared.writeTempFilterYaml
 import com.doitintl.blaster.test.tests.*
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -13,6 +10,26 @@ import kotlin.reflect.KClass
 import kotlin.system.exitProcess
 import com.doitintl.blaster.lister.main as lister
 
+
+private fun runSync(
+    classes: List<KClass<out TestBase>>, project: String
+): Pair<MutableList<String>, MutableList<String>> {
+    val successes = mutableListOf<String>()
+    val failures = mutableListOf<String>()
+
+    classes.forEach { `class` ->
+        val t: TestBase = `class`.constructors.first().call(project)
+        val result = t.test()
+        if (result) {
+            successes.add(`class`.simpleName!!)
+        } else {
+            failures.add(`class`.simpleName!!)
+
+        }
+
+    }
+    return Pair(successes, failures)
+}
 
 private fun runAsync(
     classes: List<KClass<out TestBase>>, project: String
@@ -38,12 +55,7 @@ private fun runAsync(
 
 
 fun messageForCleanup(project: String) {
-    val unfiltered =
-        { _: String?, _: List<String>?, _: String? ->
-            mapOf(REGEX to ".*", LIST_THESE to true)
-        }
 
-    val tempFilterFilePath = writeTempFilterYaml(null, null, unfiltered)
     val tempAssetsToDeleteFile = createTempFile(ASSET_LIST_FILE, ".txt")
     tempAssetsToDeleteFile.deleteOnExit()
 
@@ -53,8 +65,6 @@ fun messageForCleanup(project: String) {
             project,
             "--output-file",
             tempAssetsToDeleteFile.absolutePath,
-            "--filter-file",
-            tempFilterFilePath.absolutePath
         )
     )
     val found = tempAssetsToDeleteFile.readText()
@@ -73,12 +83,12 @@ fun main(vararg args: String) {
     val project = args[0]
     println("Project $project")
     val classes: List<KClass<out TestBase>> = listOf(
-        GKETest::class,
-        CloudRunTest::class,
-        GAEServiceTest::class,
         BucketTest::class,
         PubSubTest::class,
         GCETest::class,
+        GKETest::class,
+        CloudRunTest::class,
+        GAEServiceTest::class,
     )
 
     val (successes, failures) = runAsync(classes, project)

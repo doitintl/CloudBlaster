@@ -23,15 +23,15 @@ abstract class GAEBaseDeleter : BaseDeleter() {
             ).setApplicationName(CLOUD_BLASTER).build()
         }
 
-        fun waitOnOperation(project: String, operation: Operation) {
+        fun waitOnOperation(project: String, op: Operation) {
             val engine = getAppEngine()
             val start = currentTimeMillis()
             val threeMin = 1000 * 60 * 3
             val timeout = start + threeMin
-
+            var lastPrint = -1L
             while (currentTimeMillis() < timeout) {
                 //operation.name Takes the form apps/myproject/operations/1d7adb9f-79d8-48ed-849f-2454ce417d6f
-                val pathParts = operation.name.split("/")
+                val pathParts = op.name.split("/")
                 val id = pathParts[pathParts.size - 1]
                 val currentOp = engine.apps().operations().get(project, id).execute()!!
 
@@ -39,6 +39,10 @@ abstract class GAEBaseDeleter : BaseDeleter() {
                     return
                 }
                 Thread.sleep(SLEEP_IN_LOOPS_MS)
+                if (currentTimeMillis() - lastPrint > 15_000L) {
+                    println("Waiting on operation ${op.metadata.get("method")} for ${op.metadata.get("target")}")
+                    lastPrint = currentTimeMillis()
+                }
             }
             println()
             if (currentTimeMillis() >= timeout) {

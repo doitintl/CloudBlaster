@@ -31,12 +31,13 @@ class GKETest(project: String) : TestBase(project) {
 
         val cluster = Cluster().setName(name).setInitialNodeCount(1)
         val createClusterReq = CreateClusterRequest().setParent(path).setCluster(cluster)
-        val op =
-            getContainerService().projects().zones().clusters().create(project, location, createClusterReq).execute()!!
+        val op = getContainerService().projects().zones().clusters()
+            .create(project, location, createClusterReq).execute()!!
+
         GKEClusterDeleter.waitOnZonalOperation(project, location, op)
         val pattern = GKEClusterDeleter().pathPatterns.first { it.contains("zones") }
         val clusterPath = pathForAsset(pattern, project, name, location)
-         return listOf(clusterPath)
+        return listOf(clusterPath)
     }
 
     override fun identifierIsFullPath(): Boolean {

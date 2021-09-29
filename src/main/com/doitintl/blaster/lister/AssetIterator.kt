@@ -22,7 +22,7 @@ class AssetIterator {
                 apiIdentifiers = emptyList()
 
             }
-
+            var count = 0
             var request = ListAssetsRequest.newBuilder()
                 .setParent(ProjectName.of(projectId).toString())
                 .addAllAssetTypes(apiIdentifiers)
@@ -32,6 +32,7 @@ class AssetIterator {
             var response = client.listAssets(request)
             iterateListingResponse(response, callback, noFilter, assetTypeMap)
             while (response.nextPageToken.isNotEmpty()) {
+                // Each page is approx 1600 assets
                 request = request.toBuilder().setPageToken(response.nextPageToken).build()
                 response = client.listAssets(request)
                 iterateListingResponse(response, callback, noFilter, assetTypeMap)
@@ -43,8 +44,9 @@ class AssetIterator {
         response: AssetServiceClient.ListAssetsPagedResponse,
         callback: Callback<String>,
         noFilter: Boolean,
-        assetTypeMap: AssetTypeMap
-    ) {
+        assetTypeMap: AssetTypeMap,
+
+        ) {
         for (asset in response.iterateAll()) {
             val matched: Boolean =
                 if (noFilter) {//Just printing ALL assets
@@ -64,5 +66,6 @@ class AssetIterator {
                 callback.call(asset.name)
             }
         }
+
     }
 }

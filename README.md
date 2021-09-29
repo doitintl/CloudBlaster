@@ -93,11 +93,12 @@ asset B is gone, you delete B first, then A.
          * Implement a subclass of `BaseDeleter` alongside
           [the others](https://github.com/doitintl/CloudBlaster/tree/master/src/main/com/doitintl/blaster/deleters),
           which you can use as examples.
-                                                     c, 
+                                                      
 ### Testing
 * Run `tester.sh <PROJECT_ID>`
 * This is an integration test rather than a unit test, which is why it is not in a
-JUnit/TestNG suite that would be run on every CI build. 
+suite (JUnit/TestNG) that would be run on every CI build. 
+* Code coverage is 90% as of 2021-09-29
 * Integration tests exist for asset types in GKE, GCE Instances, Disks, Addresses, and Firewalls, 
 GAE Services, GCS regional and multiregional Buckets, CloudRun Services, and PubSub Topics and Subscriptions.
 * The test creates an asset of each type, confirms that it 
