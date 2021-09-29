@@ -1,5 +1,7 @@
 package com.doitintl.blaster.shared
 
+import com.doitintl.blaster.lister.LIST_THESE
+import com.doitintl.blaster.lister.REGEX
 import com.doitintl.blaster.shared.Constants.LIST_FILTER_YAML
 import org.yaml.snakeyaml.DumperOptions
 import org.yaml.snakeyaml.Yaml
@@ -8,19 +10,23 @@ import java.io.FileInputStream
 import java.io.FileWriter
 import java.util.*
 
-fun writeTempFilterYaml(
-    assetTypeIds: List<String>?,
-    sfx: String?,
-    makeFilter_fun: (assetTypeId: String?, assetTypeIds: List<String>?, sfx: String?) -> Map<String, Any>
-): File {
+fun writeTempFilterYaml(assetTypeIds: List<String>, sfx: String): File {
     FileInputStream(LIST_FILTER_YAML).use { `in` ->
         for (o in Yaml().loadAll(`in`)) {
             val filtersFromYaml = o as Map<String, Map<String, Any>>//The inner Map is Boolean|String
             val filtersFromYamlOut = TreeMap<String, Map<String, Any>>()
-            for (assetType: String in filtersFromYaml.keys) {
-
-                val filterForThisAssetType = makeFilter_fun(assetType, assetTypeIds, sfx)
-                filtersFromYamlOut[assetType] = filterForThisAssetType
+            for (assetTypeId: String in filtersFromYaml.keys) {
+                val filterForThisAssetType = if (assetTypeIds.contains(assetTypeId)) {
+                    val findAll = if (sfx.isBlank()) {
+                        ".*"
+                    } else {
+                        ".*$sfx.*"
+                    }
+                    mapOf(REGEX to findAll, LIST_THESE to true)
+                } else {
+                    mapOf(REGEX to ".*", LIST_THESE to false)
+                }
+                filtersFromYamlOut[assetTypeId] = filterForThisAssetType
 
             }
 

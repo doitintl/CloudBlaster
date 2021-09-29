@@ -1,7 +1,6 @@
 package com.doitintl.blaster.test
 
-import com.doitintl.blaster.lister.LIST_THESE
-import com.doitintl.blaster.lister.REGEX
+import com.doitintl.blaster.lister.AssetTypeMap
 import com.doitintl.blaster.shared.Constants.ASSET_LIST_FILE
 import com.doitintl.blaster.shared.Constants.COMMENT_READY_TO_DELETE
 import com.doitintl.blaster.shared.Constants.ID
@@ -87,14 +86,14 @@ abstract class TestBase(val project: String, private val sfx: String = randomStr
                 }
             }
 
-        waitOnUnfilteredOutput(some, "deletion", assets)
+        waitForAssets(some, "deletion", assets)
 
 
         // We assert that there are no assets with this sfx string in them.
         // If we are using fullPath, then we could assert that that there are no assets with this full path in them.
         // However, we already do that in waitOnUnfilteredOutput (line above) so it is not useful.
         if (!identifierIsFullPath()) {
-            val allAssets = listAllAssetsUnfiltered()
+            val allAssets = listAllAssetsForAllSupportedAssetTypes()
             assert(!allAssets.contains(sfx)) {
                 val foundLines = allAssets.split("\n").filter { it.contains(sfx) }.joinToString("\n")
                 "Found suffix $sfx in unfiltered output:\n$foundLines"
@@ -142,7 +141,7 @@ abstract class TestBase(val project: String, private val sfx: String = randomStr
             }
         }
 
-        waitOnUnfilteredOutput(notAll, "creation", assets)
+        waitForAssets(notAll, "creation", assets)
         return assets
     }
 
@@ -177,17 +176,32 @@ abstract class TestBase(val project: String, private val sfx: String = randomStr
         }
     }
 
-    private fun listAllAssetsUnfiltered(): String {
+    /**
+     * We could instead list here ALL assets (see --no-filter option).
+     * That would achieve test coverage on that option,
+     * We don't do that simply to speed up the tests, as there can be very many assets across all GCP asset types.
+     */
+    private fun listAllAssetsForAllSupportedAssetTypes(): String {
         val outputTempFile = createTempFile("all-assets$sfx", ".txt")
         outputTempFile.deleteOnExit()
-        lister(arrayOf("--project", project, "--output-file", outputTempFile.absolutePath, "--no-filter"))
+        val filterTempFile = writeTempFilterYaml(AssetTypeMap().assetTypeIds(), "")
+        lister(
+            arrayOf(
+                "--project",
+                project,
+                "--output-file",
+                outputTempFile.absolutePath,
+                "--filter-file",
+                filterTempFile.absolutePath
+            )
+        )
         return outputTempFile.readText()
     }
 
 
     private fun listAssetsWithFilter(sfx: String, project: String, expected: List<String>? = null): Pair<File, File> {
 
-        val tempFilterFilePath = writeTempFilterYaml(assetTypeIds(), sfx, ::makeFilter)
+        val tempFilterFilePath = writeTempFilterYaml(assetTypeIds(), sfx)
         val tempAssetsToDeleteFile = createTempFile("$ASSET_LIST_FILE-$sfx", ".txt")
         tempAssetsToDeleteFile.deleteOnExit()
         lister(
@@ -213,7 +227,11 @@ abstract class TestBase(val project: String, private val sfx: String = randomStr
     }
 
 
-    private fun waitOnUnfilteredOutput(
+    /* After creating, we wait until the assets appear in the unfiltered output.
+    After deleting, we wait until they do NOT appear.
+
+     */
+    private fun waitForAssets(
         waitCondition: (String, List<String>) -> Boolean, phase: String, expected: List<String>,
     ) {
 
@@ -221,11 +239,11 @@ abstract class TestBase(val project: String, private val sfx: String = randomStr
         val timeout = start + timeOutForCreateOrDelete()
 
         while (true) {
-            val allAssets = listAllAssetsUnfiltered()
+            val allAssets = listAllAssetsForAllSupportedAssetTypes()
             if (!waitCondition(allAssets, expected) || currentTimeMillis() > timeout) {
                 break
             }
-            Thread.sleep(2000) // To avoid exceeding Asset Service quota
+            Thread.sleep(3000) // To avoid exceeding Asset Service quota
             println("Waiting for $phase in ${this::class.simpleName}: ${(currentTimeMillis() - start) / 1000}s passed")
         }
 
@@ -235,12 +253,15 @@ abstract class TestBase(val project: String, private val sfx: String = randomStr
     }
 
     /**
-     * Timeout on waiting after an object is created/deleted before this is reflected
-     * by the results of the Asset service. May take longer for GKE, for example.
-     * But: Note that asset creation in the test blocks, so after asset creation,
-     * the asset exists. The only question is whether the Asset Service shows it.
-     * Deletion, however, does not block, so the waitTimeMillis is partially
-     * a wait for deletion to complete.
+     * Timeout on waiting after an object is created/deleted, since it may take time
+     * before this is reflected by the results of the Asset service.
+     * Subclasses may give a larger value where times are long, e.g. GKE.
+     *
+     * But: Note that asset creation in these test blocks, so after asset creation,
+     * the asset exists.
+     *
+     * The only question is whether the Asset Service shows it.
+     * Deletion, however, does not block, so the wait is allowing for deletion to complete.
      */
     open fun timeOutForCreateOrDelete(): Long {
         val twoMin = 2 * 60 * 1000L
@@ -248,35 +269,15 @@ abstract class TestBase(val project: String, private val sfx: String = randomStr
     }
 
 
-    private fun makeFilter(
-        assetTypeId: String?,
-        assetTypeIds: List<String>?,
-        sfx: String?
-    ): Map<String, Any> {
-
-        assert(sfx != null)
-        return if (assetTypeIds!!.contains(assetTypeId!!)) {
-            mapOf(REGEX to ".*$sfx.*", LIST_THESE to true)
-        } else {
-            mapOf(REGEX to ".*", LIST_THESE to false)
-        }
-    }
-
     private fun validateAssetTypeIds() {
-
-        val knownIds = mutableListOf<String>()
         FileInputStream(LIST_FILTER_YAML).use { `in` ->
+            val rootList = Yaml().loadAll(`in`).toList()
+            assert(rootList.size == 1) { rootList.size }
+            val filtersFromYaml = rootList.first() as Map<String, Map<String, Any>> //The Any is Boolean|String
+            val knownIds = filtersFromYaml.keys.toList()
+            val missing = assetTypeIds().filter { !knownIds.contains(it) }
+            assert(missing.isEmpty()) { "$missing unknown; see asset-types.properties for valid API identifiers" }
 
-            for (o in Yaml().loadAll(`in`)) {
-                val filtersFromYaml = o as Map<String, Map<String, Any>>//The Any is Boolean|String
-                for (assetTypeId in filtersFromYaml.keys) {
-                    knownIds.add(assetTypeId)
-                }
-            }
-        }
-
-        assetTypeIds().forEach {
-            assert(knownIds.contains(it)) { "$it unknown; see asset-types.properties for valid API identifiers" }
         }
     }
 

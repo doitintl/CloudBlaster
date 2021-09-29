@@ -11,21 +11,19 @@ class AssetIterator {
     fun listAssets(projectId: String, callback: Callback<String>, noFilter: Boolean, filterFile: String) {
 
         AssetServiceClient.create().use { client ->
-
             val contentType = ContentType.CONTENT_TYPE_UNSPECIFIED
             val assetTypeMap = AssetTypeMap(filterFile)
-            var apiIdentifiers: List<String> = assetTypeMap.identifiers()
-            if (apiIdentifiers.isEmpty()) {
+            var supportedAssetTypeIds: List<String> = assetTypeMap.assetTypeIds()
+            if (supportedAssetTypeIds.isEmpty()) {
                 throw IllegalConfigException("No asset types in config file")
             }
             if (noFilter) {
-                apiIdentifiers = emptyList()
+                supportedAssetTypeIds = emptyList()
 
             }
-            var count = 0
             var request = ListAssetsRequest.newBuilder()
                 .setParent(ProjectName.of(projectId).toString())
-                .addAllAssetTypes(apiIdentifiers)
+                .addAllAssetTypes(supportedAssetTypeIds)
                 .setContentType(contentType)
                 .build()
 

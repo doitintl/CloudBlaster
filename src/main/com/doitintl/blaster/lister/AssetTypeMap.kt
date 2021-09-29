@@ -2,19 +2,21 @@ package com.doitintl.blaster.lister
 
 import com.doitintl.blaster.deleter.AssetTypeDeleter
 import com.doitintl.blaster.lister.AssetTypeMap.Companion.ASSET_TYPES_FILE
-import com.doitintl.blaster.shared.IllegalCodePathException
 import com.doitintl.blaster.shared.IllegalConfigException
 import org.yaml.snakeyaml.Yaml
 import java.io.FileInputStream
 import java.io.FileReader
 import java.util.*
-import java.util.stream.Collectors
 import kotlin.reflect.KClass
 
 val assetTypeRegex: Regex = Regex("""[a-z]+\.googleapis\.com/[a-zA-Z]+""")
 const val REGEX = "regex"
 const val LIST_THESE = "listThese"
 
+/**
+ * null filterFile means unfiltered
+ *
+ */
 class AssetTypeMap(private val filterFile: String? = null) {
 
     private val assetTypeMap: Map<String, AssetType>
@@ -39,8 +41,8 @@ class AssetTypeMap(private val filterFile: String? = null) {
         return ret
     }
 
-    fun identifiers(): List<String> {
-        return assetTypeMap.values.stream().map { it.assetTypeId }.collect(Collectors.toList())
+    fun assetTypeIds(): List<String> {
+        return assetTypeMap.keys.toList()
     }
 
     private operator fun get(assetTypeIdentifier: String): AssetType {
@@ -68,39 +70,34 @@ class AssetTypeMap(private val filterFile: String? = null) {
             }
         } else {
             FileInputStream(filterFile).use { `in` ->
-                var count = 0
-                for (o in Yaml().loadAll(`in`)) {
+                val rootList = Yaml().loadAll(`in`).toList()
+                assert(rootList.size == 1) { rootList.size }
+                val filtersFromYaml = rootList.first() as Map<String, Map<String, Any>> //The Any is Boolean|String
 
-                    count++
-                    if (count > 1) {
-                        throw IllegalConfigException("Should have only one root-level map in the $filterFile")
-                    }
-                    val filtersFromYaml = o as Map<String, Map<String, Any>>//The Any is Boolean|String
-                    for (assetTypeId in filtersFromYaml.keys) {
-                        val filter = filtersFromYaml[assetTypeId] ?: mapOf()
+                for (assetTypeId in filtersFromYaml.keys) {
+                    val filter = filtersFromYaml[assetTypeId] ?: mapOf()
 
-                        val error =
-                            "$assetTypeId has keys ${filter.keys.toList()} but should have either none or \"$REGEX\" and \"$LIST_THESE\""
-                        val assetType = assetTypeMap_inout[assetTypeId] ?: error("$assetTypeId not found")
-                        when (filter.size) {//either empty, or else we have REGEX and LIST_THESE as keys
-                            0 -> {
-                                assetType.setFilterRegex(".*", true)
-                            }
-                            2 -> {
-                                if (filter.keys.toSet() != setOf(REGEX, LIST_THESE)) {
-                                    throw IllegalConfigException(error)
-                                } else {
-                                    val listThese = filter[LIST_THESE] as Boolean
-                                    val regexS = (filter[REGEX] as String).trim()
-
-                                    if (regexS.isEmpty()) {
-                                        throw IllegalArgumentException("$assetTypeId has blank $REGEX. Either omit $REGEX and $LIST_THESE or give a value")
-                                    }
-                                    assetType.setFilterRegex(regexS, listThese)
-                                }
-                            }
-                            else -> throw IllegalArgumentException(error)
+                    val error =
+                        "$assetTypeId has keys ${filter.keys.toList()} but should have either none or \"$REGEX\" and \"$LIST_THESE\""
+                    val assetType = assetTypeMap_inout[assetTypeId] ?: error("$assetTypeId not found")
+                    when (filter.size) {//either empty, or else we have REGEX and LIST_THESE as keys
+                        0 -> {
+                            assetType.setFilterRegex(".*", true)
                         }
+                        2 -> {
+                            if (filter.keys.toSet() != setOf(REGEX, LIST_THESE)) {
+                                throw IllegalConfigException(error)
+                            } else {
+                                val listThese = filter[LIST_THESE] as Boolean
+                                val regexS = (filter[REGEX] as String).trim()
+
+                                if (regexS.isEmpty()) {
+                                    throw IllegalArgumentException("$assetTypeId has blank $REGEX. Either omit $REGEX and $LIST_THESE or give a value")
+                                }
+                                assetType.setFilterRegex(regexS, listThese)
+                            }
+                        }
+                        else -> throw IllegalArgumentException(error)
                     }
                 }
             }
@@ -140,18 +137,13 @@ class AssetTypeMap(private val filterFile: String? = null) {
         }
 
         fun filterKeys(fileName: String): List<String> {
-
             FileReader(fileName).use { `in` ->
-                for (o in Yaml().loadAll(`in`)) {
-                    //only one object in root
-                    val filtersFromYaml = o as Map<String, Map<String, Any>>
-                    return filtersFromYaml.keys.toList()
-                }
+                val rootList = Yaml().loadAll(`in`).toList()
+                assert(rootList.size == 1) { rootList.size }
+                val filtersFromYaml = rootList.first() as Map<String, Map<String, Any>> //The Any is Boolean|String
+                return filtersFromYaml.keys.toList()
             }
-            throw IllegalCodePathException("Should not reach here")
-
         }
-
 
         var errMessage = ""
         val at = assetTypeConfigKeys(ASSET_TYPES_FILE)
