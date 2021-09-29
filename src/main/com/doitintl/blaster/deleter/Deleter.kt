@@ -26,6 +26,9 @@ class Deleter : Callable<Int> {
     @CommandLine.Option(names = ["-d", "--assets-to-delete-file"])
     private var assetsToDeleteFile: String = ASSET_LIST_FILE
 
+    /**
+     * todo: Does this filter have any value? Can we pass null to AssetTypeMap?
+     */
     @CommandLine.Option(names = ["-f", "--filter-file"])
     private var filterFile: String = LIST_FILTER_YAML
 

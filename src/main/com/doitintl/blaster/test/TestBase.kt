@@ -55,21 +55,42 @@ abstract class TestBase(val project: String, private val sfx: String = randomStr
         return try {
             val assets = creationPhase(sfx, project)
             val (tempAssetToDeleteFile, tempFilterFile) = listAssetsWithFilter(sfx, project, assets)
-            val content = tempAssetToDeleteFile.readText()
-            //Put COMMENT_READY_TO_DELETE at end, and in upper case, to test a slightly unusual but supported case
-            FileWriter(tempAssetToDeleteFile).use { fw ->
-                fw.write(
-                    content + "\n" + COMMENT_READY_TO_DELETE.toUpperCase()
-                )
-            }
+            addDeletionEnablement(tempAssetToDeleteFile)
 
             deletionPhase(tempAssetToDeleteFile, tempFilterFile, assets)
             println("Success ${this::class.simpleName}")
             true
         } catch (th: Throwable) {
+            finalNonblockingCleanup()
+
             System.err.println("Error in ${this::class.simpleName}: ${th.stackTraceToString()}")
             false
         }
+    }
+
+    private fun addDeletionEnablement(tempAssetToDeleteFile: File) {
+        val content = tempAssetToDeleteFile.readText()
+        //Put COMMENT_READY_TO_DELETE at end, and in upper case, to test a slightly unusual but supported case
+        FileWriter(tempAssetToDeleteFile).use { fw ->
+            fw.write(
+                content + "\n" + COMMENT_READY_TO_DELETE.toUpperCase()
+            )
+        }
+    }
+
+    fun finalNonblockingCleanup() {
+        System.err.println("finalNonblockingCleanup: $sfx")
+        val (tempAssetToDeleteFile, tempFilterFile) = listAssetsWithFilter(sfx, project)
+        addDeletionEnablement(tempAssetToDeleteFile)
+
+        deleter(
+            arrayOf(
+                "--assets-to-delete-file",
+                tempAssetToDeleteFile.absolutePath,
+                "--filter-file",
+                tempFilterFile.absolutePath
+            )
+        )
     }
 
     fun assetName(type: String): String {
@@ -155,7 +176,7 @@ abstract class TestBase(val project: String, private val sfx: String = randomStr
     }
 
 
-    private fun listAssetsWithFilter(sfx: String, project: String, expected: List<String>): Pair<File, File> {
+    private fun listAssetsWithFilter(sfx: String, project: String, expected: List<String>? = null): Pair<File, File> {
         val tempFilterFilePath = writeTempFilterYaml(assetTypeIds(), sfx, ::makeFilter)
         val tempAssetsToDeleteFile = createTempFile("$ASSET_LIST_FILE-$sfx", ".txt")
         tempAssetsToDeleteFile.deleteOnExit()
@@ -171,10 +192,13 @@ abstract class TestBase(val project: String, private val sfx: String = randomStr
         )
         val outputRaw = tempAssetsToDeleteFile.readText()
         val output = noComment(outputRaw)
-        assert(expected.all { output.contains(it) }) { "expected $expected \nbut output $output" }
-        val filteredLines = output.split("\n").filter { it.isNotBlank() }
+        if (expected != null) {
+            assert(expected.all { output.contains(it) }) { "expected $expected \nbut output $output" }
 
-        assert(expected.size == filteredLines.size) { "expected $expected\noutput $output" }
+            val filteredLines = output.split("\n").filter { it.isNotBlank() }
+
+            assert(expected.size == filteredLines.size) { "expected $expected\noutput $output" }
+        }
         return Pair(tempAssetsToDeleteFile, tempFilterFilePath)
     }
 

@@ -36,36 +36,6 @@ private fun runAsync(
 
 }
 
-fun main(vararg args: String) {
-    val start = currentTimeMillis()
-    if (args.isEmpty()) {
-        System.err.println("Must provide project as first arg")
-        exitProcess(1)
-    }
-    val project = args[0]
-    println("Project $project")
-    val classes: List<KClass<out TestBase>> = listOf(
-        GKETest::class,
-        CloudRunTest::class,
-        GAEServiceTest::class,
-        BucketTest::class,
-        PubSubTest::class,
-        GCETest::class,
-    )
-
-    val (successes, failures) = runAsync(classes, project)
-    val elapsedTimeSec = (currentTimeMillis() - start) / 1000
-    println("TestRunner total time: ${elapsedTimeSec}s")
-    if (failures.isNotEmpty()) {
-        System.err.println("Done with ${failures.size} failures: ${failures.joinToString(",")}")
-        messageForCleanup(project)
-        exitProcess(1)
-    } else {
-        println("TestRunner Done. Success in all ${successes.size} tests")
-    }
-
-}
-
 
 fun messageForCleanup(project: String) {
     val unfiltered =
@@ -91,4 +61,36 @@ fun messageForCleanup(project: String) {
     val lines = found.split("\n")
     val linesS = lines.subList(1, lines.lastIndex).joinToString("\n")
     System.err.println("\nTest failed: Check project $project for undeleted test assets. Assets found were:\n\n$linesS")
+}
+
+
+fun main(vararg args: String) {
+    val start = currentTimeMillis()
+    if (args.isEmpty()) {
+        System.err.println("Must provide project as first arg")
+        exitProcess(1)
+    }
+    val project = args[0]
+    println("Project $project")
+    val classes: List<KClass<out TestBase>> = listOf(
+        GKETest::class,
+        CloudRunTest::class,
+        GAEServiceTest::class,
+        BucketTest::class,
+        PubSubTest::class,
+        GCETest::class,
+    )
+
+    val (successes, failures) = runAsync(classes, project)
+    val elapsedTimeSec = (currentTimeMillis() - start) / 1000
+    println("TestRunner total time: ${elapsedTimeSec}s")
+
+    if (failures.isNotEmpty()) {
+        System.err.println("Done with ${failures.size} failures: ${failures.joinToString(",")}")
+        messageForCleanup(project)
+        exitProcess(1)
+    } else {
+        println("TestRunner Done. Success in all ${successes.size} tests")
+    }
+
 }
