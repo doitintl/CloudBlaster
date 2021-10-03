@@ -40,7 +40,13 @@ abstract class GAEBaseDeleter : BaseDeleter() {
                 }
                 Thread.sleep(SLEEP_IN_LOOPS_MS)
                 if (currentTimeMillis() - lastPrint > 15_000L) {
-                    println("Waiting on operation ${op.metadata.get("method")} for ${op.metadata.get("target")}")
+                    println(
+                        "${(currentTimeMillis() - start) / 1000}s waiting on operation ${op.metadata.get("method")} for ${
+                            op.metadata.get(
+                                "target"
+                            )
+                        }"
+                    )
                     lastPrint = currentTimeMillis()
                 }
             }

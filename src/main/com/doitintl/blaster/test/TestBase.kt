@@ -1,26 +1,26 @@
 package com.doitintl.blaster.test
 
 import com.doitintl.blaster.lister.AssetTypeMap
+import com.doitintl.blaster.shared.*
 import com.doitintl.blaster.shared.Constants.ASSET_LIST_FILE
 import com.doitintl.blaster.shared.Constants.COMMENT_READY_TO_DELETE
 import com.doitintl.blaster.shared.Constants.ID
 import com.doitintl.blaster.shared.Constants.LIST_FILTER_YAML
 import com.doitintl.blaster.shared.Constants.LOCATION
 import com.doitintl.blaster.shared.Constants.PROJECT
-import com.doitintl.blaster.shared.TimeoutException
-import com.doitintl.blaster.shared.noComment
-import com.doitintl.blaster.shared.randomString
-import com.doitintl.blaster.shared.writeTempFilterYaml
 import org.yaml.snakeyaml.Yaml
 import java.io.File
 import java.io.FileInputStream
+import java.io.FileNotFoundException
 import java.io.FileWriter
 import java.lang.System.currentTimeMillis
 import kotlin.system.exitProcess
+import kotlin.system.measureTimeMillis
 import com.doitintl.blaster.deleter.main as deleter
 import com.doitintl.blaster.lister.main as lister
 
 abstract class TestBase(val project: String, private val sfx: String = randomString(8)) {
+    val testInput = "test-input"
 
 
     /**
@@ -125,8 +125,17 @@ abstract class TestBase(val project: String, private val sfx: String = randomStr
         )
     }
 
-    fun assetName(type: String): String {
-        return "blastertest-$type-$sfx"
+    fun assetName(assetTypeShortId: String): String {
+        assert(assetTypeShortId == assetTypeShortId.toLowerCase())
+        return "blastertest${assetNameSeparator()}${assetTypeShortId}${assetNameSeparator()}$sfx"
+    }
+
+    /**
+     * A char that is legal for this asset type. Used to build asset name in form:
+     * blastertest-disk-tejika
+     */
+    open fun assetNameSeparator(): String {
+        return "-"
     }
 
     private fun creationPhase(sfx: String, project: String): List<String> {
@@ -244,7 +253,7 @@ abstract class TestBase(val project: String, private val sfx: String = randomStr
                 break
             }
             Thread.sleep(3000) // To avoid exceeding Asset Service quota
-            println("Waiting for $phase in ${this::class.simpleName}: ${(currentTimeMillis() - start) / 1000}s passed")
+            println("${(currentTimeMillis() - start) / 1000}s waiting for $phase in ${this::class.simpleName}")
         }
 
         if (currentTimeMillis() >= timeout) {
@@ -310,6 +319,49 @@ abstract class TestBase(val project: String, private val sfx: String = randomStr
         assert(ret != pattern)
         assert(!ret.contains("{"))
         return ret
+    }
+
+    fun createAssetByRunningDeployScript(assetName: String, dir: String) {
+        assert(assetName.contains(sfx)) { "Pass full asset name with random sfx" }
+        val testInput = "test-input"
+        if (dir.toString().contains("/$testInput/")) {
+            throw IllegalStateException("Do not pass $testInput dir but rather a subdir")
+        }
+        val workingDir = File("./$testInput/$dir")
+        assert((workingDir).isDirectory) { "$workingDir is not a directory" }
+
+        val timeInMillis = measureTimeMillis {
+            runCommand("./deploy.sh $project $assetName", workingDir)
+        }
+        println("Deployed in ${this::class.simpleName} in ${timeInMillis / 1000} s")
+
+    }
+
+    fun makeTempFileFromTemplate(
+        assetName: String,
+        templateFileBaseName: String,
+        subdir: String
+    ) {
+        assert(!subdir.contains("/$testInput/"), { "pass subdir of $testInput, not including $testInput" })
+        val dir = File("./" + testInput, subdir)
+        val dotTemplate = ".template"
+        assert(!templateFileBaseName.endsWith(dotTemplate)) { "Pass base name, not template" }
+
+        val file = File(dir, templateFileBaseName + dotTemplate)
+        if (!file.isFile) {
+            throw FileNotFoundException(file.absolutePath)
+        }
+        val templateContent = file.readText()
+
+        val content = templateContent.replace("ASSET_NAME", assetName)
+
+
+        assert(content != templateContent)
+        val outputFile = File(dir, templateFileBaseName)
+        outputFile.deleteOnExit()
+        FileWriter(outputFile).use { fw ->
+            fw.write(content)
+        }
     }
 
 

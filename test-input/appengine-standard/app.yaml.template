@@ -1,2 +1,2 @@
 runtime: python38
-service: SERVICE
+service: ASSET_NAME

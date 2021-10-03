@@ -40,14 +40,14 @@ class GKEClusterDeleter : BaseDeleter() {
                 .build()
         }
 
-        fun waitOnZonalOperation(project: String, location: String, operation: Operation) {
+        fun waitOnZonalOperation(project: String, location: String, op: Operation) {
             val start = currentTimeMillis()
             val fourMin = 1000 * 60 * 4
             val timeout = start + fourMin
             var lastPrint = -1L
             while (currentTimeMillis() < timeout) {
                 val currentOperation = getContainerService().projects().zones().operations()
-                    .get(project, location, operation.name)
+                    .get(project, location, op.name)
                     .execute()
 
                 if (currentOperation.status == "DONE") {
@@ -55,7 +55,7 @@ class GKEClusterDeleter : BaseDeleter() {
                 }
                 Thread.sleep(SLEEP_IN_LOOPS_MS)
                 if (currentTimeMillis() - lastPrint > 15_000L) {
-                    println("Waiting on ${operation.operationType}")
+                    println("${(currentTimeMillis() - start) / 1000}s waiting on ${op.operationType} for ${op.targetLink}")
                     lastPrint = currentTimeMillis()
                 }
             }

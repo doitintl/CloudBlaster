@@ -9,6 +9,7 @@ private val GROUP_NAMES_IN_REGEX = Regex("""\?<([a-zA-Z][a-zA-Z0-9]*)>""")
 abstract class BaseDeleter : AssetTypeDeleter {
     companion object {
         const val SLEEP_IN_LOOPS_MS: Long = 500 // In loops while waiting for deletion to end
+        const val DONE = "DONE"
     }
 
     override fun delete(line: String) {

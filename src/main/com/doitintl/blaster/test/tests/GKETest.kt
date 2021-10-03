@@ -36,10 +36,12 @@ class GKETest(project: String) : TestBase(project) {
 
         GKEClusterDeleter.waitOnZonalOperation(project, location, op)
         val pattern = GKEClusterDeleter().pathPatterns.first { it.contains("zones") }
-        val clusterPath = pathForAsset(pattern, project, name, location)
-        return listOf(clusterPath)
+        //using full path because secondary assets (nodes, node pools) will be created
+        val fullPath = pathForAsset(pattern, project, name, location)
+        return listOf(fullPath)
     }
 
+    //using full path because secondary assets (nodes, node pools) will be created
     override fun identifierIsFullPath(): Boolean {
         return true
     }

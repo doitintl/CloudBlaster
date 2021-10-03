@@ -99,12 +99,23 @@ asset B is gone, you delete B first, then A.
 * This is an integration test rather than a unit test, which is why it is not in a
 suite (JUnit/TestNG) that would be run on every CI build. 
 * Code coverage is 90% as of 2021-09-29
-* Integration tests exist for asset types in GKE, GCE Instances, Disks, Addresses, and Firewalls, 
-GAE Services, GCS regional and multiregional Buckets, CloudRun Services, and PubSub Topics and Subscriptions.
+* Integration tests exist for asset types in 
+   * GKE
+   * GCE Instances, Disks, Addresses, and Firewalls,
+   * GAE Services
+   * GCS regional and multiregional Buckets
+   * CloudRun Services
+   * PubSub Topics and Subscriptions.
+   * Cloud Functions
+* Not covered by the automated test (but tested manually)
+   * LoggingMetrics,  because they take up to 7 hours to appear in the Asset Service,
+    [as documented](https://cloud.google.com/asset-inventory/docs/supported-asset-types#:~:text=Cloud%20Logging).
+   * GAEVersions, because they are subsumed by GAE Services (See `GAEServiceTest` for comment)
+   * SQL Instances, because these take 10 minutes to be created.
 * The test creates an asset of each type, confirms that it 
 exists, then runs the deleter, then confirms that the asset does not exist.
-* Since cloud operations can take several minutes each, it tests ach asset type in parallel
-(grouping together some asset types like all GCE asset types)  
+* Since cloud operations can take several minutes each, it tests each asset type in parallel
+(grouping together some, like the GCE asset types)  
 * Since it works with real cloud assets and blocks on each creation/deletion operation,
 it is not robust. Permissions errors, slow response from the cloud, etc., can cause test failure. 
 * The Lister/Deleter are normally run is more robust than the Test because

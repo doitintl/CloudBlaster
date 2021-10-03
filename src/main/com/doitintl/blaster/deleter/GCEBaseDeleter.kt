@@ -14,6 +14,7 @@ abstract class GCEBaseDeleter : BaseDeleter() {
     companion object {
         private const val twoMin = 1000 * 60 * 2
 
+
         fun getComputeService(): Compute {
             val httpTransport = GoogleNetHttpTransport.newTrustedTransport()
             val jsonFactory = JacksonFactory.getDefaultInstance()
@@ -30,62 +31,60 @@ abstract class GCEBaseDeleter : BaseDeleter() {
         fun waitOnZonalOperation(
             project: String,
             location: String,
-            operation: Operation
+            op: Operation
         ) {
             val start = currentTimeMillis()
 
             val timeout = start + twoMin
             var lastPrint = -1L
             while (currentTimeMillis() < timeout) {
-                val currentOperation: Operation = getComputeService()
-                    .zoneOperations()
-                    .get(project, location, operation.name)
-                    .execute()
-                if (currentOperation.status == "DONE") {
+                if (DONE == getComputeService()
+                        .zoneOperations()
+                        .get(project, location, op.name)
+                        .execute().status
+                ) {
                     return
                 }
-                Thread.sleep(SLEEP_IN_LOOPS_MS)
-                if (currentTimeMillis() - lastPrint > 15_000L) {
-                    println("Waiting on ${operation.operationType} for ${operation.targetLink}")
-                    lastPrint = currentTimeMillis()
-                }
+                lastPrint = waiting(lastPrint, start, op)
             }
         }
 
-        fun waitOnRegionalOperation(project: String, location: String, operation: Operation) {
+        private fun waiting(lastPrint: Long, start: Long, op: Operation): Long {
+            var ret = lastPrint
+
+            Thread.sleep(SLEEP_IN_LOOPS_MS)
+            if (currentTimeMillis() - ret > 15_000L) {
+                println("${(currentTimeMillis() - start) / 1000}s waiting on ${op.operationType} for ${op.targetLink}")
+                ret = currentTimeMillis()
+            }
+            return ret
+        }
+
+        fun waitOnRegionalOperation(project: String, location: String, op: Operation) {
             val start = currentTimeMillis()
             val timeout = start + twoMin
             var lastPrint = -1L
             while (currentTimeMillis() < timeout) {
-                val currentOperation: Operation = getComputeService()
-                    .regionOperations().get(project, location, operation.name).execute()
-                if (currentOperation.status == "DONE") {
+                if (DONE == getComputeService().regionOperations().get(project, location, op.name).execute().status) {
                     return
                 }
-                Thread.sleep(SLEEP_IN_LOOPS_MS)
-                if (currentTimeMillis() - lastPrint > 15_000L) {
-                    println("Waiting on ${operation.operationType} for ${operation.targetLink}")
-                    lastPrint = currentTimeMillis()
-                }
+                lastPrint = waiting(lastPrint, start, op)
             }
         }
 
-        fun waitOnGlobalOperation(project: String, operation: Operation) {
+        fun waitOnGlobalOperation(project: String, op: Operation) {
             val start = currentTimeMillis()
 
             val timeout = start + twoMin
             var lastPrint = -1L
             while (currentTimeMillis() < timeout) {
-                val currentOperation: Operation = getComputeService()
-                    .globalOperations().get(project, operation.name).execute()
-                if (currentOperation.status == "DONE") {
+                if (DONE == getComputeService()
+                        .globalOperations().get(project, op.name).execute().status
+                ) {
                     return
                 }
-                Thread.sleep(SLEEP_IN_LOOPS_MS)
-                if (currentTimeMillis() - lastPrint > 15_000L) {
-                    println("Waiting on ${operation.operationType} for ${operation.targetLink}")
-                    lastPrint = currentTimeMillis()
-                }
+                lastPrint = waiting(lastPrint, start, op)
+
             }
         }
     }
