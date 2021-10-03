@@ -1,0 +1,2 @@
+def ASSET_NAME(request):
+    return 'Hello from Blaster Test!'

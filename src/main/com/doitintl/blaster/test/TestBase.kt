@@ -126,13 +126,16 @@ abstract class TestBase(val project: String, private val sfx: String = randomStr
     }
 
     fun assetName(assetTypeShortId: String): String {
-        assert(assetTypeShortId == assetTypeShortId.toLowerCase())
+        assert(assetTypeShortId == assetTypeShortId.toLowerCase()) { "Asset ID must be lower-case: $assetTypeShortId" }
+
         return "blastertest${assetNameSeparator()}${assetTypeShortId}${assetNameSeparator()}$sfx"
     }
 
     /**
-     * A char that is legal for this asset type. Used to build asset name in form:
-     * blastertest-disk-tejika
+     * A char that is legal for this asset type. Used to build asset name in the form
+     * blastertest-<ASSET-TYPE>-<RANDOM-STRING>
+     * Override this method where the default value would not work
+     * (For example, in Cloud Functions, where the asset name must also be the name of a function in Python).
      */
     open fun assetNameSeparator(): String {
         return "-"

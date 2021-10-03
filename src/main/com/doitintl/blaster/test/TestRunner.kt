@@ -86,10 +86,10 @@ fun main(vararg args: String) {
         BucketTest::class,
         PubSubTest::class,
         GCETest::class,
-        GKETest::class,
+        CloudFunctionTest::class,
         CloudRunTest::class,
         GAEServiceTest::class,
-        CloudFunctionTest::class,
+        GKETest::class,
     )
 
     val (successes, failures) = runAsync(classes, project)
