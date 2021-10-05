@@ -8,6 +8,7 @@ import com.doitintl.blaster.shared.currentTimeISO
 import picocli.CommandLine
 import java.io.FileWriter
 import java.util.concurrent.Callable
+import kotlin.system.exitProcess
 
 @CommandLine.Command(
     name = CLOUD_BLASTER,
@@ -79,8 +80,5 @@ internal class FileWritingCallback(project: String, filename: String, noFilter: 
 
 fun main(args: Array<String>) {
     val exitCode = CommandLine(Lister()).execute(*args)
-    if (exitCode != 0) {
-        throw RuntimeException(exitCode.toString())
-    }
-
+    exitProcess(exitCode)
 }

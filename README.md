@@ -110,18 +110,18 @@ suite (JUnit/TestNG) that would be run on every CI build.
 * Not covered by the automated test (but tested manually)
    * LoggingMetrics,  because they take up to 7 hours to appear in the Asset Service,
     [as documented](https://cloud.google.com/asset-inventory/docs/supported-asset-types#:~:text=Cloud%20Logging).
-   * GAEVersions, because they are subsumed by GAE Services (See `GAEServiceTest` for comment)
+   * GAE Versions, because they are subsumed by GAE Services (See `GAEServiceTest` for comment)
    * SQL Instances, because these take 10 minutes to be created.
 * The test creates an asset of each type, confirms that it 
 exists, then runs the deleter, then confirms that the asset does not exist.
 * Since cloud operations can take several minutes each, it tests each asset type in parallel
 (grouping together some, like the GCE asset types)  
 * Since it works with real cloud assets and blocks on each creation/deletion operation,
-it is not robust. Permissions errors, slow response from the cloud, etc., can cause test failure. 
-* The Lister/Deleter are normally run is more robust than the Test because
+it is not robust. Permissions errors, extremely slow response from the cloud, etc., can cause test failure. 
+* The functional code, the Lister and Deleter, are more robust than the Test because
 the GCP Asset Service only sees assets some time after they are created. 
 Generally this is within seconds, but for some asset types, much longer. 
-In normal usage, this is not a problem, since you don't clean up immediately, but the test
+In normal usage, this is not a problem, since you don't usually clean up immediately, but the test
 only waits a short time and if it does not see the asset, it will fail. 
      
 
@@ -142,7 +142,7 @@ only waits a short time and if it does not see the asset, it will fail.
  * Safe Scrub is in pure Bash. You may have more confidence as you see the code that it is running, without a compilation step. 
  * Safe Scrub supports more asset types (for now). It supports these asset types that are not supported by Cloud Blaster:
       * GCE routes, instance templates, networks, routers, and load balancers, along with a variety of subassets within LBs
-      * GAE firewall rules
+      * App Engine firewall rules (but does support the more common GCE firewall rules)
       * PubSub snapshots
       
       

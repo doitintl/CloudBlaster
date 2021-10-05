@@ -102,6 +102,7 @@ fun main(vararg args: String) {
         exitProcess(1)
     } else {
         println("TestRunner Done. Success in all ${successes.size} tests")
+        exitProcess(0)
     }
 
 }

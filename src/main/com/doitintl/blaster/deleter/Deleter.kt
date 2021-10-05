@@ -13,6 +13,7 @@ import kotlinx.coroutines.runBlocking
 import picocli.CommandLine
 import java.io.File
 import java.util.concurrent.Callable
+import kotlin.system.exitProcess
 
 @CommandLine.Command(
     name = CLOUD_BLASTER,
@@ -78,7 +79,5 @@ class Deleter : Callable<Int> {
 
 fun main(args: Array<String>) {
     val exitCode = CommandLine(Deleter()).execute(*args)
-    if (exitCode != 0) {
-        throw RuntimeException(exitCode.toString())
-    }
+    exitProcess(exitCode)
 }
