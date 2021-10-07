@@ -23,6 +23,7 @@ building the `asset-list.txt` file.
        * Add a comment line `# Ready to delete` to the top 
        * If you like danger, write a script to add this comment between steps.
        * Then run the Deleter. 
+1. The two-step process also means that if an asset is created between steps, it will not be deleted.
 
 ## Instructions
 

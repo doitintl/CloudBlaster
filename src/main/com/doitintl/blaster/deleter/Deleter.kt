@@ -38,7 +38,7 @@ class Deleter : Callable<Int> {
         val readyToGo = COMMENT_READY_TO_DELETE.substring(2, COMMENT_READY_TO_DELETE.length)
         val commentsStr = comments(allLines).joinToString("\n")
         if (!commentsStr.toLowerCase().contains(readyToGo.toLowerCase())) {
-            throw IllegalArgumentException("Must add \"$readyToGo\" comment to top of $assetsToDeleteFile to enable deletion.")
+            throw IllegalArgumentException("Must add \"$readyToGo\" comment to $assetsToDeleteFile to enable deletion.")
         }
 
         val lines = noComment(allLines)

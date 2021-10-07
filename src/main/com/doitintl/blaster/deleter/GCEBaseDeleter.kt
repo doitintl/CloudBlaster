@@ -54,7 +54,7 @@ abstract class GCEBaseDeleter : BaseDeleter() {
 
             Thread.sleep(SLEEP_IN_LOOPS_MS)
             if (currentTimeMillis() - ret > 15_000L) {
-                println("${(currentTimeMillis() - start) / 1000}s waiting on ${op.operationType} for ${op.targetLink}")
+                println("${(currentTimeMillis() - start) / 1000} s waiting on ${op.operationType} for ${op.targetLink}")
                 ret = currentTimeMillis()
             }
             return ret
