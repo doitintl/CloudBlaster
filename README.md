@@ -19,10 +19,10 @@ To keep it safe, Cloud Blaster has these features.
 1. The Lister can be filtered (see `list-filter.yaml` file) so that specified assets are skipped when 
 building the `asset-list.txt` file.
 1. After running the Lister, you review the list of assets for deletion
-      * Manually edit it.
-       * Add a comment line `# Ready to delete` to the top 
-       * If you like danger, write a script to add this comment between steps.
-       * Then run the Deleter. 
+    * Manually edit it.
+    * Add a comment line `# Ready to delete` to the top. 
+        * (If you like danger, write a script to add this comment between steps.)
+    * Then run the Deleter. 
 1. The two-step process also means that if an asset is created between steps, it will not be deleted.
 
 ## Instructions
@@ -39,12 +39,11 @@ You can add filters for each asset type to specify assets that you don't or do w
 * Run `./lister.sh -p <GCP_PROJECT>` 
    * (In `lister.sh`, Maven builds if needed, then executes `java com.doitintl.blaster.lister.Lister` .) 
    * The Lister outputs `asset-list.txt` (configurable with the `-o` flag).
-   * Note:
-       * If instead you want to print a list of *all* GCP assets, whether or not of a type
-       supported by Cloud Blaster, add the `-n` flag. The default output file  
-       for this is `all-types-assets-list.txt`,
-       though you can set this value with the `-o` flag.
-* Command line flags: Run `./lister.sh -h` 
+   * To list  *all* GCP assets.
+       * Add the `-n` flag to list all assets, whether or not of a type supported by Cloud Blaster,   
+       * The default output file for this is `all-types-assets-list.txt`. 
+           * You can set different file for output with the `-o` flag.
+* To see command line flags: Run `./lister.sh -h` 
 
 ### Deleting listed assets
 * Review `asset-list.txt` (or the other file you plan to use) and remove lines for any assets 
@@ -59,23 +58,24 @@ that you do not want to delete.
   permission is not available.  There is no harm in having them in `asset-list.txt` -- you 
   will just get an exception.
   * For speed, deletion is executed concurrently.
-* Command line flags: Run `./deleter.sh -h`
+* To see, command line flags: Run `./deleter.sh -h`
 
 ## Features
 ### Supported asset types
-Cloud Blaster now supports common important asset types that are set up and torn down in typical development and QA. 
-This includes: 
-    * Google Compute Engine instances, disks, firewalls, and addresses
-    * Google Cloud PubSub topics and Subscriptions 
-    * Google Kubernetes Engine regional and zonal clusters
-    * Google Cloud Operations log metrics
-    * Google Cloud Functions
-    * Cloud Run services
-    * Cloud SQL instances
-    * Google App Engine services and versions
-    * Google Cloud Storage buckets
+Cloud Blaster now supports common asset types that are set up and torn down in typical development and QA.
+* This includes:
+     * Google Compute Engine instances, disks, firewalls, and addresses
+     * Google Cloud PubSub topics and Subscriptions 
+     * Google Kubernetes Engine regional and zonal clusters
+     * Google Cloud Operations log metrics
+     * Google Cloud Functions
+     * Cloud Run services
+     * Cloud SQL instances
+     * Google App Engine services and versions
+     * Google Cloud Storage buckets
+
     
-     For the most up-to-date list of supported asset types, see `list-filter.yaml`
+* For the most up-to-date list of supported asset types, see `list-filter.yaml`.
     
 
 ### Future features
@@ -130,7 +130,7 @@ only waits a short time and if it does not see the asset, it will fail.
 - [Safe Scrub](https://github.com/doitintl/SafeScrub) was an earlier bash-only project that does the same thing. 
 - [Travis CI GCloud Cleanup](https://github.com/travis-ci/gcloud-cleanup) and [Bazooka](https://github.com/enxebre/bazooka) also delete GCE assets.
 - [Cloud Nuke](https://blog.gruntwork.io/cloud-nuke-how-we-reduced-our-aws-bill-by-85-f3aced4e5876) does this for AWS.
- 
+- [Sandbox Projects](https://help.doit-intl.com/cloud-sandbox-management/create-gcp-sandbox-accounts) are available at no charge to customers of DoiT International. 
  ### Compared to Safe Scrub
  
  [Safe Scrub](https://github.com/doitintl/SafeScrub) is another project that does the same thing. 
