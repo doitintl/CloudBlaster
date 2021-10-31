@@ -16,11 +16,11 @@ import java.io.FileWriter
 import java.lang.System.currentTimeMillis
 import kotlin.system.exitProcess
 import kotlin.system.measureTimeMillis
-import com.doitintl.blaster.deleter.main as deleter
-import com.doitintl.blaster.lister.main as lister
+import com.doitintl.blaster.deleter.run as runDeleter
+import com.doitintl.blaster.lister.run as runLister
 
 abstract class TestBase(val project: String, private val sfx: String = randomString(8)) {
-    val testInput = "test-input"
+    private val testInput = "test-input"
 
 
     /**
@@ -69,7 +69,7 @@ abstract class TestBase(val project: String, private val sfx: String = randomStr
         val (tempAssetToDeleteFile, tempFilterFile) = listAssetsWithFilter(sfx, project, assets)
         addDeletionEnablement(tempAssetToDeleteFile)
 
-        deleter(
+        runDeleter(
             arrayOf(
                 "--assets-to-delete-file",
                 tempAssetToDeleteFile.absolutePath,
@@ -116,12 +116,11 @@ abstract class TestBase(val project: String, private val sfx: String = randomStr
         val (tempAssetToDeleteFile, tempFilterFile) = listAssetsWithFilter(sfx, project)
         addDeletionEnablement(tempAssetToDeleteFile)
 
-        deleter(
+        runDeleter(
             arrayOf(
                 "--assets-to-delete-file",
                 tempAssetToDeleteFile.absolutePath,
-
-                )
+            )
         )
     }
 
@@ -194,10 +193,10 @@ abstract class TestBase(val project: String, private val sfx: String = randomStr
      * We don't do that simply to speed up the tests, as there can be very many assets across all GCP asset types.
      */
     private fun listAllAssetsForAllSupportedAssetTypes(): String {
-        val outputTempFile = createTempFile("all-assets$sfx", ".txt")
+        val outputTempFile = createTempFile("all-supported-assets$sfx", ".txt")
         outputTempFile.deleteOnExit()
         val filterTempFile = writeTempFilterYaml(AssetTypeMap().assetTypeIds(), "")
-        lister(
+        runLister(
             arrayOf(
                 "--project",
                 project,
@@ -216,7 +215,7 @@ abstract class TestBase(val project: String, private val sfx: String = randomStr
         val tempFilterFilePath = writeTempFilterYaml(assetTypeIds(), sfx)
         val tempAssetsToDeleteFile = createTempFile("$ASSET_LIST_FILE-$sfx", ".txt")
         tempAssetsToDeleteFile.deleteOnExit()
-        lister(
+        runLister(
             arrayOf(
                 "--project",
                 project,
@@ -327,7 +326,7 @@ abstract class TestBase(val project: String, private val sfx: String = randomStr
     fun createAssetByRunningDeployScript(assetName: String, dir: String) {
         assert(assetName.contains(sfx)) { "Pass full asset name with random sfx" }
         val testInput = "test-input"
-        if (dir.toString().contains("/$testInput/")) {
+        if (dir.contains("/$testInput/")) {
             throw IllegalStateException("Do not pass $testInput dir but rather a subdir")
         }
         val workingDir = File("./$testInput/$dir")
@@ -345,8 +344,8 @@ abstract class TestBase(val project: String, private val sfx: String = randomStr
         templateFileBaseName: String,
         subdir: String
     ) {
-        assert(!subdir.contains("/$testInput/"), { "pass subdir of $testInput, not including $testInput" })
-        val dir = File("./" + testInput, subdir)
+        assert(!subdir.contains("/$testInput/")) { "pass subdir of $testInput, not including $testInput" }
+        val dir = File("./$testInput", subdir)
         val dotTemplate = ".template"
         assert(!templateFileBaseName.endsWith(dotTemplate)) { "Pass base name, not template" }
 

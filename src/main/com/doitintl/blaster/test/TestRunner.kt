@@ -8,12 +8,12 @@ import kotlinx.coroutines.runBlocking
 import java.lang.System.currentTimeMillis
 import kotlin.reflect.KClass
 import kotlin.system.exitProcess
-import com.doitintl.blaster.lister.main as lister
+import com.doitintl.blaster.lister.run as runLister
 
 
 private fun runSync(
     classes: List<KClass<out TestBase>>, project: String
-): Pair<MutableList<String>, MutableList<String>> {
+): Pair<List<String>, List<String>> {
     val successes = mutableListOf<String>()
     val failures = mutableListOf<String>()
 
@@ -24,7 +24,6 @@ private fun runSync(
             successes.add(`class`.simpleName!!)
         } else {
             failures.add(`class`.simpleName!!)
-
         }
 
     }
@@ -33,7 +32,7 @@ private fun runSync(
 
 private fun runAsync(
     classes: List<KClass<out TestBase>>, project: String
-): Pair<MutableList<String>, MutableList<String>> {
+): Pair<List<String>, List<String>> {
     val successes = mutableListOf<String>()
     val failures = mutableListOf<String>()
     runBlocking {
@@ -59,7 +58,7 @@ fun messageForCleanup(project: String) {
     val tempAssetsToDeleteFile = createTempFile(ASSET_LIST_FILE, ".txt")
     tempAssetsToDeleteFile.deleteOnExit()
 
-    lister(
+    runLister(
         arrayOf(
             "--project",
             project,

@@ -77,7 +77,12 @@ class Deleter : Callable<Int> {
 }
 
 
-fun main(args: Array<String>) {
+fun run(args: Array<String>): Int {
     val exitCode = CommandLine(Deleter()).execute(*args)
+    return exitCode
+}
+
+fun main(args: Array<String>) {
+    val exitCode = run(args)
     exitProcess(exitCode)
 }

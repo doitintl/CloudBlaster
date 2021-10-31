@@ -8,6 +8,7 @@ import com.google.pubsub.v1.ProjectSubscriptionName
 
 class SubscriptionDeleter : BaseDeleter() {
 
+
     override val pathPatterns: Array<String>
         get() = arrayOf("//pubsub.googleapis.com/projects/{PROJECT}/subscriptions/{ID}")
 

@@ -16,7 +16,7 @@ To keep it safe, Cloud Blaster has these features.
 1. The first step, the Lister, does *not* delete assets; rather, it just lists assets into
  a file, `asset-list.txt`, that you review.
 1. The Lister requires you to explicitly state a project. It does not implicitly use your `gcloud` default project.
-1. The Lister can be filtered (see `list-filter.yaml` file) so that specified assets are skipped when 
+1. The Lister can be filtered (see `config/list-filter.yaml`) so that specified assets are skipped when 
 building the `asset-list.txt` file.
 1. After running the Lister, you review the list of assets for deletion
     * Manually edit it.
@@ -28,29 +28,32 @@ building the `asset-list.txt` file.
 ## Instructions
 
 ### Prerequisites
-* Install Maven. We use it here to run the project, building it if needed, with a single command. 
-(You could also build the jars and run them separately.)
+
 * Install and initialize `gcloud`. This tool provides authentication, though  it is used to give commands only in the tests. 
 
-### Listing the assets
-* Edit `list-filter.yaml` (or another file whose name you will specify on the command line of Lister and Deleter.)
+### Building and running it with Maven
+* The following instructions explain how to do it using Maven.
+* Install Maven. We use it here to run the project, building it if needed, with a single command.  
+* You can also use a Docker image if you want to avoid Maven.  See below.
+
+#### Listing the assets
+* Edit `config/list-filter.yaml` (or another file whose name you will specify on the command line of Lister and Deleter.)
 You can add filters for each asset type to specify assets that you don't or do wants to include in listing.s 
 (See the top of that file for detailed instructions.)
-* Run `./lister.sh -p <GCP_PROJECT>` 
-   * (In `lister.sh`, Maven builds if needed, then executes `java com.doitintl.blaster.lister.Lister` .) 
-   * The Lister outputs `asset-list.txt` (configurable with the `-o` flag).
+* To build if needed, followed by running the Lister, run  `./mvn_build_and_run_lister.sh -p <GCP_PROJECT>` 
+   * The Lister outputs `asset-list/asset-list.txt` (configurable with the `-o` flag).
    * To list  *all* GCP assets.
        * Add the `-n` flag to list all assets, whether or not of a type supported by Cloud Blaster,   
        * The default output file for this is `all-types-assets-list.txt`. 
            * You can set different file for output with the `-o` flag.
-* To see command line flags: Run `./lister.sh -h` 
+* To see command line flags: Run `./build-and-run-lister -h` 
 
-### Deleting listed assets
-* Review `asset-list.txt` (or the other file you plan to use) and remove lines for any assets 
+#### Deleting listed assets
+* Review `asset-list/asset-list.txt` (or the other file you plan to use) and remove lines for any assets 
 that you do not want to delete.
 * Add a comment `# Ready to delete` (or just add those words, case insensitive, to any comment line).
-* Run `./deleter.sh` 
-  * (In `deleter.sh`, Maven just builds if needed, then executes `com.doitintl.blaster.deleter.Deleter`.). 
+* * To build  if needed, followed by running the Lister, run `./mvn_build_and_run_deleter.sh` 
+  * (In this script, Maven  builds if needed, then executes `com.doitintl.blaster.deleter.Deleter`.). 
   * The Deleter tries to delete the assets listed in `asset-list.txt` (configurable). 
 * Notes:
   * You do not need to specify the project, as this is included in every asset path in `asset-list.txt`.
@@ -58,7 +61,18 @@ that you do not want to delete.
   permission is not available.  There is no harm in having them in `asset-list.txt` -- you 
   will just get an exception.
   * For speed, deletion is executed concurrently.
-* To see, command line flags: Run `./deleter.sh -h`
+* To see, command line flags: Run`./build-and-run-deleter.sh -h`
+
+### Building and running it with Docker
+* Install Docker as a prerequisite.
+* Run the following  scripts from the  `scripts` folder.
+* To build, run `./build_docker.sh`
+* Lister: In the `scripts` folder, run `./in_docker_lister.sh`. See [above](#listing-the-assets) for tips 
+on the command-line options and on the output.
+* Deleter: In the `scripts` folder, run `./in_docker_deleter.sh`. See [above](#deleting-listed-assets) for tips on the command-line options,
+and editing the asset-list file to indicate readiness.
+
+
 
 ## Features
 ### Supported asset types
@@ -73,15 +87,13 @@ Cloud Blaster now supports common asset types that are set up and torn down in t
      * Cloud SQL instances
      * Google App Engine services and versions
      * Google Cloud Storage buckets
-
     
-* For the most up-to-date list of supported asset types, see `list-filter.yaml`.
+* For the most up-to-date list of supported asset types, see `config/list-filter.yaml`.
     
-
 ### Future features
 * More asset types.
 * Track asset dependencies, so that if you want to delete asset A, but it is undeletable until 
-asset B is gone, you delete B first, then A. 
+asset B is gone, the Deleter deletes B first, then A. 
 
 ### Adding features   
 * If you want more asset types or new features, please either
@@ -90,7 +102,7 @@ asset B is gone, you delete B first, then A.
          * For instructions see the comment in `asset-types.properties`. 
          * Uncomment the asset type in `asset-types.properties` and specify the deleter class here if needed. 
          Instructions at the top of that file.
-         * Add the asset type to `list-filter.yaml`. Optionally add a default filter as in the `Firewall` example there.
+         * Add the asset type to `config/list-filter.yaml`. Optionally add a default filter as in the `Firewall` example there.
          * Implement a subclass of `BaseDeleter` alongside
           [the others](https://github.com/doitintl/CloudBlaster/tree/master/src/main/com/doitintl/blaster/deleters),
           which you can use as examples.

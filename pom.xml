@@ -15,9 +15,12 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <kotlin.version>1.5.31</kotlin.version>
         <kotlin.code.style>official</kotlin.code.style>
+        <kotlin.compiler.incremental>true</kotlin.compiler.incremental>
+        <maven.compiler.source>1.8</maven.compiler.source>
+        <maven.compiler.target>1.8</maven.compiler.target>
+        <java.version>10</java.version>
+
     </properties>
-
-
     <dependencyManagement>
         <dependencies>
             <dependency>
@@ -180,8 +183,8 @@
                     </execution>
                 </executions>
                 <configuration>
-                    <source>9</source>
-                    <target>9</target>
+                    <source>1.8</source>
+                    <target>1.8</target>
                 </configuration>
             </plugin>
         </plugins>

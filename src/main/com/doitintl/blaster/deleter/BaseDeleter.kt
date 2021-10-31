@@ -3,7 +3,7 @@ package com.doitintl.blaster.deleter
 import com.doitintl.blaster.shared.IllegalConfigException
 import java.util.*
 
-private val UPPERCASE_IN_CURLIES = Regex(""".*(\{[A-Z]+\}).*""")
+private val UPPERCASE_IN_CURLIES = Regex(""".*(\{[A-Z]+}).*""")
 private val GROUP_NAMES_IN_REGEX = Regex("""\?<([a-zA-Z][a-zA-Z0-9]*)>""")
 
 abstract class BaseDeleter : AssetTypeDeleter {

@@ -6,6 +6,7 @@ import com.doitintl.blaster.shared.Constants.CLOUD_BLASTER
 import com.doitintl.blaster.shared.Constants.LIST_FILTER_YAML
 import com.doitintl.blaster.shared.currentTimeISO
 import picocli.CommandLine
+import java.io.File
 import java.io.FileWriter
 import java.util.concurrent.Callable
 import kotlin.system.exitProcess
@@ -28,38 +29,49 @@ class Lister : Callable<Any> {
 
 
     @CommandLine.Option(names = ["-n", "--no-filter"])
-    private var noFilter: Boolean = false
+    private var unfiltered: Boolean = false
 
 
     override fun call(): Int {
         val outputFile = outputFileName()
-        FileWritingCallback(project, outputFile, noFilter).use { callback ->
-            AssetIterator().listAssets(project, callback, noFilter, filterFile)
+        FileWritingCallback(project, outputFile, unfiltered).use { callback ->
+            AssetIterator().listAssets(project, callback, unfiltered, filterFile)
+            println("Lister done, wrote " + File(outputFile).absolutePath)
             return 0
         }
     }
 
-    /** For an unfiltered list, default asset file name is "all-types-asset-list.txt"
-     * If the user sets a non-default value, however, we use that.
-     */
+
     private fun outputFileName(): String {
-        return if (noFilter) {
-            if (outputFile == ASSET_LIST_FILE) {
-                "all-types-$outputFile"
-            } else {
-                outputFile
-            }
+        val isAssetListFileDefault = outputFile == ASSET_LIST_FILE
+        return if (unfiltered && isAssetListFileDefault) {
+            /* For an unfiltered list, default asset file name is "all-types-asset-list.txt"
+             * If the user sets a non-default value, however, we use that.
+             */
+            allAssetsFileName()
         } else {
             outputFile
         }
     }
+
+    private fun allAssetsFileName(): String {
+        val pathParts = outputFile.split(File.separator)
+        val newFileName = "all-types-${pathParts.last()}"
+
+        return if (pathParts.size > 1) {
+            val dir = pathParts.subList(0, pathParts.lastIndex).joinToString(File.separator)
+            dir + File.separator + newFileName
+        } else {
+            newFileName
+        }
+    }
 }
 
-internal class FileWritingCallback(project: String, filename: String, noFilter: Boolean) : Callback<String> {
+internal class FileWritingCallback(project: String, filename: String, unfiltered: Boolean) : Callback<String> {
     private val fw: FileWriter = FileWriter(filename)
 
     init {
-        val s = if (noFilter) {
+        val s = if (unfiltered) {
             "$project at ${currentTimeISO()}; $ALL_ASSETS_ALL_TYPES_FULL_COMMENT"
         } else {
             "$project at ${currentTimeISO()}; Assets after filtering. Review, edit, then add the comment indicating readiness to delete, before passing this to the Deleter"
@@ -78,7 +90,12 @@ internal class FileWritingCallback(project: String, filename: String, noFilter: 
 }
 
 
-fun main(args: Array<String>) {
+fun run(args: Array<String>): Int {
     val exitCode = CommandLine(Lister()).execute(*args)
+    return exitCode
+}
+
+fun main(args: Array<String>) {
+    val exitCode = run(args)
     exitProcess(exitCode)
 }

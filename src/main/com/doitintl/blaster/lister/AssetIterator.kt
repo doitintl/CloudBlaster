@@ -8,7 +8,7 @@ import com.google.cloud.asset.v1.ProjectName
 
 class AssetIterator {
 
-    fun listAssets(projectId: String, callback: Callback<String>, noFilter: Boolean, filterFile: String) {
+    fun listAssets(projectId: String, callback: Callback<String>, unfiltered: Boolean, filterFile: String) {
 
         AssetServiceClient.create().use { client ->
             val contentType = ContentType.CONTENT_TYPE_UNSPECIFIED
@@ -17,7 +17,7 @@ class AssetIterator {
             if (supportedAssetTypeIds.isEmpty()) {
                 throw IllegalConfigException("No asset types in config file")
             }
-            if (noFilter) {
+            if (unfiltered) {
                 supportedAssetTypeIds = emptyList()
 
             }
@@ -28,12 +28,12 @@ class AssetIterator {
                 .build()
 
             var response = client.listAssets(request)
-            iterateListingResponse(response, callback, noFilter, assetTypeMap)
+            iterateListingResponse(response, callback, unfiltered, assetTypeMap)
             while (response.nextPageToken.isNotEmpty()) {
                 // Each page is approx 1600 assets
                 request = request.toBuilder().setPageToken(response.nextPageToken).build()
                 response = client.listAssets(request)
-                iterateListingResponse(response, callback, noFilter, assetTypeMap)
+                iterateListingResponse(response, callback, unfiltered, assetTypeMap)
             }
         }
     }
@@ -41,13 +41,13 @@ class AssetIterator {
     private fun iterateListingResponse(
         response: AssetServiceClient.ListAssetsPagedResponse,
         callback: Callback<String>,
-        noFilter: Boolean,
+        unfiltered: Boolean,
         assetTypeMap: AssetTypeMap,
 
         ) {
         for (asset in response.iterateAll()) {
             val matched: Boolean =
-                if (noFilter) {//Just printing ALL assets
+                if (unfiltered) {//Just printing ALL assets
                     callback.call(asset.name)
                     true
                 } else {
