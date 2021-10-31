@@ -3,5 +3,5 @@ target/
 *.iml
 .DS_Store
 list-filter-*.yaml
-*asset-list*
+*asset-list*.txt
 app.yaml
