@@ -3,6 +3,8 @@
 set -u
 set -e
 
+# This script simply runs the Deleter (after building the classpath.)
+#
 # This script is meant to run when run.sh, lister.sh and deleter.sh are in the root dir.
 # It was built designed for use in a Docker containmer, but can run elsewhere.
 

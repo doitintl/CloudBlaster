@@ -1,1 +1,5 @@
+# This .gitignore file is here to allow us to checkin an empty dir to git,
+# and also to exclude  all the asset-list files from git.
+*
+
 

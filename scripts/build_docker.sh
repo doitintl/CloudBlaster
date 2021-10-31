@@ -1,8 +1,9 @@
 #!/usr/bin/env bash
 
-set -x
 set -e
 set -u
+
+# This script builds the Docker container.
 
 if [[ $(pwd) != */scripts ]]; then
   echo "Run in /scripts dir"
@@ -10,5 +11,5 @@ if [[ $(pwd) != */scripts ]]; then
 fi
 pushd ..
 
-docker build -t cloudblaster:v2 .
+docker build -t cloudblaster:v1 .
 popd || exit

@@ -32,28 +32,27 @@ building the `asset-list.txt` file.
 * Install and initialize `gcloud`. This tool provides authentication, though  it is used to give commands only in the tests. 
 
 ### Building and running it with Maven
+* You can also use a Docker image instead. See [below](#building-and-running-it-with-docker)
 * The following instructions explain how to do it using Maven.
 * Install Maven. We use it here to run the project, building it if needed, with a single command.  
-* You can also use a Docker image if you want to avoid Maven.  See below.
 
 #### Listing the assets
-* Edit `config/list-filter.yaml` (or another file whose name you will specify on the command line of Lister and Deleter.)
-You can add filters for each asset type to specify assets that you don't or do wants to include in listing.s 
+* Edit `config/list-filter.yaml` (or another file whose name you will specify on the command line of Lister and Deleter).
+You can add filters for each asset type to specify assets that you don't or do wants to include in listings. 
 (See the top of that file for detailed instructions.)
-* To build if needed, followed by running the Lister, run  `./mvn_build_and_run_lister.sh -p <GCP_PROJECT>` 
+* To run the Lister (first building it as needed), run  `./mvn_build_and_run_lister.sh -p <GCP_PROJECT>` 
    * The Lister outputs `asset-list/asset-list.txt` (configurable with the `-o` flag).
-   * To list  *all* GCP assets.
-       * Add the `-n` flag to list all assets, whether or not of a type supported by Cloud Blaster,   
+   * To list  *all* GCP assets, whether or not supported for deletion by Cloud Blaster.
+       * Add the `-n` flag. 
        * The default output file for this is `all-types-assets-list.txt`. 
-           * You can set different file for output with the `-o` flag.
+           * You can set a different file for output with the `-o` flag.
 * To see command line flags: Run `./build-and-run-lister -h` 
 
 #### Deleting listed assets
-* Review `asset-list/asset-list.txt` (or the other file you plan to use) and remove lines for any assets 
+* Review `asset-list/asset-list.txt` (or another file you plan to use) and remove lines for any assets 
 that you do not want to delete.
 * Add a comment `# Ready to delete` (or just add those words, case insensitive, to any comment line).
-* * To build  if needed, followed by running the Lister, run `./mvn_build_and_run_deleter.sh` 
-  * (In this script, Maven  builds if needed, then executes `com.doitintl.blaster.deleter.Deleter`.). 
+  * To run the Deleter (first building if needed), run `./mvn_build_and_run_deleter.sh` 
   * The Deleter tries to delete the assets listed in `asset-list.txt` (configurable). 
 * Notes:
   * You do not need to specify the project, as this is included in every asset path in `asset-list.txt`.
@@ -61,16 +60,16 @@ that you do not want to delete.
   permission is not available.  There is no harm in having them in `asset-list.txt` -- you 
   will just get an exception.
   * For speed, deletion is executed concurrently.
-* To see, command line flags: Run`./build-and-run-deleter.sh -h`
+* To see command line flags: Run`./build-and-run-deleter.sh -h`
 
 ### Building and running it with Docker
 * Install Docker as a prerequisite.
-* Run the following  scripts from the  `scripts` folder.
-* To build, run `./build_docker.sh`
+* Run the following  scripts in the  `scripts` folder.
+* To build the Docker image, run `./build_docker.sh`
 * Lister: In the `scripts` folder, run `./in_docker_lister.sh`. See [above](#listing-the-assets) for tips 
 on the command-line options and on the output.
 * Deleter: In the `scripts` folder, run `./in_docker_deleter.sh`. See [above](#deleting-listed-assets) for tips on the command-line options,
-and editing the asset-list file to indicate readiness.
+and about adding a comment to the asset-list file to indicate readiness.
 
 
 

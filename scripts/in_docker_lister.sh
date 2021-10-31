@@ -1,7 +1,9 @@
 #!/usr/bin/env sh
 
 set -e
-# This runs Lister in a Docker container. Pass the optional switches to Deleter (-h for help).
+# This launches a Docker container and runs Lister in it.
+# Run it from the scripts directory.
+# Pass the command-line options for Lister (-h for help).
 
 ./in_docker_run.sh \
   Lister \

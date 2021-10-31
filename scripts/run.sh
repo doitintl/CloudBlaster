@@ -1,10 +1,14 @@
 #!/bin/sh
 
+# This script simply runs either the  Deleter or the Lister (based on the first param.)
+#
+# This script is meant to run when run.sh, lister.sh and deleter.sh are in the root dir.
+# It was created for use in a Docker container but can be run outside one.
+#
+# See USAGE below for usage
+
 set -e
 set -u
-
-# This script is meant to run when run.sh, lister.sh and deleter.sh are in the root dir.
-# It was built designed for use in a Docker containmer, but can run elsewhere.
 
 SCRIPT=$(basename $0)
 pwd

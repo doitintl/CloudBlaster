@@ -1,8 +1,9 @@
 #!/usr/bin/env sh
 
 set -e
-
-# This runs Deleter in Docker container. Pass the optional switches to Deleter (-h for help).
+# This launches a Docker container and runs Deleter in it.
+# Run it from the scripts directory.
+#  Pass the optional command-line optiojns to Deleter (-h for help).
 ./in_docker_run.sh \
   Deleter \
   "$@"

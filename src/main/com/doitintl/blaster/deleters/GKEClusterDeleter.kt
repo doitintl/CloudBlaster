@@ -44,7 +44,7 @@ class GKEClusterDeleter : BaseDeleter() {
             val start = currentTimeMillis()
             val fourMin = 1000 * 60 * 4
             val timeout = start + fourMin
-            var lastPrint = -1L
+            var lastPrint = currentTimeMillis()
             while (currentTimeMillis() < timeout) {
                 val currentOperation = getContainerService().projects().zones().operations()
                     .get(project, location, op.name)
