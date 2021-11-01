@@ -52,25 +52,30 @@ You can add filters for each asset type to specify assets that you don't or do w
 * Review `asset-list/asset-list.txt` (or another file you plan to use) and remove lines for any assets 
 that you do not want to delete.
 * Add a comment `# Ready to delete` (or just add those words, case insensitive, to any comment line).
-  * To run the Deleter (first building if needed), run `./mvn_build_and_run_deleter.sh` 
+* To run the Deleter (first building if needed), run `./mvn_build_and_run_deleter.sh` 
   * The Deleter tries to delete the assets listed in `asset-list.txt` (configurable). 
 * Notes:
+  * To see command line flags: Run`./build-and-run-deleter.sh -h`
   * You do not need to specify the project, as this is included in every asset path in `asset-list.txt`.
-  * Note that some assets cannot be deleted, such as attached Disks or the default GAE Service; or where
-  permission is not available.  There is no harm in having them in `asset-list.txt` -- you 
+  * Some assets cannot be deleted, such as attached Disks or the default GAE Service; or where
+  permission is not available. There is no harm in having them in `asset-list.txt` -- you 
   will just get an exception.
   * For speed, deletion is executed concurrently.
-* To see command line flags: Run`./build-and-run-deleter.sh -h`
+
 
 ### Building and running it with Docker
 * Install Docker as a prerequisite.
 * Run the following  scripts in the  `scripts` folder.
-* To build the Docker image, run `./build_docker.sh`
-* Lister: In the `scripts` folder, run `./in_docker_lister.sh`. See [above](#listing-the-assets) for tips 
-on the command-line options and on the output.
-* Deleter: In the `scripts` folder, run `./in_docker_deleter.sh`. See [above](#deleting-listed-assets) for tips on the command-line options,
-and about adding a comment to the asset-list file to indicate readiness.
-
+  * To build the Docker image, run `./build_docker.sh`
+  * Configuration: 
+    * To run the container, make sure that the user-provided configuration `list-filter.yaml`, is in the `config`
+      directory on your host machine (or specify its path in a parameter). 
+    * The `config` directory is mapped between the container and your local host. 
+      You can copy the default `list-filter.yaml`.
+  * Lister: Run `./in_docker_lister.sh`. See [above](#listing-the-assets) for tips 
+  on the command-line options and on the output.
+  * Deleter: Run `./in_docker_deleter.sh`. See [above](#deleting-listed-assets) for tips on the command-line options,
+  and about adding a comment to the asset-list file to indicate readiness.
 
 
 ## Features
