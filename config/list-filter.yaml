@@ -2,6 +2,8 @@
 #
 # Full list of asset types is in asset-types.properties.
 #
+# Development of new asset types: See comment at top of asset-types.properties.
+#
 # The regex  is a full-string match on the local asset name, for example the Topic or Instance name.
 #
 # For example:
@@ -19,14 +21,13 @@
 #            listThese: true
 #    is used for a whitelist: that only names foo and foobar and other full-string-matching names will be listed.
 #
-# 3. To list everything, leave the key's value blank
+# 3. To list everything, leave the key's value blank, as in the examples below.
 #
 # 4. To list nothing in a given service
-#           appengine.googleapis.com/Version:
+#          appengine.googleapis.com/Version:
 #            regex: "UNSUPPORTED"
 #            listThese: true
 #
-# Development of new asset types: See comment at top of asset-types.properties.
 #
 compute.googleapis.com/Firewall:
   regex: ^default-.*
