@@ -1,25 +1,38 @@
 # These are the asset types that will be skipped by the Lister.
 #
-# The Lister will list only the assets that are NOT matched by the regex:
-# I.e., these are the assets that you want to "protect".
-# (It is a full-string match on the local asset name, for example the Topic or Instance name.)
+# Full list of asset types is in asset-types.properties.
 #
-# For example
+# The regex  is a full-string match on the local asset name, for example the Topic or Instance name.
+#
+# For example:
+#
 # 1. The lines
 #          appengine.googleapis.com/Version:
 #            regex: "foo.*"
 #            listThese: false
 #
-#     is used for a blacklist: GAE Versions with names like foo and foobar will be skipped in listing.
-#     However, quuxfoo will NOT be skipped (as there is no full-string match; for this you could use ".*foo.*").
+#     are used for a blacklist: GAE Versions with names like foo and foobar will be skipped in listing.
+#     However, quuxfoo will NOT be skipped as there is no full-string match;
+#        for a partial-string match you could use ".*foo.*".
 #
 # 2. The same thing but with
 #            listThese: true
 #    is used for a whitelist: that only names foo and foobar and other full-string-matching names will be listed.
 #
+# 3. To list everything, leave the key's value blank
+#
+# 4. To list nothing in a given service
+#           appengine.googleapis.com/Version:
+#            regex: "UNSUPPORTED"
+#            listThese: true
+#
+# Development of new asset types: See comment at top of asset-types.properties.
 #
 compute.googleapis.com/Firewall:
   regex: ^default-.*
+  listThese: false
+compute.googleapis.com/Subnetwork:
+  regex: ^default.*
   listThese: false
 appengine.googleapis.com/Version:
 appengine.googleapis.com/Service:

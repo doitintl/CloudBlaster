@@ -14,6 +14,7 @@ import java.io.FileInputStream
 import java.io.FileNotFoundException
 import java.io.FileWriter
 import java.lang.System.currentTimeMillis
+import java.util.*
 import kotlin.system.exitProcess
 import kotlin.system.measureTimeMillis
 import com.doitintl.blaster.deleter.run as runDeleter
@@ -106,7 +107,7 @@ abstract class TestBase(val project: String, private val sfx: String = randomStr
         //Put COMMENT_READY_TO_DELETE at end, and in upper case, to test a slightly unusual but supported case
         FileWriter(tempAssetToDeleteFile).use { fw ->
             fw.write(
-                content + "\n" + COMMENT_READY_TO_DELETE.toUpperCase()
+                content + "\n" + COMMENT_READY_TO_DELETE.uppercase(Locale.getDefault())
             )
         }
     }
@@ -125,7 +126,7 @@ abstract class TestBase(val project: String, private val sfx: String = randomStr
     }
 
     fun assetName(assetTypeShortId: String): String {
-        assert(assetTypeShortId == assetTypeShortId.toLowerCase()) { "Asset ID must be lower-case: $assetTypeShortId" }
+        assert(assetTypeShortId == assetTypeShortId.lowercase(Locale.getDefault())) { "Asset ID must be lower-case: $assetTypeShortId" }
 
         return "blastertest${assetNameSeparator()}${assetTypeShortId}${assetNameSeparator()}$sfx"
     }
@@ -163,7 +164,7 @@ abstract class TestBase(val project: String, private val sfx: String = randomStr
      */
     private fun assertAssetIdStructure(assets: List<String>) {
         assert(assets.none { a -> a.contains("{") }) { "Should not have braces in $assets" }
-        assert(assets.none { it.toLowerCase() != it }) { "Should not have uppercase in $assets" }
+        assert(assets.none { it.lowercase(Locale.getDefault()) != it }) { "Should not have uppercase in $assets" }
         val predicate: (String) -> Boolean = { a -> a.contains("/") }
 
         if (this.identifierIsFullPath()) {
@@ -255,7 +256,7 @@ abstract class TestBase(val project: String, private val sfx: String = randomStr
                 break
             }
             Thread.sleep(3000) // To avoid exceeding Asset Service quota
-            println("${(currentTimeMillis() - start) / 1000}s waiting for $phase in ${this::class.simpleName}")
+            println("${(currentTimeMillis() - start) / 1000} s waiting for $phase in ${this::class.simpleName}")
         }
 
         if (currentTimeMillis() >= timeout) {
@@ -312,11 +313,12 @@ abstract class TestBase(val project: String, private val sfx: String = randomStr
 
     fun pathForAsset(pattern: String, project: String, name: String, location: String? = null): String {
 
-        val replaced = pattern.replace("{${PROJECT.toUpperCase()}}", project).replace("{${ID.toUpperCase()}}", name)
+        val replaced = pattern.replace("{${PROJECT.uppercase(Locale.getDefault())}}", project)
+            .replace("{${ID.uppercase(Locale.getDefault())}}", name)
         val ret = if (location == null) {
             replaced
         } else {
-            replaced.replace("{${LOCATION.toUpperCase()}}", location)
+            replaced.replace("{${LOCATION.uppercase(Locale.getDefault())}}", location)
         }
         assert(ret != pattern)
         assert(!ret.contains("{"))
