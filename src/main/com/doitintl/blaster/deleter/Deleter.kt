@@ -12,6 +12,7 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import picocli.CommandLine
 import java.io.File
+import java.util.*
 import java.util.concurrent.Callable
 import kotlin.system.exitProcess
 
@@ -37,12 +38,12 @@ class Deleter : Callable<Int> {
         }
         val readyToGo = COMMENT_READY_TO_DELETE.substring(2, COMMENT_READY_TO_DELETE.length)
         val commentsStr = comments(allLines).joinToString("\n")
-        if (!commentsStr.toLowerCase().contains(readyToGo.toLowerCase())) {
+        if (!commentsStr.lowercase(Locale.getDefault()).contains(readyToGo.lowercase(Locale.getDefault()))) {
             throw IllegalArgumentException("Must add \"$readyToGo\" comment to $assetsToDeleteFile to enable deletion.")
         }
 
         val lines = noComment(allLines)
-
+        sortByDependency(lines)
         var counter = 0
         runBlocking {
             lines.forEach { line ->
@@ -59,12 +60,20 @@ class Deleter : Callable<Int> {
         return 0
     }
 
+    private fun sortByDependency(lines: List<String>) {
+        val atm=AssetTypeMap()
+        atm.assetTypeIds().forEach(){
+            val delCls=atm.deleterClassForResourceId(it)
+        }
+
+    }
+
 
     private fun deleteAsset(line: String) {
         if (line.isBlank()) {
             return
         }
-        val deleter = AssetTypeMap().deleterClass(line)
+        val deleter = AssetTypeMap().deleterClassForResourceId(line)
 
         try {
             deleter.delete(line)

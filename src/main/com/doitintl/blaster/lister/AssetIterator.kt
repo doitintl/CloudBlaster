@@ -48,7 +48,6 @@ class AssetIterator {
         for (asset in response.iterateAll()) {
             val matched: Boolean =
                 if (unfiltered) {//Just printing ALL assets
-                    callback.call(asset.name)
                     true
                 } else {
                     val parts = asset.name.split("/").toTypedArray()

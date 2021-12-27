@@ -3,10 +3,13 @@ package com.doitintl.blaster.lister
 import com.doitintl.blaster.deleter.AssetTypeDeleter
 import com.doitintl.blaster.lister.AssetTypeMap.Companion.ASSET_TYPES_FILE
 import com.doitintl.blaster.shared.IllegalConfigException
+import com.doitintl.blaster.shared.OrderedProperties
 import org.yaml.snakeyaml.Yaml
+import org.yaml.snakeyaml.scanner.ScannerException
 import java.io.FileInputStream
 import java.io.FileReader
 import java.util.*
+import kotlin.collections.LinkedHashMap
 import kotlin.reflect.KClass
 
 val assetTypeRegex: Regex = Regex("""[a-z]+\.googleapis\.com/[a-zA-Z]+""")
@@ -19,9 +22,9 @@ const val LIST_THESE = "listThese"
  */
 class AssetTypeMap(private val filterFile: String? = null) {
 
-    private val assetTypeMap: Map<String, AssetType>
+    private val assetTypeMap: LinkedHashMap<String, AssetType>
 
-    fun deleterClass(line: String): AssetTypeDeleter {
+    fun deleterClassForResourceId(line: String): AssetTypeDeleter {
         var ret: AssetTypeDeleter? = null
         for (assetType in assetTypeMap.values) {
             val deleter = assetType.deleterClass.constructors.first().call()
@@ -36,7 +39,7 @@ class AssetTypeMap(private val filterFile: String? = null) {
         }
 
         if (ret == null) {
-            throw IllegalConfigException("Did not the path-pattern of any asset type $line")
+            throw IllegalConfigException("Identifier did not match the path-pattern of any asset type: $line")
         }
         return ret
     }
@@ -56,7 +59,7 @@ class AssetTypeMap(private val filterFile: String? = null) {
     }
 
 
-    private fun loadAssetTypesFromFile(): Map<String, AssetType> {
+    private fun loadAssetTypesFromFile(): LinkedHashMap<String, AssetType> {
         checkKeysSameInBothFiles()
         val ret = loadAssetTypesFile()
         loadListFilterFile(ret) //inout
@@ -105,12 +108,12 @@ class AssetTypeMap(private val filterFile: String? = null) {
     }
 
 
-    private fun loadAssetTypesFile(): Map<String, AssetType> {
-        val ret: MutableMap<String, AssetType> = TreeMap()
+    private fun loadAssetTypesFile(): LinkedHashMap<String, AssetType> {
+        val ret: LinkedHashMap<String, AssetType> = LinkedHashMap()
         FileInputStream(ASSET_TYPES_FILE).use { `in` ->
-            val props = Properties()
+            val props = OrderedProperties()
             props.load(`in`)
-            for ((k, v) in props.entries) {
+            for ((k, v) in props.entrySet()) {
                 val assetTypeId = k as String
                 if (!assetTypeRegex.matches(assetTypeId)) {
                     throw IllegalArgumentException("Unsupported asset type id $assetTypeId")
@@ -138,10 +141,15 @@ class AssetTypeMap(private val filterFile: String? = null) {
 
         fun filterKeys(fileName: String): List<String> {
             FileReader(fileName).use { `in` ->
-                val rootList = Yaml().loadAll(`in`).toList()
-                assert(rootList.size == 1) { rootList.size }
-                val filtersFromYaml = rootList.first() as Map<String, Map<String, Any>> //The Any is Boolean|String
-                return filtersFromYaml.keys.toList()
+                try {
+                    val rootList = Yaml().loadAll(`in`).toList()
+                    assert(rootList.size == 1) { rootList.size }
+                    val filtersFromYaml = rootList.first() as Map<String, Map<String, Any>> //The Any is Boolean|String
+                    return filtersFromYaml.keys.toList()
+                } catch (e: ScannerException) {
+                    throw IllegalArgumentException("$fileName is not a valid yaml file", e)
+                }
+
             }
         }
 

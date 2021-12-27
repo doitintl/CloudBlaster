@@ -10,12 +10,6 @@ class BucketTest(project: String) : TestBase(project) {
         listOf("storage.googleapis.com/Bucket")//use same value for both regional and multiregional
 
     override fun createAssets(sfx: String, project: String): List<String> {
-        fun makeBucket(project: String, location: String, bucketName: String) {
-            runCommand("gsutil mb -p $project -l $location gs://$bucketName")
-            println("Created $bucketName")
-        }
-
-
         val multiregionAsset = assetName("bucket-multiregion")
         val regionAsset = assetName("bucket-region")
         makeBucket(project, "us", multiregionAsset)
@@ -25,6 +19,11 @@ class BucketTest(project: String) : TestBase(project) {
     }
 
 
+}
+
+fun makeBucket(project: String, location: String, bucketName: String) {
+    runCommand("gsutil mb -p $project -l $location gs://$bucketName")
+    println("Created $bucketName")
 }
 
 

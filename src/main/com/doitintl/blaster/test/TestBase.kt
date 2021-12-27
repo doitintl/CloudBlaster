@@ -229,7 +229,10 @@ abstract class TestBase(val project: String, private val sfx: String = randomStr
         val outputRaw = tempAssetsToDeleteFile.readText()
         val output = noComment(outputRaw)
         if (expected != null) {
-            assert(expected.all { output.contains(it) }) { "expected $expected \nbut output $output" }
+            assert(expected.all { output.contains(it) }) {
+                val missing =expected.filter { !output.contains(it) }
+                "missing $expected \nbut output $output\n missing $missing"
+            }
 
             val filteredLines = output.split("\n").filter { it.isNotBlank() }
 
@@ -294,18 +297,15 @@ abstract class TestBase(val project: String, private val sfx: String = randomStr
     }
 
 
-    // todo Use fullpath as identifier for ALL asset types, not just where we have to.
-    // This will require developing the code to do that consistenly and easily.
-    // We use identifierIsFullPath == true where secondary assets are expected (e.g., GAE Service, GKE Cluster),
+    // todo Use fullpath as identifier for ALL asset types, not just where we have to, as today, where  we
+    //  use identifierIsFullPath == true where secondary assets are expected (e.g., GAE Service, GKE Cluster),
     // and then garbage may be left after the test (containers in the case GAE). Clean this garbage up.
-    // (The garbage is not special to Cloud Blaster or this test -- it will always happen when
-    // generating such assets.)
+    // (The garbage is not special to Cloud Blaster or this test -- it will always happen with such assets.)
 
     /**
-     * Use full path as identifier if secondary assets are expected (e.g., GAE Service which generates containers),
+     * We use full path as identifier if secondary assets are expected (e.g., GAE Service which generates containers),
      * because in these cases,the asset name by itself is not enough to identify the asset
      */
-
     open fun identifierIsFullPath(): Boolean {
         return false
     }

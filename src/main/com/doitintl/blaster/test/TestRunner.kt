@@ -73,6 +73,11 @@ fun messageForCleanup(project: String) {
 }
 
 
+/**
+ * Run all tests in the project.
+ * First argument is the project name.
+ * Second, optional argument, is "sync" for running tests seriallly, or "async" for running them in parallel.
+ */
 fun main(vararg args: String) {
     val start = currentTimeMillis()
     if (args.isEmpty()) {
@@ -81,17 +86,31 @@ fun main(vararg args: String) {
     }
     val project = args[0]
     println("Project $project")
+    var sync=false
+    if (args.size>1){
+        val syncS=args[1]
+        sync=when (syncS) {
+           "sync" -> true
+            "async" -> false
+            else -> throw IllegalStateException("Unknown sync type $syncS")
+        }
+    }
     val classes: List<KClass<out TestBase>> = listOf(
-        BucketTest::class,
-        PubSubTest::class,
-        GCETest::class,
-        CloudFunctionTest::class,
-        CloudRunTest::class,
-        GAEServiceTest::class,
-        GKETest::class,
+        //BucketTest::class,
+        //PubSubTest::class,
+        //GCETest::class,
+        //CloudFunctionTest::class,
+        //CloudRunTest::class,
+        //GAEServiceTest::class,
+        //GKETest::class,
+        LBTest::class
     )
+    val (successes, failures) = if (sync) {
+        runSync(classes, project)
+    } else {
+        runAsync(classes, project)
+    }
 
-    val (successes, failures) = runAsync(classes, project)
     val elapsedTimeSec = (currentTimeMillis() - start) / 1000
     println("TestRunner total time: ${elapsedTimeSec}s")
 

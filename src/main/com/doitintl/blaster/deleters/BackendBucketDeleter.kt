@@ -5,18 +5,21 @@ import com.doitintl.blaster.shared.Constants.ID
 import com.doitintl.blaster.shared.Constants.LOCATION
 import com.doitintl.blaster.shared.Constants.PROJECT
 
-class SubnetworkDeleter : GCEBaseDeleter() {
+class BackendBucketDeleter : GCEBaseDeleter() {
 
     override val pathPatterns: Array<String>
-        get() = arrayOf("//compute.googleapis.com/projects/{PROJECT}/regions/{LOCATION}/subnetworks/{ID}")
+        get() = arrayOf("//compute.googleapis.com/projects/{PROJECT}/global/backendBuckets/{ID}")
 
 
     override fun doDelete(p: Map<String, String>) {
         val project = p[PROJECT]!!
-        val location = p[LOCATION]!!
         val id = p[ID]
-        val operation = getComputeService().subnetworks().delete(project, location, id).execute()!!
-        waitOnRegionalOperation(project, location, operation)
+        val request = getComputeService().backendBuckets().delete(project, id)
+        val operation = request.execute()
+        waitOnGlobalOperation(project, operation)
+
     }
 
+
 }
+

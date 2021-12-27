@@ -2,6 +2,7 @@ package com.doitintl.blaster.deleter
 
 import com.doitintl.blaster.shared.IllegalConfigException
 import java.util.*
+import kotlin.collections.HashMap
 
 private val UPPERCASE_IN_CURLIES = Regex(""".*(\{[A-Z]+}).*""")
 private val GROUP_NAMES_IN_REGEX = Regex("""\?<([a-zA-Z][a-zA-Z0-9]*)>""")
@@ -31,13 +32,13 @@ abstract class BaseDeleter : AssetTypeDeleter {
                 break
             } else {
                 val idWIthCurlies = find.groupValues[1]
-                if (idWIthCurlies.toUpperCase() != idWIthCurlies) {
+                if (idWIthCurlies.uppercase(Locale.getDefault()) != idWIthCurlies) {
                     throw IllegalConfigException("Illegal pattern (expect upper-case identifiers): $pathPattern")
                 }
                 val id = idWIthCurlies.substring(1, idWIthCurlies.length - 1)
                 // The identifiers have constraints beyond just "not-slash" as below.
                 // But the goal is to capture the identifer, so a too-broad regex is OK so long as it is accurate and precise.
-                val idRegex = "(?<${id.toLowerCase()}>[^/]+)"
+                val idRegex = "(?<${id.lowercase(Locale.getDefault())}>[^/]+)"
                 pathPattern = pathPattern.replace(idWIthCurlies, idRegex)
             }
         }
